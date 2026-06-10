@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package rapharch.common;
+
+option go_package = "github.com/rapharch/api/proto/common";
+
+message Empty {}
+
+message Timestamp {
+  int64 seconds = 1;
+  int32 nanos = 2;
+}
+
+message Pagination {
+  int32 page = 1;
+  int32 limit = 2;
+  int32 total = 3;
+  int32 totalPages = 4;
+}
+
+message PaginationRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  string search = 3;
+  string sortBy = 4;
+  string sortOrder = 5;
+}
+
+message Error {
+  string message = 1;
+  string code = 2;
+  map<string, string> details = 3;
+}
+
+message ApiResponse {
+  bool success = 1;
+  string message = 2;
+  Error error = 3;
+}

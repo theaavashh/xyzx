@@ -1,0 +1,1 @@
+export { NewArrivalsSkeleton } from "./NewArrivalsSkeleton";

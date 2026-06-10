@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+package rapharch.product;
+
+import "common.proto";
+
+service ProductService {
+  rpc GetProduct(GetProductRequest) returns (ProductResponse);
+  rpc ListProducts(common.PaginationRequest) returns (ListProductsResponse);
+  rpc CreateProduct(CreateProductRequest) returns (ProductResponse);
+  rpc UpdateProduct(UpdateProductRequest) returns (ProductResponse);
+  rpc DeleteProduct(DeleteProductRequest) returns (common.ApiResponse);
+  rpc BulkDeleteProducts(BulkDeleteProductsRequest) returns (common.ApiResponse);
+}
+
+message Product {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  double price = 5;
+  double originalPrice = 6;
+  double costPrice = 7;
+  string sku = 8;
+  string barcode = 9;
+  int32 quantity = 10;
+  bool isActive = 11;
+  bool isFeatured = 12;
+  bool isDigital = 13;
+  string categoryId = 14;
+  string gender = 15;
+  repeated string images = 16;
+  string thumbnail = 17;
+  string createdAt = 18;
+  string updatedAt = 19;
+  map<string, string> attributes = 20;
+  repeated ProductVariant variants = 21;
+}
+
+message ProductVariant {
+  string id = 1;
+  string name = 2;
+  string sku = 3;
+  double price = 4;
+  int32 quantity = 5;
+  map<string, string> attributes = 6;
+}
+
+message GetProductRequest {
+  string id = 1;
+}
+
+message CreateProductRequest {
+  string name = 1;
+  string slug = 2;
+  string productCode = 3;
+  string categoryId = 4;
+  string description = 5;
+  string shortDescription = 6;
+  double price = 7;
+  double originalPrice = 8;
+  double costPrice = 9;
+  int32 quantity = 10;
+  string sku = 11;
+  string barcode = 12;
+  string gender = 13;
+  repeated string images = 14;
+  string thumbnail = 15;
+  bool isActive = 16;
+  bool isFeatured = 17;
+  bool isDigital = 18;
+  bool isVariant = 19;
+  repeated CreateProductVariant variants = 20;
+  repeated string tags = 21;
+  string seoTitle = 22;
+  string seoDescription = 23;
+}
+
+message CreateProductVariant {
+  string name = 1;
+  string sku = 2;
+  double price = 3;
+  int32 quantity = 4;
+  map<string, string> attributes = 5;
+}
+
+message UpdateProductRequest {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  double price = 5;
+  int32 quantity = 6;
+  bool isActive = 7;
+  bool isFeatured = 8;
+  repeated string images = 9;
+}
+
+message DeleteProductRequest {
+  string id = 1;
+}
+
+message BulkDeleteProductsRequest {
+  repeated string ids = 1;
+}
+
+message ProductResponse {
+  bool success = 1;
+  string message = 2;
+  Product data = 3;
+  common.Error error = 4;
+}
+
+message ListProductsResponse {
+  bool success = 1;
+  string message = 2;
+  repeated Product data = 3;
+  common.Pagination pagination = 4;
+  common.Error error = 5;
+}

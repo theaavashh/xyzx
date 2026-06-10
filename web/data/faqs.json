@@ -1,0 +1,58 @@
+[
+  {
+    "id": "1780414971529",
+    "question": "How do I place an order?",
+    "answer": "Browse our products, select your size and color, and click Add to Cart. Proceed to checkout.",
+    "category": "Orders",
+    "order": 1,
+    "isActive": true
+  },
+  {
+    "id": "1780415010861",
+    "question": "Can I modify or cancel my order?",
+    "answer": "Orders can be modified or canceled within 1 hour of placement.",
+    "category": "Orders",
+    "order": 2,
+    "isActive": true
+  },
+  {
+    "id": "1780415010886",
+    "question": "How do I track my order?",
+    "answer": "You will receive an email with a tracking number once your order ships.",
+    "category": "Orders",
+    "order": 3,
+    "isActive": true
+  },
+  {
+    "id": "1780415010921",
+    "question": "How much does shipping cost?",
+    "answer": "Free standard shipping on orders over $100. Standard $5.99, Express $12.99.",
+    "category": "Shipping",
+    "order": 1,
+    "isActive": true
+  },
+  {
+    "id": "1780415010950",
+    "question": "Do you ship internationally?",
+    "answer": "Yes, we ship to over 100 countries worldwide.",
+    "category": "Shipping",
+    "order": 2,
+    "isActive": true
+  },
+  {
+    "id": "1780415010968",
+    "question": "What payment methods do you accept?",
+    "answer": "Visa, MasterCard, Amex, Discover, PayPal, Apple Pay, Google Pay.",
+    "category": "Payment",
+    "order": 1,
+    "isActive": true
+  },
+  {
+    "id": "1780415010990",
+    "question": "Is my payment information secure?",
+    "answer": "Yes, we use industry-standard SSL encryption.",
+    "category": "Payment",
+    "order": 2,
+    "isActive": true
+  }
+]

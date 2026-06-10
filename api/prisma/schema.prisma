@@ -1,0 +1,1043 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+  binaryTargets   = ["native", "rhel-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("user")
+  isActive  Boolean  @default(true)
+  permissions Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  orders       Order[]
+  addresses    Address[]
+  userRewards  UserReward[]
+  notifications Notification[]
+  
+  @@index([role, isActive])
+  @@index([email, isActive])
+  @@index([createdAt(sort: Desc)])
+  @@map("users")
+}
+
+model Category {
+  id           String   @id @default(uuid())
+  name         String
+  slug         String   @unique
+  image        String?
+  internalLink String?
+  isActive     Boolean  @default(true)
+  parentId     String?
+  parent       Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children     Category[] @relation("CategoryHierarchy")
+  products     Product[] @relation("CategoryProducts")
+  metaTitle    String?
+  metaDescription String?
+  keywords     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@index([isActive])
+  @@index([name])
+  @@map("categories")
+}
+
+model Banner {
+  id        String   @id @default(uuid())
+  title     String
+  isActive  Boolean  @default(true)
+  position  String   @default("top")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, position])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("banners")
+}
+
+model HeroBanner {
+  id           String   @id @default(uuid())
+  title        String
+  subtitle     String?
+  largeImage   String?
+  smallImage   String?
+  videoUrl     String?
+  buttonUrl    String?
+  buttonText   String?
+  isActive     Boolean  @default(true)
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@index([isActive, order])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("hero_banners")
+}
+
+model FeaturedSection {
+  id          String   @id @default(uuid())
+  title       String   @default("")
+  subtitle    String?
+  description String?
+  image       String?
+  ctaUrl      String?
+  ctaText     String?
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([isActive, order])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("featured_sections")
+}
+
+model Product {
+  id                   String   @id @default(uuid())
+  name                 String
+  slug                 String   @unique
+  productCode          String?
+  description          String?
+  shortDescription     String?
+  materialCare         String?
+  disclaimer           String?
+  showMaterialCare     Boolean  @default(false)
+  
+  gender        String?
+  season        String?
+  material      String?
+  occasion      String?
+  fitType       String?
+  pattern       String?
+  sleeveStyle   String?
+  neckStyle     String?
+  washCare      String?
+  
+  tags                 Json?    @default("[]")
+  
+  sku       String?
+  barcode   String?
+  upc       String?
+  ean       String?
+  isbn      String?
+  
+  trackQuantity       Boolean  @default(true)
+  quantity            Int      @default(0)
+  lowStockThreshold   Int      @default(5)
+  allowBackorder      Boolean  @default(false)
+  manageStock         Boolean  @default(true)
+  
+  price             Float    @default(0)
+  originalPrice     Float?
+  costPrice         Float?
+  discountPercent   Float?
+  
+  weight     Float?
+  weightUnit String   @default("kg")
+  dimensions Json?
+  
+  images    Json?    @default("[]")
+  videos    Json?    @default("[]")
+  thumbnail String?
+
+  seoTitle                String?
+  seoDescription          String?
+  seoKeywords             Json?    @default("[]")
+  canonicalUrl            String?
+  robotsMeta              String?  @default("index,follow")
+  seoFriendlyImageFilename String?
+  imageAltText            String?
+  productSchema           Json?
+  brandSchema             Json?
+  breadcrumbSchema        Json?
+  itemListSchema          Json?
+  faqSchema               Json?
+  ogTitle                 String?
+  ogDescription           String?
+  ogImage                 String?
+  twitterCardMeta         Json?
+  productDescription      String?
+  faqs                    Json?
+  
+  isActive        Boolean  @default(true)
+  isDigital       Boolean  @default(false)
+  isFeatured      Boolean  @default(false)
+  isNew           Boolean  @default(false)
+  isOnSale        Boolean  @default(false)
+  isBestSeller    Boolean  @default(false)
+  isSales         Boolean  @default(false)
+  isNewSeller     Boolean  @default(false)
+  isFestivalOffer Boolean  @default(false)
+  visibility      String   @default("VISIBLE")
+  publishedAt     DateTime?
+  
+  requiresShipping Boolean @default(true)
+  shippingClass    String?
+  freeShipping     Boolean  @default(false)
+  
+  taxable  Boolean  @default(true)
+  taxClass String?
+  
+  categoryId     String
+  subCategoryId  String?
+  category       Category @relation("CategoryProducts", fields: [categoryId], references: [id], onDelete: Cascade)
+  brandId        String?
+  brand          Brand?   @relation(fields: [brandId], references: [id])
+  
+  orderItems  OrderItem[]
+  cartItems   CartItem[]
+  inventoryLogs InventoryLog[]
+  
+  customFields Json?
+  notes        String?
+ 
+  isVariant         Boolean   @default(false)
+  variantAttributes Json?     @default("[]")
+  selectedSizes     Json?     @default("[]")
+  selectedColors    Json?
+  variants          Json?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([categoryId, isActive])
+  @@index([brandId, isActive])
+  @@index([isFeatured, isActive])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@index([isDigital, isActive])
+  @@index([isOnSale, isActive])
+  @@index([visibility, isActive])
+  @@index([isBestSeller, isActive])
+  @@index([isNew, isActive])
+  @@index([categoryId, isFeatured, isActive])
+  @@index([name])
+  @@index([publishedAt, isActive])
+  @@index([quantity, isActive])
+  @@map("products")
+}
+
+model Brand {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  logo        String?
+  description String?
+  website     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  products    Product[]
+  
+  @@index([isActive])
+  @@index([name])
+  @@map("brands")
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  orderNumber     String      @unique
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  status          OrderStatus @default(PENDING)
+  subtotal        Float
+  tax             Float       @default(0)
+  shipping        Float       @default(0)
+  total           Float
+  currency        String      @default("USD")
+  
+  shippingName    String
+  shippingEmail   String
+  shippingPhone   String?
+  shippingAddress String
+  shippingCity    String
+  shippingState   String?
+  shippingCountry String
+  shippingZip     String
+  
+  billingName     String?
+  billingEmail    String?
+  billingPhone    String?
+  billingAddress  String?
+  billingCity     String?
+  billingState    String?
+  billingCountry  String?
+  billingZip      String?
+  
+  notes           String?
+  adminNotes      String?
+  
+  paymentMethod   String?
+  paymentStatus   String?
+  paidAt          DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  orderItems      OrderItem[]
+  userRewards     UserReward[]
+  delivery        Delivery?
+  
+  @@index([userId, status])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@index([paymentStatus])
+  @@index([orderNumber])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String @id @default(uuid())
+  orderId   String
+  order     Order  @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([orderId])
+  @@index([productId])
+  @@index([productId, orderId])
+  @@map("order_items")
+}
+
+model Cart {
+  id        String   @id @default(uuid())
+  userId    String?
+  sessionId String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items     CartItem[]
+
+  @@index([userId])
+  @@index([userId, updatedAt])
+  @@map("carts")
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int      @default(1)
+  size      String?
+  color     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId, size, color])
+  @@index([cartId])
+  @@index([productId])
+  @@map("cart_items")
+}
+
+model RewardSettings {
+  id          String   @id @default(uuid())
+  amountUnit  Float    @default(100)
+  rewardValue Int      @default(1)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+   
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("reward_settings")
+}
+
+model ColorSettings {
+  id                   String   @id @default(uuid())
+  primaryColor         String   @default("#D4AF37")
+  secondaryColor       String   @default("#10B981")
+  accentColor          String   @default("#F59E0B")
+  backgroundColor      String   @default("#FFFFFF")
+  textColor            String   @default("#1F2937")
+  buttonPrimaryBg      String   @default("#D4AF37")
+  buttonPrimaryText    String   @default("#FFFFFF")
+  buttonSecondaryBg    String   @default("#F3F4F6")
+  buttonSecondaryText  String   @default("#1F2937")
+  bannerBackgroundColor String   @default("#F9FAFB")
+  bannerTextColor       String   @default("#1F2937")
+  cardBackgroundColor  String   @default("#FFFFFF")
+  cardBorderColor      String   @default("#E5E7EB")
+  headerBackgroundColor String @default("#FFFFFF")
+  footerBackgroundColor String   @default("#1F2937")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+   
+  @@index([createdAt(sort: Desc)])
+  @@map("color_settings")
+}
+
+model UserReward {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+  orderId     String?
+  order       Order?     @relation(fields: [orderId], references: [id])
+  points      Int
+  type        RewardType @default(EARNED)
+  description String?
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+   
+  @@index([userId, isActive])
+  @@index([userId, type, createdAt(sort: Desc)])
+  @@index([orderId])
+  @@index([type, isActive, createdAt(sort: Desc)])
+  @@map("user_rewards")
+}
+
+model Coupon {
+  id                String    @id @default(uuid())
+  code              String    @unique
+  name              String
+  type              String    @default("percentage")
+  value             Float
+  minOrderAmount    Float?
+  maxDiscountAmount Float?
+  usageLimit        Int?
+  usedCount         Int       @default(0)
+  startDate         DateTime
+  endDate           DateTime
+  isActive          Boolean   @default(true)
+  applicableTo      String    @default("all")
+  applicableItems   Json?     @default("[]")
+  description       String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([code, isActive])
+  @@index([isActive, startDate, endDate])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("coupons")
+}
+
+enum RewardType {
+  EARNED
+  REDEEMED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+model NavigationItem {
+  id        String   @id @default(uuid())
+  name      String
+  href      String
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  columns   NavigationColumn[]
+  
+  @@index([isActive, order])
+  @@map("navigation_items")
+}
+
+model NavigationColumn {
+  id               String       @id @default(uuid())
+  title            String
+  href             String       @default("")
+  order            Int          @default(0)
+  navigationItemId String
+  navigationItem   NavigationItem @relation(fields: [navigationItemId], references: [id], onDelete: Cascade)
+  links            NavigationLink[]
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([navigationItemId, order])
+  @@map("navigation_columns")
+}
+
+model NavigationLink {
+  id       String   @id @default(uuid())
+  label    String
+  href     String
+  order    Int      @default(0)
+  columnId String
+  column   NavigationColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([columnId, order])
+  @@map("navigation_links")
+}
+
+model ShopByCategory {
+  id        String   @id @default(uuid())
+  title     String
+  image     String
+  link      String
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([isActive, order])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("shop_by_categories")
+}
+
+model ContentPage {
+  id            String   @id @default(uuid())
+  slug          String   @unique
+  title         String
+  content       String   @db.LongText
+  metaTitle     String?
+  metaDescription String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("content_pages")
+}
+
+model FooterCatalog {
+  id        String   @id @default(uuid())
+  title     String
+  href      String   @default("")
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  links     FooterCatalogLink[]
+  
+  @@index([isActive, order])
+  @@map("footer_catalogs")
+}
+
+model FooterCatalogLink {
+  id        String   @id @default(uuid())
+  label     String
+  href      String
+  order     Int      @default(0)
+  catalogId String
+  catalog   FooterCatalog @relation(fields: [catalogId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([catalogId, order])
+  @@map("footer_catalog_links")
+}
+
+model FooterSection {
+  id        String   @id @default(uuid())
+  title     String
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  links     FooterSectionLink[]
+  
+  @@index([isActive, order])
+  @@map("footer_sections")
+}
+
+model FooterSectionLink {
+  id        String   @id @default(uuid())
+  name      String
+  href      String
+  order     Int      @default(0)
+  sectionId String
+  section   FooterSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([sectionId, order])
+  @@map("footer_section_links")
+}
+
+model FollowSection {
+  id               String   @id @default(uuid())
+  brandName        String   @default("Rapharch")
+  street           String   @default("123 Fashion Avenue")
+  city             String   @default("New York")
+  state            String   @default("NY")
+  zip              String   @default("10001")
+  country          String   @default("United States")
+  copyrightText    String   @default("All rights reserved.")
+  designerCredit   String   @default("Designed by: M.A.P Tech Pvt. Ltd.")
+  showPaymentIcons Boolean  @default(true)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  serviceItems     FollowServiceItem[]
+  socialLinks      FollowSocialLink[]
+  
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("follow_sections")
+}
+
+model FollowServiceItem {
+  id              String   @id @default(uuid())
+  title           String
+  description     String
+  image           String
+  order           Int      @default(0)
+  isActive        Boolean  @default(true)
+  followSectionId String
+  followSection   FollowSection @relation(fields: [followSectionId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([followSectionId, order])
+  @@index([isActive, order])
+  @@map("follow_service_items")
+}
+
+model FollowSocialLink {
+  id              String   @id @default(uuid())
+  name            String
+  url             String
+  icon            String   @default("Facebook")
+  ariaLabel       String
+  order           Int      @default(0)
+  isActive        Boolean  @default(true)
+  followSectionId String
+  followSection   FollowSection @relation(fields: [followSectionId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([followSectionId, order])
+  @@index([isActive, order])
+  @@map("follow_social_links")
+}
+
+model SalesBanner {
+  id          String   @id @default(uuid())
+  title       String
+  subtitle    String?
+  image       String
+  buttonText  String?
+  buttonUrl   String?
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([isActive, order])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("sales_banners")
+}
+
+model JsonLdTemplate {
+  id        String   @id @default(uuid())
+  name      String
+  type      String
+  page      String   @default("global")
+  schema    Json
+  variables Json?
+  isActive  Boolean  @default(true)
+  priority  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([type])
+  @@index([page, isActive, priority])
+  @@index([isActive, priority])
+  @@map("json_ld_templates")
+}
+
+model SitemapConfig {
+  id        String   @id @default(uuid())
+  urls      Json     @default("[]")
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  
+  @@index([createdAt(sort: Desc)])
+  @@map("sitemap_config")
+}
+
+model RobotsConfig {
+  id        String   @id @default(uuid())
+  content   String   @db.LongText
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  
+  @@index([createdAt(sort: Desc)])
+  @@map("robots_config")
+}
+
+model EditorialSection {
+  id          String   @id @default(uuid())
+  season      String
+  title       String
+  description String?
+  ctaText     String?
+  ctaLink     String?
+  images      Json     @default("[]")
+  featureType String?
+  productIds  Json     @default("[]")
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([isActive, order])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("editorial_sections")
+}
+
+model DualCardSection {
+  id        String   @id @default(uuid())
+  cards     Json     @default("[]")
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([isActive, order])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("dual_card_sections")
+}
+
+model SiteSettings {
+  id                   String   @id @default(uuid())
+  siteName             String   @default("Rapharch")
+  siteDescription      String   @default("Your trusted online shopping destination")
+  siteUrl              String   @default("https://rapharch.com")
+  siteLogo             String?
+  siteFavicon          String?
+  
+  email                String   @default("info@rapharch.com")
+  phone                String?
+  address              String?
+  city                 String?
+  country              String   @default("Nepal")
+  
+  currency             String   @default("NPR")
+  timezone             String   @default("Asia/Kathmandu")
+  language             String   @default("en")
+  
+  paymentMethods       Json     @default("[\"cash\", \"card\", \"bank_transfer\", \"esewa\", \"khalti\"]")
+  taxRate              Float    @default(13)
+  shippingCost         Float    @default(100)
+  
+  emailNotifications   Boolean  @default(true)
+  smsNotifications     Boolean  @default(false)
+  pushNotifications    Boolean  @default(true)
+  
+  twoFactorAuth        Boolean  @default(false)
+  sessionTimeout       Int      @default(30)
+  passwordPolicy       String   @default("strong")
+  
+  lowStockThreshold    Int      @default(10)
+  autoReorder          Boolean  @default(false)
+  trackInventory       Boolean  @default(true)
+  
+  seoTitle             String?
+  seoDescription       String?
+  seoKeywords          String?
+  ogTitle              String?
+  ogDescription        String?
+  ogImage              String?
+  ogType               String   @default("website")
+  twitterCard          String   @default("summary_large_image")
+  twitterSite          String?
+  
+  googleAnalyticsId    String?
+  facebookPixelId      String?
+  conversionTracking   Boolean  @default(false)
+  
+  primaryColor         String   @default("#D4AF37")
+  secondaryColor       String   @default("#10B981")
+  accentColor          String   @default("#F59E0B")
+  backgroundColor      String   @default("#FFFFFF")
+  textColor            String   @default("#1F2937")
+  buttonPrimaryBg      String   @default("#D4AF37")
+  buttonPrimaryText    String   @default("#FFFFFF")
+  buttonSecondaryBg    String   @default("#F3F4F6")
+  buttonSecondaryText  String   @default("#1F2937")
+  bannerBackgroundColor String   @default("#F0F9FF")
+  bannerTextColor       String   @default("#1E40AF")
+  cardBackgroundColor  String   @default("#FFFFFF")
+  cardBorderColor      String   @default("#E5E7EB")
+  headerBackgroundColor String @default("#FFFFFF")
+  footerBackgroundColor String   @default("#1F2937")
+  theme                String   @default("light")
+  
+  defaultVariantImageWidth   Int     @default(800)
+  defaultVariantImageHeight  Int     @default(800)
+  variantAutoGeneration      Boolean @default(true)
+  allowVariantCombinations   Boolean @default(true)
+  showOutOfStockVariants     Boolean @default(false)
+  variantFallbackEnabled     Boolean @default(true)
+  variantAttributeTypes      String  @default("color,size,material")
+  
+  googleAnalyticsMeasurementId String?
+  googleAnalyticsTrackingId    String?
+  enhancedEcommerceEnabled     Boolean @default(false)
+  googleAdsEnabled             Boolean @default(false)
+  googleAdsConversionId        String?
+  googleAdsConversionLabel     String?
+  facebookConversionApiEnabled Boolean @default(false)
+  facebookConversionApiToken   String?
+  facebookPixelAdvancedMatching Boolean @default(false)
+  customTrackingScripts        String? @db.LongText
+  
+  stripePublishableKey      String?
+  stripeSecretKey           String?
+  stripeWebhookSecret       String?
+  bankApiKey                String?
+  australiaPostApiKey       String?
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  @@index([createdAt(sort: Desc)])
+  @@map("site_settings")
+}
+
+model InventoryLog {
+  id          String   @id @default(uuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId   String?
+  changeType  InventoryChangeType
+  quantity    Int
+  previousQuantity Int
+  newQuantity Int
+  source      InventorySource @default(ONLINE)
+  orderId     String?
+  reason      String?
+  performedBy String?
+  createdAt   DateTime @default(now())
+
+  @@index([productId])
+  @@index([productId, createdAt(sort: Desc)])
+  @@index([changeType])
+  @@index([source])
+  @@index([createdAt(sort: Desc)])
+  @@map("inventory_logs")
+}
+
+enum InventoryChangeType {
+  STOCK_ADDED
+  STOCK_DEDUCTED
+  STOCK_ADJUSTED
+  STOCK_RESERVED
+  STOCK_RELEASED
+  STOCK_RETURNED
+}
+
+enum InventorySource {
+  ONLINE
+  STORE
+  MANUAL
+  IMPORT
+  RETURN
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      NotificationType @default(SYSTEM)
+  isRead    Boolean  @default(false)
+  link      String?
+  orderId   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([type])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  ORDER
+  SYSTEM
+  PROMO
+  STOCK
+  DELIVERY
+  PAYMENT
+}
+
+model Delivery {
+  id               String   @id @default(uuid())
+  orderId          String   @unique
+  order            Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status           DeliveryStatus @default(PENDING)
+  trackingNumber   String?
+  carrier          String?
+  estimatedDelivery DateTime?
+  actualDelivery   DateTime?
+  notes            String?
+  locationHistory  Json?    @default("[]")
+  updatedBy        String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([status])
+  @@index([orderId])
+  @@index([estimatedDelivery])
+  @@map("deliveries")
+}
+
+model Address {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   @default("home")
+  name      String
+  phone     String
+  street    String
+  city      String
+  state     String?
+  zip       String
+  country   String   @default("Nepal")
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, isDefault])
+  @@map("addresses")
+}
+
+model FAQ {
+  id        String   @id @default(uuid())
+  question  String
+  answer    String   @db.LongText
+  category  String
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, order])
+  @@index([category])
+  @@map("faqs")
+}
+
+model ShippingItem {
+  id          String   @id @default(uuid())
+  type        String   // "method" | "info" | "region"
+  name        String?  // method name or info title
+  title       String?  // info title
+  region      String?  // region name
+  description String?  @db.Text
+  price       String?
+  time        String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type, isActive, order])
+  @@map("shipping_items")
+}
+
+model ShippingSettings {
+  id                         String   @id @default(uuid())
+  freeShippingThreshold      String   @default("$100")
+  freeInternationalThreshold String   @default("$200")
+  heroTitle                  String   @default("Shipping")
+  heroSubtitle               String   @default("Fast, reliable delivery worldwide")
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+
+  @@map("shipping_settings")
+}
+
+model StoreSection {
+  id          String   @id @default(uuid())
+  title       String   @default("Visit Our Store")
+  subtitle    String?
+  description String   @db.Text
+  address     String   @default("123 Fashion Avenue")
+  city        String   @default("New York")
+  state       String   @default("NY")
+  zip         String   @default("10001")
+  country     String   @default("United States")
+  phone       String?
+  email       String?
+  image       String?
+  mapEmbedUrl String?
+  ctaText     String   @default("Get In Touch")
+  ctaUrl      String   @default("/contact-us")
+  hours       Json     @default("[]")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+  @@map("store_sections")
+}
+
+model ContactSubmission {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String
+  message   String   @db.LongText
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([isRead, createdAt(sort: Desc)])
+  @@map("contact_submissions")
+}
+
+model AttributeOption {
+  id        String   @id @default(uuid())
+  type      String
+  value     String
+  label     String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([type, value])
+  @@index([type, isActive, sortOrder])
+  @@index([type])
+  @@map("attribute_options")
+}
+
+enum DeliveryStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+  CANCELLED
+}

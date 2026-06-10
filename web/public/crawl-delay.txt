@@ -1,0 +1,11 @@
+User-agent: Googlebot
+Crawl-delay: 1
+
+User-agent: Bingbot
+Crawl-delay: 1
+
+User-agent: Slurp
+Crawl-delay: 1
+
+User-agent: DuckDuckBot
+Crawl-delay: 1

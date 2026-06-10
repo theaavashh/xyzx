@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package rapharch.user;
+
+import "common.proto";
+
+service UserService {
+  rpc GetUser(GetUserRequest) returns (UserResponse);
+  rpc ListUsers(common.PaginationRequest) returns (ListUsersResponse);
+  rpc CreateUser(CreateUserRequest) returns (UserResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (common.ApiResponse);
+  rpc ToggleUserStatus(ToggleUserStatusRequest) returns (UserResponse);
+  rpc UpdateUserRole(UpdateUserRoleRequest) returns (UserResponse);
+}
+
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string role = 4;
+  bool isActive = 5;
+  string createdAt = 6;
+  string updatedAt = 7;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+  string role = 4;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string password = 4;
+  string role = 5;
+  bool isActive = 6;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+  string userId = 2;
+}
+
+message ToggleUserStatusRequest {
+  string id = 1;
+  string userId = 2;
+}
+
+message UpdateUserRoleRequest {
+  string id = 1;
+  string role = 2;
+  string userId = 3;
+}
+
+message UserResponse {
+  bool success = 1;
+  string message = 2;
+  User data = 3;
+  common.Error error = 4;
+}
+
+message ListUsersResponse {
+  bool success = 1;
+  string message = 2;
+  repeated User data = 3;
+  common.Pagination pagination = 4;
+  common.Error error = 5;
+}

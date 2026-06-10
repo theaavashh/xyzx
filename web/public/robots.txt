@@ -1,0 +1,40 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://rapharch.com/sitemap.xml
+
+# Block AI crawlers (optional)
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+# Block admin areas
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /favicon.ico
+Disallow: /*.json$
+
+# Allow specific paths for crawling
+Allow: /products/
+Allow: /categories/
+Allow: /contact-us
+Allow: /privacy-policy
+Allow: /terms-of-use
+Allow: /refund
+
+# Crawl delay (optional - adjust based on server capacity)
+Crawl-delay: 1

@@ -1,0 +1,1 @@
+export { SalesBannerSkeleton } from './SalesBannerSkeleton';

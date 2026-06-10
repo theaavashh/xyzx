@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package rapharch.admin;
+
+import "common.proto";
+import "cms.proto";
+
+service StaffService {
+  rpc GetStaff(common.PaginationRequest) returns (ListStaffResponse);
+  rpc GetStaffById(cms.GetByIdRequest) returns (StaffResponse);
+  rpc CreateStaff(CreateStaffRequest) returns (StaffResponse);
+  rpc UpdateStaff(UpdateStaffRequest) returns (StaffResponse);
+  rpc DeleteStaff(cms.GetByIdRequest) returns (common.ApiResponse);
+  rpc ToggleStaffStatus(cms.GetByIdRequest) returns (StaffResponse);
+  rpc UpdateStaffPermissions(UpdateStaffPermissionsRequest) returns (StaffResponse);
+}
+
+service AnalyticsService {
+  rpc GetRecentActivity(common.Empty) returns (AnalyticsResponse);
+  rpc GetRecentOrders(common.Empty) returns (AnalyticsResponse);
+  rpc GetSalesOverview(PeriodRequest) returns (AnalyticsResponse);
+  rpc GetOrdersChart(PeriodRequest) returns (AnalyticsResponse);
+  rpc GetTrafficOverview(common.Empty) returns (AnalyticsResponse);
+  rpc GetTopProducts(TopProductsRequest) returns (AnalyticsResponse);
+  rpc GetRevenueMetrics(PeriodRequest) returns (AnalyticsResponse);
+  rpc GetOrdersByStatus(common.Empty) returns (AnalyticsResponse);
+  rpc GetCategoryPerformance(common.Empty) returns (AnalyticsResponse);
+}
+
+service SettingsService {
+  rpc GetSettings(common.Empty) returns (SettingsResponse);
+  rpc UpdateSettings(UpdateSettingsRequest) returns (SettingsResponse);
+  rpc ResetSettings(common.Empty) returns (common.ApiResponse);
+}
+
+service ColorThemeService {
+  rpc GetColorSettings(common.Empty) returns (ColorThemeResponse);
+  rpc UpdateColorSettings(UpdateColorThemeRequest) returns (ColorThemeResponse);
+}
+
+service SeoService {
+  rpc GetSitemap(common.Empty) returns (SitemapResponse);
+  rpc UpdateSitemap(UpdateSitemapRequest) returns (SitemapResponse);
+  rpc AddSitemapUrl(AddSitemapUrlRequest) returns (SitemapResponse);
+  rpc DeleteSitemapUrl(DeleteSitemapUrlRequest) returns (common.ApiResponse);
+  rpc GenerateSitemap(common.Empty) returns (common.ApiResponse);
+  rpc GetRobots(common.Empty) returns (RobotsResponse);
+  rpc UpdateRobots(UpdateRobotsRequest) returns (RobotsResponse);
+}
+
+service JsonLdService {
+  rpc GetJsonLdTemplates(GetJsonLdTemplatesRequest) returns (ListJsonLdTemplatesResponse);
+  rpc GetJsonLdTemplateById(cms.GetByIdRequest) returns (JsonLdTemplateResponse);
+  rpc GetJsonLdForPage(GetJsonLdForPageRequest) returns (ListJsonLdTemplatesResponse);
+  rpc CreateJsonLdTemplate(CreateJsonLdTemplateRequest) returns (JsonLdTemplateResponse);
+  rpc UpdateJsonLdTemplate(UpdateJsonLdTemplateRequest) returns (JsonLdTemplateResponse);
+  rpc DeleteJsonLdTemplate(cms.GetByIdRequest) returns (common.ApiResponse);
+  rpc BulkDeleteJsonLdTemplates(BulkDeleteRequest) returns (common.ApiResponse);
+  rpc GetAvailableTypes(common.Empty) returns (TypesResponse);
+  rpc GetAvailablePages(common.Empty) returns (TypesResponse);
+}
+
+message CreateStaffRequest { string name = 1; string email = 2; string password = 3; string permissions = 4; }
+message UpdateStaffRequest { string id = 1; string name = 2; string email = 3; string password = 4; string permissions = 5; }
+message UpdateStaffPermissionsRequest { string id = 1; string permissions = 2; }
+message PeriodRequest { string period = 1; }
+message TopProductsRequest { int32 limit = 1; }
+message UpdateSettingsRequest { string settings = 1; }
+message UpdateColorThemeRequest { string primaryColor = 1; string secondaryColor = 2; string accentColor = 3; string backgroundColor = 4; string textColor = 5; string buttonPrimaryBg = 6; string buttonPrimaryText = 7; string buttonSecondaryBg = 8; string buttonSecondaryText = 9; string bannerBackgroundColor = 10; string bannerTextColor = 11; string cardBackgroundColor = 12; string cardBorderColor = 13; string headerBackgroundColor = 14; string footerBackgroundColor = 15; }
+message UpdateSitemapRequest { string urls = 1; }
+message AddSitemapUrlRequest { string url = 1; }
+message DeleteSitemapUrlRequest { string loc = 1; }
+message UpdateRobotsRequest { string content = 1; }
+message GetJsonLdTemplatesRequest { string type = 1; string page = 2; bool isActive = 3; }
+message GetJsonLdForPageRequest { string page = 1; string variables = 2; }
+message CreateJsonLdTemplateRequest { string name = 1; string type = 2; string page = 3; string schema = 4; string variables = 5; bool isActive = 6; int32 priority = 7; }
+message UpdateJsonLdTemplateRequest { string id = 1; string name = 2; string type = 3; string page = 4; string schema = 5; string variables = 6; bool isActive = 7; int32 priority = 8; }
+message BulkDeleteRequest { repeated string ids = 1; }
+
+message Staff { string id = 1; string name = 2; string email = 3; string role = 4; string permissions = 5; bool isActive = 6; string createdAt = 7; string updatedAt = 8; }
+message ColorTheme { string primaryColor = 1; string secondaryColor = 2; string accentColor = 3; string backgroundColor = 4; string textColor = 5; string buttonPrimaryBg = 6; string buttonPrimaryText = 7; string buttonSecondaryBg = 8; string buttonSecondaryText = 9; string bannerBackgroundColor = 10; string bannerTextColor = 11; string cardBackgroundColor = 12; string cardBorderColor = 13; string headerBackgroundColor = 14; string footerBackgroundColor = 15; }
+message JsonLdTemplate { string id = 1; string name = 2; string type = 3; string page = 4; string schema = 5; string variables = 6; bool isActive = 7; int32 priority = 8; string createdAt = 9; string updatedAt = 10; }
+
+message StaffResponse { bool success = 1; string message = 2; Staff data = 3; common.Error error = 4; }
+message ListStaffResponse { bool success = 1; string message = 2; repeated Staff data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message AnalyticsResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message SettingsResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message ColorThemeResponse { bool success = 1; string message = 2; ColorTheme data = 3; common.Error error = 4; }
+message SitemapResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message RobotsResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message JsonLdTemplateResponse { bool success = 1; string message = 2; JsonLdTemplate data = 3; common.Error error = 4; }
+message ListJsonLdTemplatesResponse { bool success = 1; string message = 2; repeated JsonLdTemplate data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message TypesResponse { bool success = 1; string message = 2; repeated string data = 3; common.Error error = 4; }

@@ -1,0 +1,57 @@
+upstream api_http {
+    least_conn;
+    server api:9999 max_fails=3 fail_timeout=30s;
+}
+
+upstream api_grpc {
+    least_conn;
+    server api:50051 max_fails=3 fail_timeout=30s;
+}
+
+server {
+    listen 80;
+    server_name _;
+
+    location /api/ {
+        proxy_pass http://api_http;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_read_timeout 60s;
+        proxy_send_timeout 60s;
+    }
+
+    location /health {
+        proxy_pass http://api_http;
+    }
+
+    location /metrics {
+        proxy_pass http://api_http;
+    }
+
+    location /uploads/ {
+        proxy_pass http://api_http;
+        proxy_buffering off;
+        proxy_cache off;
+    }
+
+    location / {
+        return 404;
+    }
+}
+
+server {
+    listen 50052 http2;
+    server_name _;
+
+    grpc_pass grpc://api_grpc;
+    grpc_set_header Host $host;
+    grpc_set_header X-Real-IP $remote_addr;
+    grpc_read_timeout 60s;
+    grpc_send_timeout 60s;
+}

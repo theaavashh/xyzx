@@ -1,0 +1,22 @@
+-- Create color_settings table
+CREATE TABLE IF NOT EXISTS `color_settings` (
+  `id` CHAR(36) NOT NULL DEFAULT (UUID()),
+  `primaryColor` VARCHAR(255) NOT NULL DEFAULT '#3B82F6',
+  `secondaryColor` VARCHAR(255) NOT NULL DEFAULT '#10B981',
+  `accentColor` VARCHAR(255) NOT NULL DEFAULT '#F59E0B',
+  `backgroundColor` VARCHAR(255) NOT NULL DEFAULT '#FFFFFF',
+  `textColor` VARCHAR(255) NOT NULL DEFAULT '#1F2937',
+  `buttonPrimaryBg` VARCHAR(255) NOT NULL DEFAULT '#3B82F6',
+  `buttonPrimaryText` VARCHAR(255) NOT NULL DEFAULT '#FFFFFF',
+  `buttonSecondaryBg` VARCHAR(255) NOT NULL DEFAULT '#F3F4F6',
+  `buttonSecondaryText` VARCHAR(255) NOT NULL DEFAULT '#1F2937',
+  `bannerBackgroundColor` VARCHAR(255) NOT NULL DEFAULT '#F9FAFB',
+  `bannerTextColor` VARCHAR(255) NOT NULL DEFAULT '#1F2937',
+  `cardBackgroundColor` VARCHAR(255) NOT NULL DEFAULT '#FFFFFF',
+  `cardBorderColor` VARCHAR(255) NOT NULL DEFAULT '#E5E7EB',
+  `headerBackgroundColor` VARCHAR(255) NOT NULL DEFAULT '#FFFFFF',
+  `footerBackgroundColor` VARCHAR(255) NOT NULL DEFAULT '#1F2937',
+  `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

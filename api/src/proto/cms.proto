@@ -1,0 +1,148 @@
+syntax = "proto3";
+
+package rapharch.cms;
+
+import "common.proto";
+
+service BannerService {
+  rpc GetBanners(common.PaginationRequest) returns (ListBannersResponse);
+  rpc GetActiveBanners(GetActiveBannersRequest) returns (ListBannersResponse);
+  rpc GetBannerById(GetByIdRequest) returns (BannerResponse);
+  rpc CreateBanner(CreateBannerRequest) returns (BannerResponse);
+  rpc UpdateBanner(UpdateBannerRequest) returns (BannerResponse);
+  rpc DeleteBanner(GetByIdRequest) returns (common.ApiResponse);
+  rpc ToggleBannerStatus(GetByIdRequest) returns (BannerResponse);
+}
+
+service HeroBannerService {
+  rpc GetHeroBanners(common.PaginationRequest) returns (ListHeroBannersResponse);
+  rpc GetActiveHeroBanners(common.Empty) returns (ListHeroBannersResponse);
+  rpc GetHeroBannerById(GetByIdRequest) returns (HeroBannerResponse);
+  rpc CreateHeroBanner(CreateHeroBannerRequest) returns (HeroBannerResponse);
+  rpc UpdateHeroBanner(UpdateHeroBannerRequest) returns (HeroBannerResponse);
+  rpc DeleteHeroBanner(GetByIdRequest) returns (common.ApiResponse);
+  rpc ToggleHeroBannerStatus(GetByIdRequest) returns (HeroBannerResponse);
+  rpc ReorderHeroBanners(ReorderRequest) returns (common.ApiResponse);
+}
+
+service EditorialSectionService {
+  rpc GetEditorialSections(common.PaginationRequest) returns (ListEditorialSectionsResponse);
+  rpc GetActiveEditorialSections(common.Empty) returns (ListEditorialSectionsResponse);
+  rpc GetEditorialSectionById(GetByIdRequest) returns (EditorialSectionResponse);
+  rpc CreateEditorialSection(CreateEditorialSectionRequest) returns (EditorialSectionResponse);
+  rpc UpdateEditorialSection(UpdateEditorialSectionRequest) returns (EditorialSectionResponse);
+  rpc DeleteEditorialSection(GetByIdRequest) returns (common.ApiResponse);
+  rpc ToggleEditorialSectionStatus(GetByIdRequest) returns (EditorialSectionResponse);
+  rpc ReorderEditorialSections(ReorderRequest) returns (common.ApiResponse);
+}
+
+service DualCardSectionService {
+  rpc GetDualCardSections(common.PaginationRequest) returns (ListDualCardSectionsResponse);
+  rpc GetActiveDualCardSections(common.Empty) returns (ListDualCardSectionsResponse);
+  rpc GetDualCardSectionById(GetByIdRequest) returns (DualCardSectionResponse);
+  rpc CreateDualCardSection(CreateDualCardSectionRequest) returns (DualCardSectionResponse);
+  rpc UpdateDualCardSection(UpdateDualCardSectionRequest) returns (DualCardSectionResponse);
+  rpc DeleteDualCardSection(GetByIdRequest) returns (common.ApiResponse);
+  rpc ToggleDualCardSectionStatus(GetByIdRequest) returns (DualCardSectionResponse);
+  rpc ReorderDualCardSections(ReorderRequest) returns (common.ApiResponse);
+}
+
+service FeaturedSectionService {
+  rpc GetFeaturedSections(common.PaginationRequest) returns (ListFeaturedSectionsResponse);
+  rpc GetActiveFeaturedSections(common.Empty) returns (ListFeaturedSectionsResponse);
+  rpc GetFeaturedSectionById(GetByIdRequest) returns (FeaturedSectionResponse);
+  rpc CreateFeaturedSection(CreateFeaturedSectionRequest) returns (FeaturedSectionResponse);
+  rpc UpdateFeaturedSection(UpdateFeaturedSectionRequest) returns (FeaturedSectionResponse);
+  rpc DeleteFeaturedSection(GetByIdRequest) returns (common.ApiResponse);
+  rpc ToggleFeaturedSectionStatus(GetByIdRequest) returns (FeaturedSectionResponse);
+  rpc ReorderFeaturedSections(ReorderRequest) returns (common.ApiResponse);
+}
+
+service FollowSectionService {
+  rpc GetFollowSection(common.Empty) returns (FollowSectionResponse);
+  rpc GetAllFollowSections(common.Empty) returns (ListFollowSectionsResponse);
+  rpc GetFollowSectionById(GetByIdRequest) returns (FollowSectionResponse);
+  rpc CreateFollowSection(CreateFollowSectionRequest) returns (FollowSectionResponse);
+  rpc UpdateFollowSection(UpdateFollowSectionRequest) returns (FollowSectionResponse);
+  rpc DeleteFollowSection(GetByIdRequest) returns (common.ApiResponse);
+  rpc ToggleFollowSectionStatus(GetByIdRequest) returns (FollowSectionResponse);
+}
+
+service SalesBannerService {
+  rpc GetSalesBanners(common.PaginationRequest) returns (ListSalesBannersResponse);
+  rpc GetActiveSalesBanners(common.Empty) returns (ListSalesBannersResponse);
+  rpc GetSalesBannerById(GetByIdRequest) returns (SalesBannerResponse);
+  rpc CreateSalesBanner(CreateSalesBannerRequest) returns (SalesBannerResponse);
+  rpc UpdateSalesBanner(UpdateSalesBannerRequest) returns (SalesBannerResponse);
+  rpc DeleteSalesBanner(GetByIdRequest) returns (common.ApiResponse);
+  rpc ToggleSalesBannerStatus(GetByIdRequest) returns (SalesBannerResponse);
+  rpc ReorderSalesBanners(ReorderRequest) returns (common.ApiResponse);
+}
+
+service ContentService {
+  rpc GetContentPages(common.PaginationRequest) returns (ListContentPagesResponse);
+  rpc GetContentPageBySlug(GetBySlugRequest) returns (ContentPageResponse);
+  rpc GetContentPageById(GetByIdRequest) returns (ContentPageResponse);
+  rpc CreateContentPage(CreateContentPageRequest) returns (ContentPageResponse);
+  rpc UpdateContentPage(UpdateContentPageRequest) returns (ContentPageResponse);
+  rpc UpsertContentBySlug(UpsertContentRequest) returns (ContentPageResponse);
+  rpc DeleteContentPage(GetByIdRequest) returns (common.ApiResponse);
+  rpc ToggleContentPageStatus(GetByIdRequest) returns (ContentPageResponse);
+}
+
+message GetByIdRequest { string id = 1; }
+message GetBySlugRequest { string slug = 1; }
+message GetActiveBannersRequest { string position = 1; }
+message ReorderRequest { repeated OrderItem orders = 1; }
+message OrderItem { string id = 1; int32 order = 2; }
+
+message CreateBannerRequest { string title = 1; bool isActive = 2; string position = 3; }
+message UpdateBannerRequest { string id = 1; string title = 2; bool isActive = 3; string position = 4; }
+
+message CreateHeroBannerRequest { string title = 1; string subtitle = 2; string largeImage = 3; string smallImage = 4; string videoUrl = 5; string buttonUrl = 6; string buttonText = 7; bool isActive = 8; int32 order = 9; }
+message UpdateHeroBannerRequest { string id = 1; string title = 2; string subtitle = 3; string largeImage = 4; string smallImage = 5; string videoUrl = 6; string buttonUrl = 7; string buttonText = 8; bool isActive = 9; int32 order = 10; }
+
+message CreateEditorialSectionRequest { string season = 1; string title = 2; string description = 3; string ctaText = 4; string ctaLink = 5; repeated string images = 6; string featureType = 7; repeated string productIds = 8; bool isActive = 9; int32 order = 10; }
+message UpdateEditorialSectionRequest { string id = 1; string season = 2; string title = 3; string description = 4; string ctaText = 5; string ctaLink = 6; repeated string images = 7; string featureType = 8; repeated string productIds = 9; bool isActive = 10; int32 order = 11; }
+
+message CreateDualCardSectionRequest { string cards = 1; bool isActive = 2; int32 order = 3; }
+message UpdateDualCardSectionRequest { string id = 1; string cards = 2; bool isActive = 3; int32 order = 4; }
+
+message CreateFeaturedSectionRequest { string title = 1; string subtitle = 2; string description = 3; string image = 4; string ctaUrl = 5; string ctaText = 6; bool isActive = 7; int32 order = 8; }
+message UpdateFeaturedSectionRequest { string id = 1; string title = 2; string subtitle = 3; string description = 4; string image = 5; string ctaUrl = 6; string ctaText = 7; bool isActive = 8; int32 order = 9; }
+
+message CreateFollowSectionRequest { string brandName = 1; string street = 2; string city = 3; string state = 4; string zip = 5; string country = 6; bool isActive = 7; string serviceItems = 8; string socialLinks = 9; }
+message UpdateFollowSectionRequest { string id = 1; string brandName = 2; string street = 3; string city = 4; string state = 5; string zip = 6; string country = 7; bool isActive = 8; string serviceItems = 9; string socialLinks = 10; }
+
+message CreateSalesBannerRequest { string title = 1; string subtitle = 2; string image = 3; string buttonText = 4; string buttonUrl = 5; bool isActive = 6; int32 order = 7; }
+message UpdateSalesBannerRequest { string id = 1; string title = 2; string subtitle = 3; string image = 4; string buttonText = 5; string buttonUrl = 6; bool isActive = 7; int32 order = 8; }
+
+message CreateContentPageRequest { string slug = 1; string title = 2; string content = 3; string metaTitle = 4; string metaDescription = 5; }
+message UpdateContentPageRequest { string id = 1; string title = 2; string content = 3; string metaTitle = 4; string metaDescription = 5; bool isActive = 6; }
+message UpsertContentRequest { string slug = 1; string title = 2; string content = 3; string metaTitle = 4; string metaDescription = 5; bool isActive = 6; }
+
+message Banner { string id = 1; string title = 2; bool isActive = 3; string position = 4; string createdAt = 5; string updatedAt = 6; }
+message HeroBanner { string id = 1; string title = 2; string subtitle = 3; string largeImage = 4; string smallImage = 5; string videoUrl = 6; string buttonUrl = 7; string buttonText = 8; bool isActive = 9; int32 order = 10; string createdAt = 11; string updatedAt = 12; }
+message EditorialSection { string id = 1; string season = 2; string title = 3; string description = 4; string ctaText = 5; string ctaLink = 6; repeated string images = 7; string featureType = 8; bool isActive = 9; int32 order = 10; string createdAt = 11; string updatedAt = 12; }
+message DualCardSection { string id = 1; string cards = 2; bool isActive = 3; int32 order = 4; string createdAt = 5; string updatedAt = 6; }
+message FeaturedSection { string id = 1; string title = 2; string subtitle = 3; string description = 4; string image = 5; string ctaUrl = 6; string ctaText = 7; bool isActive = 8; int32 order = 9; string createdAt = 10; string updatedAt = 11; }
+message FollowSection { string id = 1; string brandName = 2; string street = 3; string city = 4; string state = 5; string zip = 6; string country = 7; bool isActive = 8; string serviceItems = 9; string socialLinks = 10; string createdAt = 11; string updatedAt = 12; }
+message SalesBanner { string id = 1; string title = 2; string subtitle = 3; string image = 4; string buttonText = 5; string buttonUrl = 6; bool isActive = 7; int32 order = 8; string createdAt = 9; string updatedAt = 10; }
+message ContentPage { string id = 1; string slug = 2; string title = 3; string content = 4; string metaTitle = 5; string metaDescription = 6; bool isActive = 7; string createdAt = 8; string updatedAt = 9; }
+
+message BannerResponse { bool success = 1; string message = 2; Banner data = 3; common.Error error = 4; }
+message ListBannersResponse { bool success = 1; string message = 2; repeated Banner data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message HeroBannerResponse { bool success = 1; string message = 2; HeroBanner data = 3; common.Error error = 4; }
+message ListHeroBannersResponse { bool success = 1; string message = 2; repeated HeroBanner data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message EditorialSectionResponse { bool success = 1; string message = 2; EditorialSection data = 3; common.Error error = 4; }
+message ListEditorialSectionsResponse { bool success = 1; string message = 2; repeated EditorialSection data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message DualCardSectionResponse { bool success = 1; string message = 2; DualCardSection data = 3; common.Error error = 4; }
+message ListDualCardSectionsResponse { bool success = 1; string message = 2; repeated DualCardSection data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message FeaturedSectionResponse { bool success = 1; string message = 2; FeaturedSection data = 3; common.Error error = 4; }
+message ListFeaturedSectionsResponse { bool success = 1; string message = 2; repeated FeaturedSection data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message FollowSectionResponse { bool success = 1; string message = 2; FollowSection data = 3; common.Error error = 4; }
+message ListFollowSectionsResponse { bool success = 1; string message = 2; repeated FollowSection data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message SalesBannerResponse { bool success = 1; string message = 2; SalesBanner data = 3; common.Error error = 4; }
+message ListSalesBannersResponse { bool success = 1; string message = 2; repeated SalesBanner data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message ContentPageResponse { bool success = 1; string message = 2; ContentPage data = 3; common.Error error = 4; }
+message ListContentPagesResponse { bool success = 1; string message = 2; repeated ContentPage data = 3; common.Pagination pagination = 4; common.Error error = 5; }

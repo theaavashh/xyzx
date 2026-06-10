@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rapharch
+  labels:
+    app.kubernetes.io/name: rapharch
+    app.kubernetes.io/part-of: rapharch-ecommerce

@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package rapharch.order;
+
+import "common.proto";
+
+service OrderService {
+  rpc GetOrder(GetOrderRequest) returns (OrderResponse);
+  rpc ListOrders(common.PaginationRequest) returns (ListOrdersResponse);
+  rpc CreateOrder(CreateOrderRequest) returns (OrderResponse);
+  rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (OrderResponse);
+  rpc CancelOrder(CancelOrderRequest) returns (OrderResponse);
+}
+
+message Order {
+  string id = 1;
+  string orderNumber = 2;
+  string userId = 3;
+  double subtotal = 4;
+  double tax = 5;
+  double shipping = 6;
+  double total = 7;
+  string currency = 8;
+  string status = 9;
+  string paymentMethod = 10;
+  string shippingName = 11;
+  string shippingEmail = 12;
+  string shippingPhone = 13;
+  string shippingAddress = 14;
+  string shippingCity = 15;
+  string shippingState = 16;
+  string shippingCountry = 17;
+  string shippingZip = 18;
+  string billingName = 19;
+  string billingEmail = 20;
+  string billingPhone = 21;
+  string billingAddress = 22;
+  string billingCity = 23;
+  string billingState = 24;
+  string billingCountry = 25;
+  string billingZip = 26;
+  string notes = 27;
+  string createdAt = 28;
+  string updatedAt = 29;
+  repeated OrderItem items = 30;
+}
+
+message OrderItem {
+  string id = 1;
+  string productId = 2;
+  string productName = 3;
+  string sku = 4;
+  double price = 5;
+  int32 quantity = 6;
+  double total = 7;
+}
+
+message GetOrderRequest {
+  string id = 1;
+}
+
+message CreateOrderRequest {
+  string userId = 1;
+  double subtotal = 2;
+  double tax = 3;
+  double shipping = 4;
+  double total = 5;
+  string currency = 6;
+  string shippingName = 7;
+  string shippingEmail = 8;
+  string shippingPhone = 9;
+  string shippingAddress = 10;
+  string shippingCity = 11;
+  string shippingState = 12;
+  string shippingCountry = 13;
+  string shippingZip = 14;
+  string billingName = 15;
+  string billingEmail = 16;
+  string billingPhone = 17;
+  string billingAddress = 18;
+  string billingCity = 19;
+  string billingState = 20;
+  string billingCountry = 21;
+  string billingZip = 22;
+  string notes = 23;
+  string paymentMethod = 24;
+  repeated CreateOrderItem items = 25;
+}
+
+message CreateOrderItem {
+  string productId = 1;
+  string productName = 2;
+  string sku = 3;
+  double price = 4;
+  int32 quantity = 5;
+}
+
+message UpdateOrderStatusRequest {
+  string id = 1;
+  string status = 2;
+  string adminNotes = 3;
+}
+
+message CancelOrderRequest {
+  string id = 1;
+  string reason = 2;
+}
+
+message OrderResponse {
+  bool success = 1;
+  string message = 2;
+  Order data = 3;
+  common.Error error = 4;
+}
+
+message ListOrdersResponse {
+  bool success = 1;
+  string message = 2;
+  repeated Order data = 3;
+  common.Pagination pagination = 4;
+  common.Error error = 5;
+}

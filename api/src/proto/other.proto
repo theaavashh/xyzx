@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+package rapharch.other;
+
+import "common.proto";
+import "cms.proto";
+
+service InventoryService {
+  rpc GetInventoryStats(common.Empty) returns (InventoryStatsResponse);
+  rpc GetStock(cms.GetByIdRequest) returns (StockResponse);
+  rpc UpdateStock(UpdateStockRequest) returns (StockResponse);
+  rpc GetLowStockProducts(GetLowStockRequest) returns (StockResponse);
+  rpc GetInventoryLogs(GetInventoryLogsRequest) returns (InventoryLogsResponse);
+  rpc DeductStockForStoreSale(DeductStockRequest) returns (InventoryResponse);
+  rpc BulkUpdateStock(BulkUpdateStockRequest) returns (InventoryResponse);
+}
+
+service PosService {
+  rpc CreatePosSale(CreatePosSaleRequest) returns (PosSaleResponse);
+  rpc ListPosSales(PosSalesListRequest) returns (ListPosSalesResponse);
+  rpc GetPosSale(cms.GetByIdRequest) returns (PosSaleResponse);
+}
+
+service NotificationService {
+  rpc GetNotifications(GetNotificationsRequest) returns (ListNotificationsResponse);
+  rpc CreateNotification(CreateNotificationRequest) returns (NotificationResponse);
+  rpc CreateBulkNotifications(CreateBulkNotificationsRequest) returns (common.ApiResponse);
+  rpc MarkAsRead(cms.GetByIdRequest) returns (NotificationResponse);
+  rpc MarkAllAsRead(UserContextRequest) returns (common.ApiResponse);
+  rpc MarkAsUnread(cms.GetByIdRequest) returns (NotificationResponse);
+  rpc DeleteNotification(cms.GetByIdRequest) returns (common.ApiResponse);
+  rpc ClearAll(UserContextRequest) returns (common.ApiResponse);
+  rpc GetUnreadCount(UserContextRequest) returns (UnreadCountResponse);
+}
+
+service ContactService {
+  rpc SubmitContact(SubmitContactRequest) returns (common.ApiResponse);
+  rpc GetSubmissions(common.Empty) returns (ListContactSubmissionsResponse);
+  rpc GetSubmission(cms.GetByIdRequest) returns (ContactSubmissionResponse);
+  rpc DeleteSubmission(cms.GetByIdRequest) returns (common.ApiResponse);
+  rpc MarkContactAsRead(cms.GetByIdRequest) returns (common.ApiResponse);
+}
+
+service FaqService {
+  rpc GetFAQs(common.Empty) returns (ListFaqsResponse);
+  rpc GetAllFAQs(common.Empty) returns (ListFaqsResponse);
+  rpc GetFAQById(cms.GetByIdRequest) returns (FaqResponse);
+  rpc CreateFAQ(CreateFaqRequest) returns (FaqResponse);
+  rpc UpdateFAQ(UpdateFaqRequest) returns (FaqResponse);
+  rpc DeleteFAQ(cms.GetByIdRequest) returns (common.ApiResponse);
+  rpc ToggleFAQStatus(cms.GetByIdRequest) returns (FaqResponse);
+}
+
+service AttributeOptionService {
+  rpc GetAttributeOptions(GetAttributeOptionsRequest) returns (ListAttributeOptionsResponse);
+  rpc CreateAttributeOption(CreateAttributeOptionRequest) returns (AttributeOptionResponse);
+  rpc DeleteAttributeOption(cms.GetByIdRequest) returns (common.ApiResponse);
+}
+
+service AddressService {
+  rpc GetAddresses(UserContextRequest) returns (ListAddressesResponse);
+  rpc CreateAddress(CreateAddressRequest) returns (AddressResponse);
+  rpc UpdateAddress(UpdateAddressRequest) returns (AddressResponse);
+  rpc DeleteAddress(DeleteAddressRequest) returns (common.ApiResponse);
+  rpc SetDefaultAddress(SetDefaultAddressRequest) returns (AddressResponse);
+}
+
+service PublicUserService {
+  rpc CreatePublicUser(CreatePublicUserRequest) returns (PublicUserResponse);
+}
+
+message UserContextRequest { string userId = 1; }
+message GetLowStockRequest { int32 threshold = 1; }
+message GetInventoryLogsRequest { string productId = 1; int32 limit = 2; int32 offset = 3; }
+message GetNotificationsRequest { string userId = 1; bool unread = 2; int32 limit = 3; int32 offset = 4; }
+message GetAttributeOptionsRequest { string type = 1; bool isActive = 2; }
+
+message UpdateStockRequest { string productId = 1; int32 quantity = 2; string changeType = 3; string source = 4; string reason = 5; }
+message DeductStockForStoreSaleItem { string productId = 1; int32 quantity = 2; }
+message DeductStockRequest { repeated DeductStockForStoreSaleItem items = 1; string saleId = 2; string customerName = 3; string customerPhone = 4; double subtotal = 5; double tax = 6; double total = 7; }
+message BulkUpdateStockItem { string productId = 1; int32 quantity = 2; string changeType = 3; string reason = 4; }
+message BulkUpdateStockRequest { repeated BulkUpdateStockItem updates = 1; }
+
+message CreatePosSaleRequest { repeated PosSaleItem items = 1; string customerName = 2; string customerPhone = 3; double subtotal = 4; double tax = 5; double discount = 6; double total = 7; string paymentMethod = 8; }
+message PosSaleItem { string productId = 1; string productName = 2; int32 quantity = 3; double price = 4; }
+message PosSalesListRequest { int32 page = 1; int32 limit = 2; string search = 3; }
+
+message CreateNotificationRequest { string userId = 1; string title = 2; string message = 3; string type = 4; string link = 5; string orderId = 6; }
+message CreateBulkNotificationsRequest { repeated string userIds = 1; string title = 2; string message = 3; string type = 4; string link = 5; }
+
+message SubmitContactRequest { string name = 1; string email = 2; string subject = 3; string message = 4; }
+message CreateFaqRequest { string question = 1; string answer = 2; string category = 3; int32 order = 4; bool isActive = 5; }
+message UpdateFaqRequest { string id = 1; string question = 2; string answer = 3; string category = 4; int32 order = 5; bool isActive = 6; }
+
+message CreateAttributeOptionRequest { string type = 1; string value = 2; string label = 3; int32 sortOrder = 4; bool isActive = 5; }
+
+message CreateAddressRequest { string userId = 1; string type = 2; string name = 3; string phone = 4; string street = 5; string city = 6; string state = 7; string zip = 8; string country = 9; bool isDefault = 10; }
+message UpdateAddressRequest { string id = 1; string userId = 2; string type = 3; string name = 4; string phone = 5; string street = 6; string city = 7; string state = 8; string zip = 9; string country = 10; bool isDefault = 11; }
+message DeleteAddressRequest { string id = 1; string userId = 2; }
+message SetDefaultAddressRequest { string id = 1; string userId = 2; }
+
+message CreatePublicUserRequest { string name = 1; string email = 2; string password = 3; }
+
+message Notification { string id = 1; string userId = 2; string title = 3; string message = 4; string type = 5; string link = 6; bool isRead = 7; string createdAt = 8; }
+message ContactSubmission { string id = 1; string name = 2; string email = 3; string subject = 4; string message = 5; bool isRead = 6; string createdAt = 7; }
+message Faq { string id = 1; string question = 2; string answer = 3; string category = 4; int32 order = 5; bool isActive = 6; string createdAt = 7; string updatedAt = 8; }
+message AttributeOption { string id = 1; string type = 2; string value = 3; string label = 4; int32 sortOrder = 5; bool isActive = 6; string createdAt = 7; }
+message Address { string id = 1; string userId = 2; string type = 3; string name = 4; string phone = 5; string street = 6; string city = 7; string state = 8; string zip = 9; string country = 10; bool isDefault = 11; string createdAt = 12; string updatedAt = 13; }
+
+message InventoryStatsResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message StockResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message InventoryLogsResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message InventoryResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message PosSaleResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message ListPosSalesResponse { bool success = 1; string message = 2; string data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message NotificationResponse { bool success = 1; string message = 2; Notification data = 3; common.Error error = 4; }
+message ListNotificationsResponse { bool success = 1; string message = 2; repeated Notification data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message UnreadCountResponse { bool success = 1; string message = 2; int32 count = 3; common.Error error = 4; }
+message ContactSubmissionResponse { bool success = 1; string message = 2; ContactSubmission data = 3; common.Error error = 4; }
+message ListContactSubmissionsResponse { bool success = 1; string message = 2; repeated ContactSubmission data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message FaqResponse { bool success = 1; string message = 2; Faq data = 3; common.Error error = 4; }
+message ListFaqsResponse { bool success = 1; string message = 2; repeated Faq data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message AttributeOptionResponse { bool success = 1; string message = 2; AttributeOption data = 3; common.Error error = 4; }
+message ListAttributeOptionsResponse { bool success = 1; string message = 2; repeated AttributeOption data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message AddressResponse { bool success = 1; string message = 2; Address data = 3; common.Error error = 4; }
+message ListAddressesResponse { bool success = 1; string message = 2; repeated Address data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message PublicUserResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }

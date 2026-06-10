@@ -1,0 +1,1 @@
+export { EditorialProductCard } from './EditorialProductCard';

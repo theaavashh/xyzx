@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package rapharch.commerce;
+
+import "common.proto";
+import "cms.proto";
+
+service PaymentService {
+  rpc CreatePaymentIntent(CreatePaymentIntentRequest) returns (PaymentResponse);
+  rpc ConfirmPaymentIntent(ConfirmPaymentIntentRequest) returns (PaymentResponse);
+  rpc CreateSetupIntent(CreateSetupIntentRequest) returns (PaymentResponse);
+  rpc CreateCustomer(CreateCustomerRequest) returns (PaymentResponse);
+  rpc GetPaymentMethods(cms.GetByIdRequest) returns (PaymentResponse);
+  rpc HandleWebhook(WebhookRequest) returns (PaymentResponse);
+}
+
+service CouponService {
+  rpc GetCoupons(common.PaginationRequest) returns (ListCouponsResponse);
+  rpc GetCouponById(cms.GetByIdRequest) returns (CouponResponse);
+  rpc GetCouponByCode(GetCouponByCodeRequest) returns (CouponResponse);
+  rpc CreateCoupon(CreateCouponRequest) returns (CouponResponse);
+  rpc UpdateCoupon(UpdateCouponRequest) returns (CouponResponse);
+  rpc DeleteCoupon(cms.GetByIdRequest) returns (common.ApiResponse);
+  rpc ToggleCouponStatus(cms.GetByIdRequest) returns (CouponResponse);
+  rpc GetCouponStats(common.Empty) returns (CouponStatsResponse);
+}
+
+service ShippingService {
+  rpc GetPublicShipping(common.Empty) returns (ListShippingItemsResponse);
+  rpc GetShippingItems(GetShippingItemsRequest) returns (ListShippingItemsResponse);
+  rpc GetShippingItem(cms.GetByIdRequest) returns (ShippingItemResponse);
+  rpc CreateShippingItem(CreateShippingItemRequest) returns (ShippingItemResponse);
+  rpc UpdateShippingItem(UpdateShippingItemRequest) returns (ShippingItemResponse);
+  rpc DeleteShippingItem(cms.GetByIdRequest) returns (common.ApiResponse);
+  rpc ToggleShippingItem(cms.GetByIdRequest) returns (ShippingItemResponse);
+  rpc GetShippingSettings(common.Empty) returns (ShippingSettingsResponse);
+  rpc UpdateShippingSettings(UpdateShippingSettingsRequest) returns (ShippingSettingsResponse);
+}
+
+service DeliveryService {
+  rpc CreateDelivery(CreateDeliveryRequest) returns (DeliveryResponse);
+  rpc GetDeliveryByOrder(cms.GetByIdRequest) returns (DeliveryResponse);
+  rpc GetDeliveryById(cms.GetByIdRequest) returns (DeliveryResponse);
+  rpc UpdateDeliveryStatus(UpdateDeliveryStatusRequest) returns (DeliveryResponse);
+  rpc GetActiveDeliveries(PaginatedRequest) returns (ListDeliveriesResponse);
+  rpc GetDeliveriesByStatus(GetDeliveriesByStatusRequest) returns (ListDeliveriesResponse);
+  rpc GetDeliveryStats(common.Empty) returns (DeliveryStatsResponse);
+  rpc DeleteDelivery(cms.GetByIdRequest) returns (common.ApiResponse);
+}
+
+service RewardService {
+  rpc GetRewardSettings(common.Empty) returns (RewardSettingsResponse);
+  rpc UpdateRewardSettings(UpdateRewardSettingsRequest) returns (RewardSettingsResponse);
+  rpc GetUserRewards(GetUserRewardsRequest) returns (ListRewardsResponse);
+  rpc GetRewardAnalytics(RewardAnalyticsRequest) returns (RewardAnalyticsResponse);
+  rpc AddManualReward(AddManualRewardRequest) returns (RewardResponse);
+  rpc DeleteReward(cms.GetByIdRequest) returns (common.ApiResponse);
+}
+
+service UserRewardService {
+  rpc GetUserRewardBalance(UserContextRequest) returns (RewardBalanceResponse);
+  rpc GetUserRewardHistory(UserRewardHistoryRequest) returns (ListRewardsResponse);
+  rpc GetPublicRewardSettings(common.Empty) returns (RewardSettingsResponse);
+  rpc CalculateRewards(CalculateRewardsRequest) returns (RewardCalculationResponse);
+}
+
+message PaginatedRequest { int32 page = 1; int32 limit = 2; int32 offset = 3; }
+message UserContextRequest { string userId = 1; }
+
+message CreatePaymentIntentRequest { double amount = 1; string currency = 2; string metadata = 3; string customerId = 4; }
+message ConfirmPaymentIntentRequest { string paymentIntentId = 1; }
+message CreateSetupIntentRequest { string customerId = 1; }
+message CreateCustomerRequest { string email = 1; string name = 2; string metadata = 3; }
+message WebhookRequest { string payload = 1; string signature = 2; }
+message GetCouponByCodeRequest { string code = 1; }
+message GetShippingItemsRequest { string type = 1; }
+message GetDeliveriesByStatusRequest { string status = 1; int32 limit = 2; int32 offset = 3; }
+
+message CreateCouponRequest { string code = 1; string name = 2; string type = 3; double value = 4; double minOrderAmount = 5; double maxDiscountAmount = 6; int32 usageLimit = 7; string startDate = 8; string endDate = 9; bool isActive = 10; string applicableTo = 11; string applicableItems = 12; string description = 13; }
+message UpdateCouponRequest { string id = 1; string code = 2; string name = 3; string type = 4; double value = 5; double minOrderAmount = 6; double maxDiscountAmount = 7; int32 usageLimit = 8; string startDate = 9; string endDate = 10; bool isActive = 11; string applicableTo = 12; string applicableItems = 13; string description = 14; }
+
+message CreateShippingItemRequest { string type = 1; string name = 2; string title = 3; string region = 4; string description = 5; double price = 6; string time = 7; int32 order = 8; bool isActive = 9; }
+message UpdateShippingItemRequest { string id = 1; string type = 2; string name = 3; string title = 4; string region = 5; string description = 6; double price = 7; string time = 8; int32 order = 9; bool isActive = 10; }
+message UpdateShippingSettingsRequest { double freeShippingThreshold = 1; double freeInternationalThreshold = 2; string heroTitle = 3; string heroSubtitle = 4; }
+
+message CreateDeliveryRequest { string orderId = 1; string trackingNumber = 2; string carrier = 3; string estimatedDelivery = 4; string notes = 5; }
+message UpdateDeliveryStatusRequest { string orderId = 1; string status = 2; string trackingNumber = 3; string carrier = 4; string estimatedDelivery = 5; string notes = 6; string locationUpdate = 7; }
+
+message GetUserRewardsRequest { string userId = 1; string type = 2; int32 page = 3; int32 limit = 4; string search = 5; }
+message RewardAnalyticsRequest { string startDate = 1; string endDate = 2; }
+message AddManualRewardRequest { string userId = 1; int32 points = 2; string description = 3; }
+message UserRewardHistoryRequest { string userId = 1; string type = 2; int32 page = 3; int32 limit = 4; }
+message CalculateRewardsRequest { string userId = 1; double amount = 2; }
+message UpdateRewardSettingsRequest { double amountUnit = 1; double rewardValue = 2; bool isActive = 3; }
+
+message Coupon { string id = 1; string code = 2; string name = 3; string type = 4; double value = 5; bool isActive = 6; string startDate = 7; string endDate = 8; string createdAt = 9; string updatedAt = 10; }
+message ShippingItem { string id = 1; string type = 2; string name = 3; string title = 4; string region = 5; string description = 6; double price = 7; string time = 8; int32 order = 9; bool isActive = 10; string createdAt = 11; string updatedAt = 12; }
+message Delivery { string id = 1; string orderId = 2; string trackingNumber = 3; string carrier = 4; string status = 5; string estimatedDelivery = 6; string notes = 7; string createdAt = 8; string updatedAt = 9; }
+message Reward { string id = 1; string userId = 2; int32 points = 3; string type = 4; string description = 5; string createdAt = 6; }
+
+message PaymentResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message CouponResponse { bool success = 1; string message = 2; Coupon data = 3; common.Error error = 4; }
+message ListCouponsResponse { bool success = 1; string message = 2; repeated Coupon data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message CouponStatsResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message ShippingItemResponse { bool success = 1; string message = 2; ShippingItem data = 3; common.Error error = 4; }
+message ListShippingItemsResponse { bool success = 1; string message = 2; repeated ShippingItem data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message ShippingSettingsResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message DeliveryResponse { bool success = 1; string message = 2; Delivery data = 3; common.Error error = 4; }
+message ListDeliveriesResponse { bool success = 1; string message = 2; repeated Delivery data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message DeliveryStatsResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message RewardSettingsResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message RewardResponse { bool success = 1; string message = 2; Reward data = 3; common.Error error = 4; }
+message ListRewardsResponse { bool success = 1; string message = 2; repeated Reward data = 3; common.Pagination pagination = 4; common.Error error = 5; }
+message RewardAnalyticsResponse { bool success = 1; string message = 2; string data = 3; common.Error error = 4; }
+message RewardBalanceResponse { bool success = 1; string message = 2; int32 balance = 3; common.Error error = 4; }
+message RewardCalculationResponse { bool success = 1; string message = 2; int32 points = 3; common.Error error = 4; }

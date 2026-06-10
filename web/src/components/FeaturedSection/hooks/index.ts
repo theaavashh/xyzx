@@ -1,0 +1,1 @@
+export { useFeaturedSections } from "./useFeaturedSections";

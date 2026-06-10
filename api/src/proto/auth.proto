@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package rapharch.auth;
+
+import "common.proto";
+
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Signup(SignupRequest) returns (SignupResponse);
+  rpc VerifyOtp(VerifyOtpRequest) returns (AuthResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (AuthResponse);
+  rpc ForgotPassword(ForgotPasswordRequest) returns (common.ApiResponse);
+  rpc ResetPassword(ResetPasswordRequest) returns (common.ApiResponse);
+  rpc ChangePassword(ChangePasswordRequest) returns (common.ApiResponse);
+  rpc Logout(common.Empty) returns (common.ApiResponse);
+  rpc VerifyCredentials(VerifyCredentialsRequest) returns (VerifyCredentialsResponse);
+  rpc GetProfile(GetProfileRequest) returns (UserProfile);
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  bool success = 1;
+  string message = 2;
+  string email = 3;
+}
+
+message SignupRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message SignupResponse {
+  bool success = 1;
+  string message = 2;
+  UserProfile user = 3;
+}
+
+message VerifyOtpRequest {
+  string email = 1;
+  string otp = 2;
+}
+
+message AuthResponse {
+  bool success = 1;
+  string message = 2;
+  UserProfile user = 3;
+  string accessToken = 4;
+  string refreshToken = 5;
+}
+
+message RefreshTokenRequest {
+  string refreshToken = 1;
+}
+
+message ForgotPasswordRequest {
+  string email = 1;
+}
+
+message ResetPasswordRequest {
+  string email = 1;
+  string token = 2;
+  string newPassword = 3;
+}
+
+message ChangePasswordRequest {
+  string currentPassword = 1;
+  string newPassword = 2;
+  string accessToken = 3;
+}
+
+message VerifyCredentialsRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message VerifyCredentialsResponse {
+  bool success = 1;
+  string message = 2;
+  UserProfile user = 3;
+}
+
+message GetProfileRequest {
+  string accessToken = 1;
+}
+
+message UserProfile {
+  string id = 1;
+  string email = 2;
+  string name = 3;
+  string role = 4;
+  bool isActive = 5;
+  bool emailVerified = 6;
+  string createdAt = 7;
+  string updatedAt = 8;
+}

@@ -1,0 +1,76 @@
+{
+  "heroTitle": "Shipping Information",
+  "heroSubtitle": "Everything you need to know about shipping, delivery times, and costs",
+  "methods": [
+    {
+      "id": "1",
+      "name": "Standard Shipping",
+      "price": "$5.99",
+      "time": "5-7 business days",
+      "description": "Free on orders over $100",
+      "isActive": true,
+      "order": 1
+    },
+    {
+      "id": "2",
+      "name": "Express Shipping",
+      "price": "$12.99",
+      "time": "2-3 business days",
+      "description": "Track your package",
+      "isActive": true,
+      "order": 2
+    },
+    {
+      "id": "3",
+      "name": "Next Day Delivery",
+      "price": "$24.99",
+      "time": "1 business day",
+      "description": "Order before 2pm EST",
+      "isActive": true,
+      "order": 3
+    }
+  ],
+  "info": [
+    {
+      "id": "1",
+      "title": "Order Processing",
+      "description": "Orders are processed within 1-2 business days.",
+      "order": 1,
+      "isActive": true
+    },
+    {
+      "id": "2",
+      "title": "Delivery Areas",
+      "description": "We ship to all 50 states in the US.",
+      "order": 2,
+      "isActive": true
+    },
+    {
+      "id": "3",
+      "title": "Package Tracking",
+      "description": "You will receive a tracking number via email.",
+      "order": 3,
+      "isActive": true
+    }
+  ],
+  "regions": [
+    {
+      "id": "1",
+      "region": "New Zealand",
+      "time": "7-10 business days",
+      "price": "$15.99",
+      "isActive": true,
+      "order": 1
+    },
+    {
+      "id": "4",
+      "region": "Rest of World",
+      "time": "14-21 business days",
+      "price": "$34.99",
+      "isActive": true,
+      "order": 2
+    }
+  ],
+  "freeShippingThreshold": "$100",
+  "freeInternationalThreshold": "$200"
+}
