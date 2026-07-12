@@ -115,13 +115,33 @@ function resolveService(protoDef: any, packagePath: string[], serviceName: strin
   return current?.[serviceName];
 }
 
+function findProtoDir(): string {
+  const candidates = [
+    path.join(__dirname, '..', 'proto'),
+    path.join(__dirname, '..', '..', 'src', 'proto'),
+    path.join(process.cwd(), 'src', 'proto'),
+    path.join(process.cwd(), 'dist', 'proto'),
+  ];
+  for (const dir of candidates) {
+    try {
+      const fs = require('fs') as typeof import('fs');
+      if (fs.existsSync(dir)) {
+        return dir;
+      }
+    } catch {
+      continue;
+    }
+  }
+  return candidates[0]!;
+}
+
 export function createGrpcServer(): grpc.Server {
   const server = new grpc.Server({
     'grpc.max_receive_message_length': 10 * 1024 * 1024,
     'grpc.max_send_message_length': 10 * 1024 * 1024,
   });
 
-  const protoDir = path.join(__dirname, '..', 'proto');
+  const protoDir = findProtoDir();
   const includeDirs = [protoDir];
 
   let registeredCount = 0;
@@ -148,10 +168,33 @@ export function createGrpcServer(): grpc.Server {
 export async function startGrpcServer(server?: grpc.Server): Promise<grpc.Server> {
   const gServer = server || createGrpcServer();
 
+  let credentials = grpc.ServerCredentials.createInsecure();
+
+  const sslKeyPath = process.env.GRPC_SSL_KEY_PATH;
+  const sslCertPath = process.env.GRPC_SSL_CERT_PATH;
+  const isProduction = process.env.NODE_ENV === 'production';
+  if (isProduction && (!sslKeyPath || !sslCertPath)) {
+    logger.warn('GRPC_SSL_KEY_PATH and GRPC_SSL_CERT_PATH not set, using insecure credentials in production');
+  }
+  if (sslKeyPath && sslCertPath) {
+    try {
+      const fs = await import('fs');
+      const key = fs.readFileSync(sslKeyPath);
+      const cert = fs.readFileSync(sslCertPath);
+      credentials = grpc.ServerCredentials.createSsl(null, [{ private_key: key, cert_chain: cert }]);
+      logger.info('gRPC server using SSL credentials');
+    } catch (error) {
+      if (isProduction) {
+        throw new Error('Failed to load gRPC SSL credentials: ' + (error as Error).message);
+      }
+      logger.warn('Failed to load gRPC SSL credentials, falling back to insecure');
+    }
+  }
+
   return new Promise((resolve, reject) => {
     gServer.bindAsync(
       `0.0.0.0:${GRPC_PORT}`,
-      grpc.ServerCredentials.createInsecure(),
+      credentials,
       (error, port) => {
         if (error) {
           reject(error);

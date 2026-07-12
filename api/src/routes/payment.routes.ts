@@ -28,6 +28,7 @@ router.post(
 
 router.post(
   '/create-payment-intent',
+  authenticateToken,
   paymentIntentLimiter,
   createPaymentIntent
 );

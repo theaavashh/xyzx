@@ -4,7 +4,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9999'
 
 export async function fetchFAQs(): Promise<FAQItem[]> {
   try {
-    const response = await fetch(`${API_BASE}/api/v1/faqs`);
+    const response = await fetch('/api/v1/public/faqs');
 
     if (!response.ok) return [];
 

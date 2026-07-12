@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -34,20 +35,38 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX || '200', 10),
+  max: parseInt(process.env.RATE_LIMIT_MAX || '300', 10),
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.',
   },
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) => req.path === '/health' || req.path === '/' || req.path === '/api/v1/auth/login',
+  skip: (req) => {
+    const path = req.path;
+    return (
+      path.startsWith('/api/v1/public/') ||
+      path.startsWith('/uploads/')
+    );
+  },
 });
 
 const speedLimiter = slowDown({
   windowMs: 15 * 60 * 1000,
   delayAfter: 10,
   delayMs: () => 500,
+  skip: (req) => req.path.startsWith('/api/v1/public/') || req.path.startsWith('/uploads/'),
+});
+
+const publicLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: parseInt(process.env.PUBLIC_RATE_LIMIT_MAX || '600', 10),
+  message: {
+    success: false,
+    message: 'Too many requests, please try again later.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 app.use(compression());
@@ -65,9 +84,9 @@ app.use(
       'Content-Type',
       'Accept',
       'Authorization',
-      'X-CSRF-Token',
       'X-HTTP-Method-Override',
       'X-Request-ID',
+      'X-CSRF-Token',
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   }),
@@ -105,8 +124,8 @@ app.use(
     ieNoOpen: true,
     frameguard: { action: 'deny' },
     xssFilter: true,
-    crossOriginOpenerPolicy: { policy: 'unsafe-none' },
-    crossOriginEmbedderPolicy: { policy: 'unsafe-none' },
+    crossOriginOpenerPolicy: { policy: 'same-origin' },
+    crossOriginEmbedderPolicy: { policy: 'credentialless' },
   }),
 );
 
@@ -120,6 +139,7 @@ if (!isProduction) {
   app.use(morgan('combined'));
 }
 
+app.use('/api/v1/public', publicLimiter);
 app.use(globalLimiter);
 app.use(speedLimiter);
 
@@ -135,9 +155,9 @@ app.use(
 
 app.use(
   express.urlencoded({
-    extended: true,
+    extended: false,
     limit: '10mb',
-    parameterLimit: 1000,
+    parameterLimit: 100,
   }),
 );
 
@@ -148,7 +168,7 @@ app.use(
     maxAge: '1d',
     etag: true,
     setHeaders: (res, filePath) => {
-      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Origin', CORS_ORIGINS[0] || '*');
       res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
       res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
       res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
@@ -213,12 +233,28 @@ app.get('/', (_req: Request, res: Response) => {
     message: 'Welcome to the API server!',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
-    environment: process.env.NODE_ENV,
   });
 });
 
 app.get('/health', healthCheck);
-app.get('/metrics', metricsEndpoint);
+app.get('/metrics', (req: Request, res: Response, next: NextFunction) => {
+  const providedKey = (req.headers['x-api-key'] as string) || '';
+  const expectedKey = process.env.METRICS_API_KEY || process.env.API_KEY;
+  if (expectedKey) {
+    if (!providedKey) {
+      res.status(403).json({ success: false, message: 'Forbidden' });
+      return;
+    }
+    // Use timing-safe comparison to prevent timing attacks
+    const expectedBuf = Buffer.from(expectedKey);
+    const providedBuf = Buffer.from(providedKey);
+    if (expectedBuf.length !== providedBuf.length || !crypto.timingSafeEqual(expectedBuf, providedBuf)) {
+      res.status(403).json({ success: false, message: 'Forbidden' });
+      return;
+    }
+  }
+  next();
+}, metricsEndpoint);
 
 setupSwagger(app);
 
@@ -288,7 +324,6 @@ app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   return res.status(500).json({
     success: false,
     message: isProduction ? 'Internal server error' : err.message,
-    ...(isProduction === false && { stack: err.stack }),
   });
 });
 

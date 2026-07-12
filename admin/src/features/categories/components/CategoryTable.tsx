@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import {
   ArrowDown,
   ArrowUp,
@@ -68,13 +67,11 @@ function CategoryImage({
   }
 
   return (
-    <Image
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
       src={getFullImageUrl(src)}
       alt={alt}
-      width={200}
-      height={200}
       className={className}
-      crossOrigin="anonymous"
       onError={() => setHasError(true)}
       onClick={onPreview}
     />
@@ -102,7 +99,7 @@ function SortHeader({
   const isActive = currentField === field;
   return (
     <th
-      className="px-4 py-4 text-left text-base font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:text-gray-800 transition-colors"
+      className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:text-gray-800 transition-colors outer-sans"
       onClick={() => onSort(field)}
     >
       <div className="flex items-center gap-1.5">
@@ -243,22 +240,22 @@ export default function CategoryTable({
                     className="h-4 w-4 rounded border-gray-300 text-[#D4AF37] focus:ring-[#D4AF37] cursor-pointer"
                   />
                 </th>
-                <th className="w-10 px-2 py-4 text-center text-base font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="w-10 px-2 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">
                   #
                 </th>
-                <th className="px-4 py-4 text-left text-base font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">
                   Image
                 </th>
                 <SortHeader field="name" currentField={sortField} direction={sortDirection} onSort={onSort}>
                   Name
                 </SortHeader>
-                <th className="px-4 py-4 text-left text-base font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">
                   Internal Link
                 </th>
                 <SortHeader field="status" currentField={sortField} direction={sortDirection} onSort={onSort}>
                   Status
                 </SortHeader>
-                <th className="px-4 py-4 text-right text-base font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">
                   Actions
                 </th>
               </tr>

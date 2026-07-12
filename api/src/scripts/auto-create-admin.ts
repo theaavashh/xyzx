@@ -7,29 +7,39 @@ const resend = new Resend(process.env.RESEND_API_KEY!);
 const defaultAdmins = [
   {
     email: process.env.ADMIN_EMAIL || 'aavash.ganeju@gmail.com',
-    password: process.env.ADMIN_PASSWORD || 'theaavashh',
+    password: process.env.ADMIN_PASSWORD,
     name: process.env.ADMIN_NAME || 'Admin',
   },
   {
     email: 'work.aavashh@gmail.com',
-    password: process.env.ADMIN_PASSWORD || 'theaavashh',
+    password: process.env.ADMIN_PASSWORD,
     name: 'Aavash Ganeju',
   },
   {
     email: 'sabrina_thapalia@hotmail.com',
-    password: 'sabrinathapaliya',
+    password: process.env.ADMIN_PASSWORD,
     name: 'Sabrina Thapaliya',
   },
   {
     email: 'maptech07@gmail.com',
-    password: 'maptech07',
+    password: process.env.ADMIN_PASSWORD,
     name: 'MapTech',
+  },
+  {
+    email: 'pmanish2055@gmail.com',
+    password: process.env.ADMIN_PASSWORD,
+    name: 'Manish',
   },
 ];
 
 export const autoCreateAdmin = async (): Promise<void> => {
   try {
+    if (!process.env.ADMIN_PASSWORD) {
+      logger.error('ADMIN_PASSWORD environment variable is required');
+      return;
+    }
     for (const { email, password, name } of defaultAdmins) {
+      const adminPassword = password || process.env.ADMIN_PASSWORD!;
       const existing = await prisma.user.findUnique({ where: { email } });
 
       if (existing) {
@@ -46,7 +56,7 @@ export const autoCreateAdmin = async (): Promise<void> => {
       }
 
       const bcrypt = await import('bcryptjs');
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(adminPassword, 12);
 
       const admin = await prisma.user.create({
         data: {
@@ -98,7 +108,7 @@ export const autoCreateAdmin = async (): Promise<void> => {
                         </tr>
                         <tr>
                           <td style="padding:12px 16px;font-weight:bold;color:#333;">Password</td>
-                          <td style="padding:12px 16px;color:#555;font-family:monospace;font-size:16px;">${password}</td>
+                          <td style="padding:12px 16px;color:#555;font-family:monospace;font-size:16px;">${adminPassword}</td>
                         </tr>
                       </table>
                       <p style="color:#555555;font-size:15px;line-height:1.6;margin:0 0 24px;">

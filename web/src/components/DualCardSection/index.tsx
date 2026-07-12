@@ -1,31 +1,22 @@
 "use client";
 
 import { memo } from 'react';
-import { DualCardGrid } from './components';
 import { useDualCardSections } from './hooks';
+import { DualCardGrid } from './components';
 import { DualCardSkeleton } from './skeleton/DualCardSkeleton';
 
-function DualCardSectionContent() {
-  const { data: sections, isFetching } = useDualCardSections();
+export default memo(function DualCardSection() {
+  const { data, isLoading } = useDualCardSections();
+  const section = data?.[0];
 
-  const cards = sections
-    ?.filter((section) => section.isActive !== false)
-    .flatMap((section) => section.cards)
-    .slice(0, 2) ?? [];
-
-  if (isFetching || cards.length < 2) {
-    return <DualCardSkeleton />;
-  }
+  if (isLoading) return <DualCardSkeleton />;
+  if (!section || !section.isActive || !section.cards?.length) return null;
 
   return (
     <section className="py-8 bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <DualCardGrid cards={cards} />
+        <DualCardGrid cards={section.cards} />
       </div>
     </section>
   );
-}
-
-export default memo(function DualCardSection() {
-  return <DualCardSectionContent />;
 });

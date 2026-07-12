@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE `banners` ADD COLUMN `endDate` DATETIME(3) NULL;
+ALTER TABLE `banners` ADD COLUMN `buttonText` VARCHAR(191) NULL;
+ALTER TABLE `banners` ADD COLUMN `buttonUrl` VARCHAR(191) NULL;
+ALTER TABLE `banners` ADD COLUMN `backgroundColor` VARCHAR(191) NULL;
+ALTER TABLE `banners` ADD COLUMN `textColor` VARCHAR(191) NULL;

@@ -4,13 +4,7 @@ import { useEffect, useState } from 'react';
 import { ServiceGrid, MobileSlider } from './components';
 import { FeatureSkeleton } from './skeleton';
 import { fetchFeature } from './utils/api';
-import { DEFAULT_SERVICE_ITEMS } from './constants';
-import type { FeatureData, ServiceItem } from './types';
-
-function getActiveItems(items?: ServiceItem[]): ServiceItem[] {
-  const active = items?.filter((item) => item.isActive) ?? [];
-  return active.length > 0 ? active : DEFAULT_SERVICE_ITEMS;
-}
+import type { FeatureData } from './types';
 
 export default function Feature() {
   const [data, setData] = useState<FeatureData | null>(null);
@@ -47,7 +41,9 @@ export default function Feature() {
     return <FeatureSkeleton />;
   }
 
-  const serviceItems = getActiveItems(data?.serviceItems);
+  const serviceItems = data?.serviceItems?.filter((item) => item.isActive) ?? [];
+
+  if (serviceItems.length === 0) return null;
 
   return (
     <section className="bg-white py-8 md:py-10">

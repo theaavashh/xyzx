@@ -83,7 +83,7 @@ export default function ProductPerformancePage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black lastik">Product Performance</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Product Performance</h1>
             <p className="text-black text-lg mt-2">Analyze product sales, views, and conversion metrics</p>
           </div>
           <div className="flex items-center space-x-3">
@@ -207,16 +207,16 @@ export default function ProductPerformancePage() {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Product</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Category</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Price</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Sales</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Revenue</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Views</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Conversion</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Rating</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Growth</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Status</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Product</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Category</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Price</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Sales</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Revenue</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Views</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Conversion</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Rating</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Growth</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Status</th>
                 </tr>
               </thead>
               <tbody>

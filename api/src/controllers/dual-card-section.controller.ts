@@ -96,7 +96,12 @@ export const updateDualCardSection: RequestHandler = asyncHandler(
       return;
     }
 
-    const section = await dualCardSectionRepository.updateDualCardSection(id, req.body);
+    const { cards, isActive, order } = req.body;
+    const section = await dualCardSectionRepository.updateDualCardSection(id, {
+      cards: cards || undefined,
+      isActive: isActive !== undefined ? isActive : undefined,
+      order: order !== undefined ? order : undefined,
+    });
 
     sendSuccess(res, section, 'Dual card section updated successfully');
     triggerRevalidation('dual-card-sections');

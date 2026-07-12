@@ -147,7 +147,7 @@ export function NavigationItemModal({
               <div className="flex items-center gap-3">
                 
                 <div>
-                  <h2 className="text-2xl font-semibold text-black lastik">
+                  <h2 className="text-2xl font-semibold text-black outer-sans">
                     {editingItem ? 'Edit Navigation Item' : 'New Navigation Item'}
                   </h2>
                   <p className="text-xs text-gray-500">

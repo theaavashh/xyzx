@@ -65,7 +65,7 @@ export function FastMovingCategories() {
       <CardContent className="p-6">
         <div className="flex items-center gap-2 mb-4">
           <Zap className="w-5 h-5 text-[#D4AF37]" />
-          <h3 className="text-lg font-bold text-black lastik uppercase tracking-wide">Category Movement</h3>
+          <h3 className="text-lg font-bold text-black outer-sans uppercase tracking-wide">Category Movement</h3>
         </div>
 
         {isLoading ? (

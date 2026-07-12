@@ -141,7 +141,7 @@ function PermissionsContent() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black lastik">Permissions</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Permissions</h1>
             <p className="text-black text-lg mt-2">
               Manage access permissions for staff members
             </p>
@@ -184,7 +184,7 @@ function PermissionsContent() {
               <Shield className="w-6 h-6 text-[#D4AF37]" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-black lastik">
+              <h2 className="text-xl font-semibold text-black outer-sans">
                 Available Permissions
               </h2>
               <p className="text-black text-sm">
@@ -236,7 +236,7 @@ function PermissionsContent() {
         </div>
 
         <div className="bg-gray-50 rounded-lg border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-black lastik mb-4">
+          <h2 className="text-lg font-semibold text-black outer-sans mb-4">
             Permission Guidelines
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-black">

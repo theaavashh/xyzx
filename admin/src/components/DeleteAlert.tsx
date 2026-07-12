@@ -52,7 +52,7 @@ export default function DeleteAlert({
 
           <div className="relative min-h-screen flex items-center justify-center p-4">
             <motion.div
-              className="relative bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden"
+              className="relative bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden"
               initial={{ scale: 0.95, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 10 }}
@@ -65,7 +65,7 @@ export default function DeleteAlert({
                       <AlertTriangle className="w-5 h-5 text-red-500" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-gray-900">
+                      <h2 className="text-lg font-semibold text-gray-900 outer-sans">
                         {title}
                       </h2>
                       <p className="text-sm text-red-500 font-medium">

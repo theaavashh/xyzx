@@ -5,7 +5,7 @@ import { connectDB, disconnectDB } from './lib/database.connection';
 import { initializeCache, closeCache } from './services/cache.service';
 import { autoCreateAdmin } from './scripts/auto-create-admin';
 import { logger } from './utils/logger';
-import { createGrpcServer, stopGrpcServer } from './grpc';
+import { startGrpcServer, stopGrpcServer } from './grpc';
 
 dotenv.config();
 
@@ -53,19 +53,7 @@ const startServer = async () => {
     await autoCreateAdmin();
     logger.info('Admin user check completed');
 
-    grpcServer = createGrpcServer();
-    grpcServer.bindAsync(
-      `0.0.0.0:${process.env.GRPC_PORT || '50051'}`,
-      grpc.ServerCredentials.createInsecure(),
-      (err, port) => {
-        if (err) {
-          logger.error('Failed to start gRPC server', undefined, err);
-          return;
-        }
-        grpcServer!.start();
-        logger.info(`gRPC server running on port ${port}`);
-      },
-    );
+    grpcServer = await startGrpcServer();
 
     const server = app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`, {

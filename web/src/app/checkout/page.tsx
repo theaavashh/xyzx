@@ -181,7 +181,7 @@ export default function CheckoutPage() {
                   <h2 className="text-base font-medium text-neutral-900 mb-1">Guest Checkout</h2>
                   <p className="text-sm text-neutral-400 mb-4">
                     You can checkout as a guest. Already have an account?{" "}
-                    <Link href="/auth/login" className="text-neutral-900 underline underline-offset-2 hover:no-underline font-medium">Sign in</Link>
+                    <Link href="/login" className="text-neutral-900 underline underline-offset-2 hover:no-underline font-medium">Sign in</Link>
                   </p>
 
                   <div className="border-t border-neutral-100 pt-4 mt-2">

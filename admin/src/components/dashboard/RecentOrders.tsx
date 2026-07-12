@@ -51,12 +51,18 @@ const RecentOrders: React.FC<RecentOrdersProps> = ({
         if (showLoading) setIsLoading(true);
         setError(null);
 
+        const token = document.cookie
+          .split(';')
+          .find(c => c.trim().startsWith('accessToken='))
+          ?.split('=')[1];
+
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/analytics/recent-orders?limit=${limit}`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9999'}/api/v1/analytics/recent-orders?limit=${limit}`,
           {
             credentials: 'include',
             headers: {
               'Content-Type': 'application/json',
+              ...(token ? { Authorization: `Bearer ${decodeURIComponent(token)}` } : {}),
             },
           },
         );
@@ -176,7 +182,7 @@ const RecentOrders: React.FC<RecentOrdersProps> = ({
               <ShoppingBag className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 lastik uppercase">
+              <h3 className="text-lg font-semibold text-gray-900 outer-sans uppercase">
                 Recent Orders
               </h3>
               <p className="text-xs text-gray-500 custom-font">
@@ -214,7 +220,7 @@ const RecentOrders: React.FC<RecentOrdersProps> = ({
             <ShoppingBag className="w-5 h-5 text-purple-600" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 lastik uppercase tracking-wide">
+            <h3 className="text-lg font-semibold text-gray-900 outer-sans uppercase tracking-wide">
               Recent Orders
             </h3>
             <p className="text-xs text-gray-500 custom-font">

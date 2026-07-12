@@ -128,7 +128,7 @@ export const ChangePasswordModal = ({
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 id="change-password-title" className="text-xl font-bold text-black lastik">
+                <h2 id="change-password-title" className="text-xl font-bold text-black outer-sans">
                   Change Password
                 </h2>
                 <button

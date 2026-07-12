@@ -169,12 +169,16 @@ export const consumeResetToken = async (token: string): Promise<void> => {
   await cacheService.delete(getResetTokenKey(token));
 };
 
+const getBcryptSaltRounds = (): number => {
+  return parseInt(process.env.BCRYPT_SALT_ROUNDS || '12', 10);
+};
+
 export const updateUserPassword = async (
   email: string,
   newPassword: string,
 ): Promise<void> => {
   const bcrypt = await import('bcryptjs');
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const hashedPassword = await bcrypt.hash(newPassword, getBcryptSaltRounds());
   await prisma.user.update({
     where: { email },
     data: { password: hashedPassword },
@@ -187,7 +191,7 @@ export const createUser = async (
   password: string,
 ): Promise<User> => {
   const bcrypt = await import('bcryptjs');
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, getBcryptSaltRounds());
   const user = await prisma.user.create({
     data: { name, email, password: hashedPassword, role: 'user' },
   });
@@ -204,14 +208,21 @@ export const createUser = async (
   };
 };
 
+const hashBackupCodes = async (codes: string[]): Promise<string[]> => {
+  const bcrypt = await import('bcryptjs');
+  const cost = Math.min(parseInt(process.env.BCRYPT_SALT_ROUNDS || '12', 10), 10);
+  return Promise.all(codes.map((code) => bcrypt.hash(code.toUpperCase(), cost)));
+};
+
 export const storeTotpSecret = async (
   userId: string,
   secret: string,
   backupCodes: string[],
 ): Promise<void> => {
+  const hashedCodes = await hashBackupCodes(backupCodes);
   await cacheService.set(getTotpKey(userId), {
     secret,
-    backupCodes,
+    backupCodes: hashedCodes,
     isEnabled: false,
   });
 };
@@ -240,8 +251,11 @@ export const verifyTotpTokenFn = async (
   const totpData = await getTotpSecret(userId);
   if (!totpData) return { valid: false, isBackupCode: false };
 
-  if (totpData.backupCodes.includes(token.toUpperCase())) {
-    return { valid: true, isBackupCode: true };
+  const bcrypt = await import('bcryptjs');
+  for (const hashedCode of totpData.backupCodes) {
+    if (await bcrypt.compare(token.toUpperCase(), hashedCode)) {
+      return { valid: true, isBackupCode: true };
+    }
   }
 
   const verification = verifyTotpToken(totpData.secret, token);
@@ -255,13 +269,20 @@ export const consumeBackupCode = async (
   const totpData = await getTotpSecret(userId);
   if (!totpData) return false;
 
-  const originalLength = totpData.backupCodes.length;
-  totpData.backupCodes = totpData.backupCodes.filter(
-    (code) => code !== backupCode.toUpperCase(),
-  );
+  const bcrypt = await import('bcryptjs');
+  let found = false;
+  totpData.backupCodes = totpData.backupCodes.filter((hashedCode) => {
+    if (!found && bcrypt.compareSync(backupCode.toUpperCase(), hashedCode)) {
+      found = true;
+      return false;
+    }
+    return true;
+  });
+
+  if (!found) return false;
 
   await cacheService.set(getTotpKey(userId), totpData);
-  return totpData.backupCodes.length < originalLength;
+  return true;
 };
 
 export const disableTotp = async (userId: string): Promise<void> => {

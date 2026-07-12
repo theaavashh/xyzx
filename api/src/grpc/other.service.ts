@@ -91,7 +91,7 @@ export const posHandlers = make('pos', {
     const sale = await (repo.createPosSale?.({
       items: (items || []).map((i: any) => ({ productId: i.productId, quantity: i.quantity, price: i.price })),
       customerName, customerPhone, subtotal, tax, discount, total, paymentMethod,
-    }) ?? prisma.order.create({ data: { orderNumber: `POS-${Date.now()}`, total: total || 0, subtotal: subtotal || 0, paymentMethod: paymentMethod || 'CASH', items: { create: (items || []).map((i: any) => ({ productId: i.productId, quantity: i.quantity, price: i.price })) } } }));
+    }) ?? prisma.order.create({ data: { userId: c.request.userId || 'pos-system', orderNumber: `POS-${Date.now()}`, total: total || 0, subtotal: subtotal || 0, tax: tax || 0, shipping: 0, currency: 'USD', shippingName: customerName || 'POS Customer', shippingEmail: customerPhone || 'pos@rapharch.com', shippingAddress: 'POS Sale', shippingCity: 'POS', shippingCountry: 'AU', shippingZip: '0000', paymentMethod: paymentMethod || 'CASH', orderItems: { create: (items || []).map((i: any) => ({ productId: i.productId, quantity: i.quantity, price: i.price })) } } }));
     return ok(JSON.stringify(sale), 'Sale created');
   },
   ListPosSales: async (c, _r) => {
@@ -184,30 +184,30 @@ export const contactHandlers = make('contact', {
 
 export const faqHandlers = make('faq', {
   GetFAQs: async (_c, _r) => {
-    const data = await prisma.faq.findMany({ where: { isActive: true }, orderBy: { order: 'asc' } });
+    const data = await prisma.fAQ.findMany({ where: { isActive: true }, orderBy: { order: 'asc' } });
     return listOk(data);
   },
   GetAllFAQs: async (_c, _r) => {
-    const data = await prisma.faq.findMany({ orderBy: { order: 'asc' } });
+    const data = await prisma.fAQ.findMany({ orderBy: { order: 'asc' } });
     return listOk(data);
   },
   GetFAQById: (c, r) => gi(c, r, 'findById'),
   CreateFAQ: async (c, _r) => {
-    const d = await prisma.faq.create({ data: c.request });
+    const d = await prisma.fAQ.create({ data: c.request });
     return ok(d, 'Created');
   },
   UpdateFAQ: async (c, _r) => {
     const { id, ...data } = c.request;
-    const d = await prisma.faq.update({ where: { id }, data });
+    const d = await prisma.fAQ.update({ where: { id }, data });
     return ok(d, 'Updated');
   },
   DeleteFAQ: async (c, _r) => {
-    await prisma.faq.delete({ where: { id: c.request.id } });
+    await prisma.fAQ.delete({ where: { id: c.request.id } });
     return apiOk('Deleted');
   },
   ToggleFAQStatus: async (c, _r) => {
-    const faq = await prisma.faq.findUnique({ where: { id: c.request.id } });
-    const d = await prisma.faq.update({ where: { id: c.request.id }, data: { isActive: !faq?.isActive } });
+    const faq = await prisma.fAQ.findUnique({ where: { id: c.request.id } });
+    const d = await prisma.fAQ.update({ where: { id: c.request.id }, data: { isActive: !faq?.isActive } });
     return ok(d, 'Toggled');
   },
 });

@@ -1,0 +1,9 @@
+{
+  "version": "5.2",
+  "steps": [
+    {
+      "tag": "CreateMigration",
+      "datamodel": "datasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel AboutSection {\n  id        String   @id @default(uuid())\n  quote     String\n  ctaText   String   @default(\"More About Us\")\n  ctaUrl    String   @default(\"/about\")\n  isActive  Boolean  @default(true)\n  order     Int      @default(0)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@index([isActive, order])\n  @@map(\"about_sections\")\n}\n"
+    }
+  ]
+}

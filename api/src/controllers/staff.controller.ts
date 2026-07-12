@@ -73,6 +73,13 @@ export const createStaff: RequestHandler = asyncHandler(
       permissions: permissions ?? [],
     });
 
+    logger.info('Staff member created', {
+      action: 'staff_created',
+      targetUserId: user.id,
+      targetEmail: email,
+      performedBy: req.user?.userId,
+    });
+
     sendCreated(res, user, 'Staff member created successfully');
   },
 );
@@ -111,6 +118,13 @@ export const updateStaff: RequestHandler = asyncHandler(
       permissions: permissions as string[] | undefined,
     });
 
+    logger.info('Staff member updated', {
+      action: 'staff_updated',
+      targetUserId: id,
+      changes: { name: !!name, email: !!email, password: !!password, permissions: !!permissions },
+      performedBy: req.user?.userId,
+    });
+
     sendSuccess(res, user, 'Staff member updated successfully');
   },
 );
@@ -138,6 +152,12 @@ export const deleteStaff: RequestHandler = asyncHandler(
 
     await userRepository.deleteUser(id);
 
+    logger.info('Staff member deleted', {
+      action: 'staff_deleted',
+      targetUserId: id,
+      performedBy: req.user?.userId,
+    });
+
     sendSuccess(res, null, 'Staff member deleted successfully');
   },
 );
@@ -159,6 +179,12 @@ export const toggleStaffStatus: RequestHandler = asyncHandler(
 
     try {
       const user = await userRepository.toggleUserStatus(id);
+
+      logger.info('Staff member status toggled', {
+        action: user.isActive ? 'staff_activated' : 'staff_deactivated',
+        targetUserId: id,
+        performedBy: req.user?.userId,
+      });
 
       sendSuccess(
         res,
@@ -193,6 +219,12 @@ export const updateStaffPermissions: RequestHandler = asyncHandler(
     }
 
     const user = await userRepository.updateUser(id, { permissions });
+
+    logger.info('Staff permissions updated', {
+      action: 'staff_permissions_updated',
+      targetUserId: id,
+      performedBy: req.user?.userId,
+    });
 
     sendSuccess(res, user, 'Permissions updated successfully');
   },

@@ -104,7 +104,19 @@ export const updateEditorialSection: RequestHandler = asyncHandler(
       return;
     }
 
-    const section = await editorialSectionRepository.updateEditorialSection(id, req.body);
+    const { season, title, description, ctaText, ctaLink, images, featureType, productIds, isActive, order } = req.body;
+    const section = await editorialSectionRepository.updateEditorialSection(id, {
+      season,
+      title,
+      description: description || undefined,
+      ctaText: ctaText || undefined,
+      ctaLink: ctaLink || undefined,
+      images: images || undefined,
+      featureType: featureType || undefined,
+      productIds: productIds || undefined,
+      isActive: isActive !== undefined ? isActive : undefined,
+      order: order !== undefined ? order : undefined,
+    });
 
     sendSuccess(res, section, 'Editorial section updated successfully');
     triggerRevalidation('editorial-sections');

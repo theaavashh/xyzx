@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticateToken, requireAdmin } from '../middlewares/auth';
 import { validate } from '../middlewares/validation';
-import { sectionCreateSchema, sectionUpdateSchema, sectionReorderSchema } from '../dto/section.dto';
+import { salesBannerCreateSchema, salesBannerUpdateSchema, salesBannerReorderSchema } from '../dto/sales-banner.dto';
 import {
   getSalesBanners,
   getActiveSalesBanners,
@@ -18,10 +18,10 @@ const router: Router = Router();
 router.get('/active', getActiveSalesBanners);
 router.get('/', authenticateToken, requireAdmin, getSalesBanners);
 router.get('/:id', authenticateToken, requireAdmin, getSalesBannerById);
-router.post('/', authenticateToken, requireAdmin, validate(sectionCreateSchema), createSalesBanner);
-router.put('/:id', authenticateToken, requireAdmin, validate(sectionUpdateSchema), updateSalesBanner);
+router.post('/', authenticateToken, requireAdmin, validate(salesBannerCreateSchema), createSalesBanner);
+router.put('/:id', authenticateToken, requireAdmin, validate(salesBannerUpdateSchema), updateSalesBanner);
 router.delete('/:id', authenticateToken, requireAdmin, deleteSalesBanner);
 router.patch('/:id/toggle', authenticateToken, requireAdmin, toggleSalesBannerStatus);
-router.patch('/reorder', authenticateToken, requireAdmin, validate(sectionReorderSchema), reorderSalesBanners);
+router.patch('/reorder', authenticateToken, requireAdmin, validate(salesBannerReorderSchema), reorderSalesBanners);
 
 export default router;

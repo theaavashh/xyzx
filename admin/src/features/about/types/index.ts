@@ -1,12 +1,24 @@
-export interface AboutUsData {
-  id?: string;
-  slug?: string;
-  title: string;
-  content: string;
-  metaTitle: string;
-  metaDescription: string;
+export interface AboutSection {
+  id: string;
+  quote: string;
+  ctaText: string;
+  ctaUrl: string;
   isActive: boolean;
-  lastUpdated?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
 }
+
+export interface AboutSectionFormData {
+  quote: string;
+  ctaText: string;
+  ctaUrl: string;
+  isActive: boolean;
+}
+
+export const EMPTY_FORM: AboutSectionFormData = {
+  quote: '',
+  ctaText: 'More About Us',
+  ctaUrl: '/about',
+  isActive: true,
+};

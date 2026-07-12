@@ -1,78 +1,32 @@
 import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import { getJwtConfig } from '../config/env-config';
 import { prisma } from '../lib/database';
+import { cacheService } from '../services/cache.service';
 import { logger } from '../utils/logger';
 
-// Extend the Express Request interface to include user info
 declare global {
   namespace Express {
     interface Request {
-      user?: any; // User information decoded from JWT
+      user?: {
+        userId: string;
+        email: string;
+        role?: string;
+        iat?: number;
+        exp?: number;
+        isActive: boolean;
+      };
       apiKey?: string;
     }
   }
 }
 
-/**
- * Browser Access Protection Middleware
- * Prevents direct browser access to API endpoints
- * Allows requests from trusted frontend origins only
- * Why: Protects API from unauthorized direct browser access
- */
-export const preventDirectBrowserAccess = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): void | Response => {
-  try {
-    // Check if request comes from trusted frontend origin
-    const referer = req.get('Referer');
-    const origin = req.get('Origin');
-
-    // Define trusted frontend origins
-    const trustedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      process.env.FRONTEND_URL || '', // Add your actual frontend URL from env
-    ].filter(Boolean); // Remove empty strings
-
-    // Allow requests from trusted origins
-    const isTrustedOrigin =
-      (referer &&
-        trustedOrigins.some((trusted) => referer.startsWith(trusted))) ||
-      (origin && trustedOrigins.some((trusted) => origin.startsWith(trusted)));
-
-    if (isTrustedOrigin) {
-      return next();
-    }
-
-    // Block direct browser access or requests from untrusted origins
-    return res.status(403).json({
-      success: false,
-      message:
-        'Direct browser access not allowed. Please use the official application.',
-    });
-  } catch (error) {
-    logger.error('Browser access validation error', undefined, error as Error);
-    return res.status(500).json({
-      success: false,
-      message: 'Access validation error',
-    });
-  }
-};
-
-/**
- * Require Admin Role Middleware
- * Checks if authenticated user has admin role
- * Why: Restricts access to admin-only API routes
- */
 export const requireAdmin = (
   req: Request,
   res: Response,
   next: NextFunction,
 ): void | Response => {
   try {
-    // Check if user is authenticated and has admin role
     if (!req.user || req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
@@ -90,41 +44,24 @@ export const requireAdmin = (
   }
 };
 
-/**
- * JWT Authentication Middleware
- * Validates JWT tokens for user authentication from cookies or Authorization header
- * Why: Ensures only authenticated users can access private API routes
- */
 export const authenticateToken = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void | Response> => {
   try {
-    // Extract token from Authorization header or cookies
     const authHeader = req.headers['authorization'];
-    let token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-
-    // If no token in header, check cookies
-    if (!token && req.cookies) {
-      token = req.cookies.accessToken;
-    }
-
-    if (!token) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
-        message: 'Access token is required',
+        message: 'Access token is required. Use: Authorization: Bearer <token>',
       });
     }
 
-    // Verify token using secret from environment
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      throw new Error('JWT_SECRET is not defined in environment');
-    }
+    const token = authHeader!.slice(7);
 
-    // Decode the token
-    const decoded = jwt.verify(token, secret) as {
+    const jwtConfig = getJwtConfig();
+    const payload = jwt.verify(token, jwtConfig.secret) as unknown as {
       userId: string;
       email: string;
       role?: string;
@@ -132,9 +69,17 @@ export const authenticateToken = async (
       exp: number;
     };
 
-    // Check if user still exists and is active in database
+    const blacklistKey = `blacklist:user:${payload.userId}`;
+    const invalidatedAt = await cacheService.get<number>(blacklistKey);
+    if (invalidatedAt && payload.iat < invalidatedAt) {
+      return res.status(401).json({
+        success: false,
+        message: 'Token has been revoked. Please log in again.',
+      });
+    }
+
     const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+      where: { id: payload.userId },
       select: { id: true, email: true, role: true, isActive: true },
     });
 
@@ -145,8 +90,7 @@ export const authenticateToken = async (
       });
     }
 
-    // Add user info to request for downstream use
-    req.user = { ...decoded, isActive: user.isActive };
+    req.user = { ...payload, isActive: user.isActive };
 
     next();
   } catch (error) {

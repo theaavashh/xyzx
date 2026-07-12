@@ -46,7 +46,7 @@ export function FeaturedSectionGrid({
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex items-center gap-2 bg-[#D4AF37] text-white px-4 py-2.5 lastik text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all font-semibold"
+          className="inline-flex items-center gap-2 bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all font-semibold"
         >
           <Plus className="w-4 h-4" />
           Add Section

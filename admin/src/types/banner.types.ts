@@ -3,6 +3,11 @@ export interface Banner {
   title: string;
   isActive: boolean;
   position: string;
+  endDate: string | null;
+  buttonText: string | null;
+  buttonUrl: string | null;
+  backgroundColor: string | null;
+  textColor: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -10,6 +15,11 @@ export interface Banner {
 export interface BannerFormData {
   title: string;
   isActive: boolean;
+  endDate?: string | null;
+  buttonText?: string | null;
+  buttonUrl?: string | null;
+  backgroundColor?: string | null;
+  textColor?: string | null;
 }
 
 export interface BannerResponse {

@@ -127,7 +127,7 @@ export function ShopByCategoryModal({
           >
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-semibold text-black lastik">
+                <h2 className="text-2xl font-semibold text-black outer-sans">
                   {editingItem ? 'Edit Category' : 'Create Category'}
                 </h2>
                 <button

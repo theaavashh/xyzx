@@ -9,53 +9,41 @@ interface ProductStatsCardsProps {
   lowStock: number;
 }
 
+const cards = [
+  { label: 'Total', value: (v: number) => v, icon: Package, color: 'gray' },
+  { label: 'Active', value: (v: number) => v, icon: CheckCircle, color: 'emerald' },
+  { label: 'Inactive', value: (v: number) => v, icon: EyeOff, color: 'gray' },
+  { label: 'Low Stock', value: (v: number) => v, icon: AlertTriangle, color: 'amber' },
+];
+
+const colorMap: Record<string, { bg: string; text: string; icon: string; iconBg: string }> = {
+  gray: { bg: 'bg-gray-100', text: 'text-gray-900', icon: 'text-gray-600', iconBg: 'bg-gray-100' },
+  emerald: { bg: 'bg-emerald-50', text: 'text-emerald-600', icon: 'text-emerald-600', iconBg: 'bg-emerald-50' },
+  amber: { bg: 'bg-amber-50', text: 'text-amber-600', icon: 'text-amber-600', iconBg: 'bg-amber-50' },
+};
+
 export default function ProductStatsCards({ total, active, inactive, lowStock }: ProductStatsCardsProps) {
+  const values = { total, active, inactive, lowStock };
+
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-      <div className="rounded-lg bg-white p-5 ring-1 ring-gray-200">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-lg bg-gray-100">
-            <Package className="w-4 h-4 text-gray-600" />
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {cards.map((c) => {
+        const clr = colorMap[c.color];
+        const Icon = c.icon;
+        return (
+          <div key={c.label} className="rounded-xl bg-white p-5 ring-1 ring-gray-200 hover:ring-[#D4AF37]/20 hover:shadow-sm transition-all">
+            <div className="flex items-center gap-3">
+              <div className={`p-2.5 rounded-lg ${clr.iconBg}`}>
+                <Icon className={`w-4 h-4 ${clr.icon}`} />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">{c.label}</p>
+                <p className={`text-2xl outer-sans ${clr.text}`}>{c.value(values[c.label as keyof typeof values])}</p>
+              </div>
+            </div>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">Total</p>
-            <p className="text-xl font-semibold text-gray-900">{total}</p>
-          </div>
-        </div>
-      </div>
-      <div className="rounded-lg bg-white p-5 ring-1 ring-gray-200">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-lg bg-emerald-50">
-            <CheckCircle className="w-4 h-4 text-emerald-600" />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Active</p>
-            <p className="text-xl font-semibold text-emerald-600">{active}</p>
-          </div>
-        </div>
-      </div>
-      <div className="rounded-lg bg-white p-5 ring-1 ring-gray-200">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-lg bg-gray-50">
-            <EyeOff className="w-4 h-4 text-gray-500" />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Inactive</p>
-            <p className="text-xl font-semibold text-gray-600">{inactive}</p>
-          </div>
-        </div>
-      </div>
-      <div className="rounded-lg bg-white p-5 ring-1 ring-gray-200">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-lg bg-amber-50">
-            <AlertTriangle className="w-4 h-4 text-amber-600" />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Low Stock</p>
-            <p className="text-xl font-semibold text-amber-600">{lowStock}</p>
-          </div>
-        </div>
-      </div>
+        );
+      })}
     </div>
   );
 }

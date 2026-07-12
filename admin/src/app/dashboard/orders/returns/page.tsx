@@ -44,7 +44,7 @@ export default function ReturnsPage() {
     <DashboardLayout title="Returns">
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div><h1 className="text-2xl sm:text-3xl font-bold text-black lastik">Returns</h1><p className="text-black text-lg mt-2">Manage product returns and refunds</p></div>
+          <div><h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Returns</h1><p className="text-black text-lg mt-2">Manage product returns and refunds</p></div>
           <div className="flex items-center gap-3">
             <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
@@ -93,7 +93,7 @@ export default function ReturnsPage() {
                 className="bg-white rounded-t-xl sm:rounded-xl shadow-xl w-full sm:max-w-md"
                 onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
-                  <h2 className="text-2xl font-semibold text-black lastik">Filter Returns</h2>
+                  <h2 className="text-2xl font-semibold text-black outer-sans">Filter Returns</h2>
                   <button type="button" onClick={() => setShowFilters(false)}
                     className="text-gray-400 hover:text-black focus:outline-none focus:ring-2 focus:ring-[#D4AF37] rounded-md"><X className="w-6 h-6" /></button>
                 </div>

@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback, use, useMemo } from "react";
 import Link from "next/link";
-import { ShoppingBag, Heart, Eye, Search, X, SlidersHorizontal, ChevronDown } from "lucide-react";
+import { ShoppingBag, Heart, Eye, X, SlidersHorizontal, ChevronDown } from "lucide-react";
+import { hardcodedProducts } from './data';
 
 interface Product {
   id: string;
@@ -49,7 +50,6 @@ export default function ProductsPage({ params }: { params: Promise<{ category: s
   const [sortBy, setSortBy] = useState("newest");
   const [genderFilter, setGenderFilter] = useState("");
   const [saleOnly, setSaleOnly] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -62,6 +62,12 @@ export default function ProductsPage({ params }: { params: Promise<{ category: s
       : category.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
   const fetchProducts = useCallback(async () => {
+    if (category === "all") {
+      setProducts(hardcodedProducts);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     try {
       const sortParam =
@@ -112,21 +118,13 @@ export default function ProductsPage({ params }: { params: Promise<{ category: s
 
   const filteredProducts = useMemo(() => {
     let result = products;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.category?.name.toLowerCase().includes(q)
-      );
-    }
     if (selectedColors.length > 0) {
       result = result.filter(
         (p) => p.selectedColors?.some((c) => selectedColors.includes(c))
       );
     }
     return result;
-  }, [products, searchQuery, selectedColors]);
+  }, [products, selectedColors]);
 
   const getBadge = (product: Product): string | null => {
     if (product.isOnSale) return "Sale";
@@ -143,7 +141,7 @@ export default function ProductsPage({ params }: { params: Promise<{ category: s
 
   const FilterContent = () => (
     <>
-      <div className="border-b border-neutral-100 pb-6">
+      <div className="pb-6">
         <h4 className="text-sm font-medium text-neutral-900 mb-4">Gender</h4>
         <div className="space-y-2">
           {GENDER_OPTIONS.map((opt) => (
@@ -163,7 +161,7 @@ export default function ProductsPage({ params }: { params: Promise<{ category: s
         </div>
       </div>
 
-      <div className="border-b border-neutral-100 pb-6">
+      <div className="pb-6">
         <h4 className="text-sm font-medium text-neutral-900 mb-4">Sale & Offers</h4>
         <label className="flex items-center gap-2.5 cursor-pointer group">
           <input
@@ -179,7 +177,7 @@ export default function ProductsPage({ params }: { params: Promise<{ category: s
       </div>
 
       {availableColors.length > 0 && (
-        <div className="border-b border-neutral-100 pb-6">
+        <div className="pb-6">
           <h4 className="text-sm font-medium text-neutral-900 mb-4">Color</h4>
           <div className="flex flex-wrap gap-2">
             {availableColors.map((color) => (
@@ -199,8 +197,8 @@ export default function ProductsPage({ params }: { params: Promise<{ category: s
         </div>
       )}
 
-      <div className="sm:hidden border-b border-neutral-100 pb-6">
-        <h4 className="text-sm font-medium text-neutral-900 mb-4">Sort</h4>
+      <div className="sm:hidden pb-6">
+        <h4 className="text-sm font-medium text-neutral-900 mb-4">Sort By:</h4>
         <div className="space-y-2">
           {[
             { value: "newest", label: "Newest" },
@@ -241,24 +239,27 @@ export default function ProductsPage({ params }: { params: Promise<{ category: s
   return (
     <div className="min-h-screen bg-white">
       <div className="pt-5 pb-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          <div className="mb-6 sm:mb-8 px-4 sm:px-0">
-            <div className="flex items-baseline gap-2 mb-1">
-              <h1 className="lastik text-3xl sm:text-4xl text-neutral-900 tracking-tight">
-                {pageTitle}
-              </h1>
-              <span className="text-sm text-neutral-400">
-                ({isLoading ? "..." : filteredProducts.length})
-              </span>
+            <div className="mb-6 sm:mb-8 px-4 sm:px-0">
+              <div className="flex items-baseline gap-2 mb-1">
+                <h1 className="lastik text-3xl sm:text-4xl text-neutral-900 tracking-tight">
+                  {pageTitle}
+                </h1>
+                <span className="text-sm text-neutral-400">
+                  ({isLoading ? "..." : filteredProducts.length})
+                </span>
+              </div>
             </div>
-          </div>
 
           <div className="flex items-center justify-between mb-6 px-4 sm:px-0">
             <div className="flex items-center gap-3">
+              <span className="hidden sm:block text-sm text-neutral-500">
+                Showing all {isLoading ? "..." : filteredProducts.length} results
+              </span>
               <button
                 onClick={() => setFilterOpen(true)}
-                className="sm:hidden flex items-center gap-1.5 px-4 py-2 text-sm border border-neutral-200 rounded-full text-neutral-600"
+                className="sm:hidden flex items-center gap-1.5 px-4 py-2 text-sm text-neutral-600"
               >
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 Filters
@@ -274,35 +275,20 @@ export default function ProductsPage({ params }: { params: Promise<{ category: s
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="relative hidden sm:block">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-300" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search..."
-                  className="w-40 lg:w-48 pl-9 pr-8 py-2 text-sm border border-neutral-200 rounded-full focus:outline-none focus:border-neutral-400 transition-colors"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2"
-                  >
-                    <X className="w-3 h-3 text-neutral-300" />
-                  </button>
-                )}
-              </div>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="hidden sm:block border border-neutral-200 rounded-full px-4 py-2 text-sm text-neutral-600 focus:outline-none focus:border-neutral-400 transition-colors"
-              >
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-neutral-500">Sort By:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="border border-neutral-200 rounded-md px-4 py-2 text-sm text-neutral-600 focus:outline-none focus:border-neutral-400 transition-colors"
+                >
                 <option value="newest">Newest</option>
                 <option value="price-asc">Price: Low to High</option>
                 <option value="price-desc">Price: High to Low</option>
               </select>
             </div>
           </div>
+        </div>
 
           <div className="flex gap-8">
             {sidebarOpen && (
@@ -400,7 +386,7 @@ export default function ProductsPage({ params }: { params: Promise<{ category: s
                           )}
 
                           <div className="absolute inset-0 flex items-end justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-3">
-                            <span className="w-full text-center py-2.5 bg-white/90 backdrop-blur-sm text-xs font-medium text-neutral-900 rounded-full">
+                            <span className="w-full text-center py-2.5 bg-white/90 backdrop-blur-sm text-xs font-medium text-neutral-900 rounded-md">
                               Quick View
                             </span>
                           </div>

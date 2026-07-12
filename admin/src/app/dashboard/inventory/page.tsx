@@ -36,7 +36,7 @@ export default function InventoryPage() {
     <DashboardLayout title="Inventory Management">
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-black lastik">Inventory</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Inventory</h1>
           <p className="text-black text-lg mt-2">Manage stock levels and track inventory changes</p>
         </div>
 

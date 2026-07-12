@@ -74,10 +74,10 @@ function InvoicesContent() {
           <table>
             <thead>
               <tr>
-                <th>Item</th>
-                <th>Quantity</th>
-                <th>Unit Price</th>
-                <th>Total</th>
+                <th className="outer-sans">Item</th>
+                <th className="outer-sans">Quantity</th>
+                <th className="outer-sans">Unit Price</th>
+                <th className="outer-sans">Total</th>
               </tr>
             </thead>
             <tbody>
@@ -115,10 +115,10 @@ function InvoicesContent() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-black lastik">Invoices</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Invoices</h1>
           <p className="text-black text-lg mt-2">View and manage customer invoices</p>
         </div>
-        <button type="button" className="bg-[#D4AF37] text-white px-4 py-2.5 lastik text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold">
+        <button type="button" className="bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold">
           <Download className="w-4 h-4" /> Export All
         </button>
       </div>
@@ -148,13 +148,13 @@ function InvoicesContent() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Invoice #</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans">Invoice #</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans">Order ID</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans">Customer</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans">Date</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans">Amount</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">

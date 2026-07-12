@@ -66,8 +66,15 @@ export const createBulkNotifications: RequestHandler = asyncHandler(
 export const markAsRead: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const id = req.params.id as string;
+    const userId = req.user?.userId;
     if (!id) {
       sendBadRequest(res, 'Notification ID is required');
+      return;
+    }
+
+    const notification = await notificationRepository.findById(id);
+    if (!notification || notification.userId !== userId) {
+      sendNotFound(res, 'Notification not found');
       return;
     }
 
@@ -92,8 +99,15 @@ export const markAllAsRead: RequestHandler = asyncHandler(
 export const markAsUnread: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const id = req.params.id as string;
+    const userId = req.user?.userId;
     if (!id) {
       sendBadRequest(res, 'Notification ID is required');
+      return;
+    }
+
+    const notification = await notificationRepository.findById(id);
+    if (!notification || notification.userId !== userId) {
+      sendNotFound(res, 'Notification not found');
       return;
     }
 
@@ -105,8 +119,15 @@ export const markAsUnread: RequestHandler = asyncHandler(
 export const deleteNotification: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const id = req.params.id as string;
+    const userId = req.user?.userId;
     if (!id) {
       sendBadRequest(res, 'Notification ID is required');
+      return;
+    }
+
+    const notification = await notificationRepository.findById(id);
+    if (!notification || notification.userId !== userId) {
+      sendNotFound(res, 'Notification not found');
       return;
     }
 

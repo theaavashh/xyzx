@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
+import { authenticateToken } from '../middlewares/auth';
 import {
   changePassword,
   forgotPassword,
@@ -57,6 +58,14 @@ const passwordResetLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const totpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { success: false, message: 'Too many TOTP attempts, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const refreshLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -65,20 +74,20 @@ const refreshLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-router.post('/login', validate(loginSchema), login);
-router.post('/verify-otp', validate(otpSchema), verifyOtp);
-router.post('/forgot-password', validate(forgotPasswordSchema), forgotPassword);
-router.post('/reset-password', validate(resetPasswordSchema), resetPassword);
-router.post('/signup', validate(signupSchema), signup);
-router.get('/profile', getProfile);
+router.post('/login', authLimiter, validate(loginSchema), login);
+router.post('/verify-otp', otpLimiter, validate(otpSchema), verifyOtp);
+router.post('/forgot-password', passwordResetLimiter, validate(forgotPasswordSchema), forgotPassword);
+router.post('/reset-password', passwordResetLimiter, validate(resetPasswordSchema), resetPassword);
+router.post('/signup', authLimiter, validate(signupSchema), signup);
+router.get('/profile', authenticateToken, getProfile);
 router.post('/verify-credentials', validate(verifyCredentialsSchema), verifyCredentials);
 router.post('/logout', logout);
-router.post('/refresh', refreshAccessToken);
-router.post('/generate-totp', validate(totpSetupSchema), generateTotpSecret);
-router.post('/verify-totp', validate(verifyTotpSchema), verifyTotpSetup);
-router.post('/login-with-totp', validate(loginWithTotpSchema), loginWithTotp);
-router.post('/disable-totp', validate(disableTotpSchema), disableTotp);
-router.post('/change-password', validate(changePasswordSchema), changePassword);
+router.post('/refresh', refreshLimiter, refreshAccessToken);
+router.post('/generate-totp', authenticateToken, validate(totpSetupSchema), generateTotpSecret);
+router.post('/verify-totp', authenticateToken, validate(verifyTotpSchema), verifyTotpSetup);
+router.post('/login-with-totp', totpLimiter, validate(loginWithTotpSchema), loginWithTotp);
+router.post('/disable-totp', authenticateToken, validate(disableTotpSchema), disableTotp);
+router.post('/change-password', authenticateToken, validate(changePasswordSchema), changePassword);
 router.get('/test', (_req, res) => {
   res.json({ message: 'Auth test endpoint working' });
 });

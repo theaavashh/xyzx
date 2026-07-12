@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { authenticateToken, requireAdmin } from '../middlewares/auth';
 import { healthCheck } from '../controllers/health.controller';
+import aboutRoutes from './about.routes';
 import analyticsRoutes from './analytics.routes';
 import authRoutes from './auth.routes';
 import bannerRoutes from './banner.routes';
 import cartRoutes from './cart.routes';
 import categoryRoutes from './category.routes';
+import categoryGridRoutes from './category-grid.routes';
 import contentRoutes from './content.routes';
 import dualCardSectionRoutes from './dual-card-section.routes';
 import editorialSectionRoutes from './editorial-section.routes';
@@ -15,6 +17,8 @@ import followSectionRoutes from './follow-section.routes';
 import footerCatalogRoutes from './footer-catalog.routes';
 import footerSectionRoutes from './footer-section.routes';
 import heroBannerRoutes from './hero-banner.routes';
+import heroSlideRoutes from './hero-slide.routes';
+import imageGridRoutes from './image-grid.routes';
 import inventoryRoutes from './inventory.routes';
 import jsonLdRoutes from './json-ld.routes';
 import navigationRoutes from './navigation.routes';
@@ -60,11 +64,15 @@ router.use('/contact', contactRoutes);
 router.use('/attribute-options', attributeOptionRoutes);
 
 // Public read-only routes for storefront
+router.use('/public/about', aboutRoutes);
 router.use('/public/banners', bannerRoutes);
+router.use('/public/hero-slides', heroSlideRoutes);
 router.use('/public/hero-banners', heroBannerRoutes);
+router.use('/public/image-grid', imageGridRoutes);
 router.use('/shipping', shippingRoutes);
 router.use('/store-section', storeRoutes);
 router.use('/public/featured-sections', featuredSectionRoutes);
+router.use('/public/category-grid', categoryGridRoutes);
 router.use('/public/shop-by-categories', shopByCategoryRoutes);
 router.use('/public/navigation', navigationRoutes);
 router.use('/public/footer-catalog', footerCatalogRoutes);
@@ -89,9 +97,13 @@ router.use('/deliveries', ...authMiddleware, deliveryRoutes);
 router.use('/user/addresses', addressRoutes);
 
 // Admin-managed routes (require admin auth)
+router.use('/about', ...adminMiddleware, aboutRoutes);
 router.use('/inventory', ...adminMiddleware, inventoryRoutes);
 router.use('/banners', ...adminMiddleware, bannerRoutes);
+router.use('/hero-slides', ...adminMiddleware, heroSlideRoutes);
 router.use('/hero-banners', ...adminMiddleware, heroBannerRoutes);
+router.use('/image-grid', ...adminMiddleware, imageGridRoutes);
+router.use('/category-grid', ...adminMiddleware, categoryGridRoutes);
 router.use('/shop-by-categories', ...adminMiddleware, shopByCategoryRoutes);
 router.use('/navigation', ...adminMiddleware, navigationRoutes);
 router.use('/footer-catalog', ...adminMiddleware, footerCatalogRoutes);

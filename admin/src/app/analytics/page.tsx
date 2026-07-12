@@ -954,7 +954,7 @@ export default function AnalyticsPage() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black lastik">Analytics</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Analytics</h1>
             <p className="text-black text-lg mt-2">
               View and analyze your store performance
             </p>

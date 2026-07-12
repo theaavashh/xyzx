@@ -9,10 +9,13 @@ dotenv.config();
 
 async function createAdminUser() {
   try {
-    // Use the specified credentials
-    const email = 'aavash.ganeju@gmail.com';
-    const password = 'admin123';
-    const name = 'Aavash Ganeju';
+    const email = process.env.ADMIN_EMAIL || 'aavash.ganeju@gmail.com';
+    const password = process.env.ADMIN_PASSWORD;
+    if (!password || password.length < 8) {
+      console.error('ADMIN_PASSWORD environment variable must be set (min 8 characters)');
+      process.exit(1);
+    }
+    const name = process.env.ADMIN_NAME || 'Aavash Ganeju';
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);

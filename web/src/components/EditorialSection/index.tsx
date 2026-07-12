@@ -3,20 +3,23 @@
 import { memo } from 'react';
 import { EditorialSectionClient } from './EditorialSectionClient';
 import { useEditorialSection } from './hooks';
+import { EditorialSkeleton } from './skeleton/EditorialSkeleton';
 
 export default memo(function EditorialSection() {
-  const { data } = useEditorialSection();
-  const section = data?.section;
-  const products = data?.products || [];
+  const { data, isLoading } = useEditorialSection();
+  const { section, products } = data ?? { section: null, products: [] };
+
+  if (isLoading) return <EditorialSkeleton />;
+  if (!section) return null;
 
   return (
     <EditorialSectionClient
-      season={section?.season || 'Editor\'s Pick'}
-      title={section?.title || 'Summer 2025'}
-      description={section?.description || 'Handpicked styles for the modern wardrobe'}
-      ctaText={section?.ctaText || 'Shop the Edit'}
-      ctaLink={section?.ctaLink || '/products'}
-      products={products}
+      season={section.season}
+      title={section.title}
+      description={section.description}
+      ctaText={section.ctaText}
+      ctaLink={section.ctaLink}
+      products={products.slice(0, 4)}
     />
   );
 });

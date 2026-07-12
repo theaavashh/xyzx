@@ -1,35 +1,39 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { ChevronDown, HelpCircle, ArrowRight } from 'lucide-react';
+import { Plus, Minus, ArrowRight, MessageCircle } from 'lucide-react';
 import { fetchFAQs } from '@/components/FAQ/utils/api';
-import type { FAQItem, FAQCategory } from '@/components/FAQ/types';
+import type { FAQItem } from '@/components/FAQ/types';
 
 function Accordion({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="border border-gray-100 rounded-2xl overflow-hidden">
+    <div className="border-b border-zinc-200 last:border-b-0">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between gap-4 py-5 text-left group"
       >
-        <span className="font-semibold text-gray-900 pr-4">{q}</span>
-        <ChevronDown
-          className={`w-5 h-5 text-gray-400 shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-        />
+        <span className="text-sm font-medium text-zinc-900 group-hover:text-zinc-600 transition-colors pr-4">
+          {q}
+        </span>
+        {open ? (
+          <Minus className="w-4 h-4 text-zinc-400 shrink-0" />
+        ) : (
+          <Plus className="w-4 h-4 text-zinc-400 shrink-0" />
+        )}
       </button>
       {open && (
-        <div className="px-5 pb-5">
-          <p className="text-gray-500 leading-relaxed text-sm">{a}</p>
+        <div className="pb-5">
+          <p className="text-sm text-zinc-500 leading-relaxed">{a}</p>
         </div>
       )}
     </div>
   );
 }
 
-function groupFAQs(faqs: FAQItem[]): FAQCategory[] {
+function groupFAQs(faqs: FAQItem[]): { category: string; questions: FAQItem[] }[] {
   const map = new Map<string, FAQItem[]>();
   for (const faq of faqs) {
     const list = map.get(faq.category) ?? [];
@@ -42,6 +46,7 @@ function groupFAQs(faqs: FAQItem[]): FAQCategory[] {
 export default function FAQPage() {
   const [faqs, setFaqs] = useState<FAQItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -52,49 +57,57 @@ export default function FAQPage() {
     load();
   }, []);
 
-  const categories = groupFAQs(faqs);
+  const categories = useMemo(() => groupFAQs(faqs), [faqs]);
+
+  useEffect(() => {
+    if (!activeCategory && categories.length > 0) {
+      setActiveCategory(categories[0].category);
+    }
+  }, [categories, activeCategory]);
+
+  const activeQuestions = useMemo(() => {
+    const cat = categories.find((c) => c.category === activeCategory);
+    return cat?.questions ?? [];
+  }, [categories, activeCategory]);
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="py-24 lg:py-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/10 ring-1 ring-amber-400/20 mb-6">
-              <span className="text-xs font-semibold tracking-[0.2em] uppercase text-amber-600">
-                Help Center
-              </span>
-            </div>
-            <h1 className={`lastik text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-6`}>
-              FAQ
-            </h1>
-            <p className="text-gray-500 max-w-2xl mx-auto text-base lg:text-lg leading-relaxed">
-              Find answers to common questions about orders, shipping, returns, and more
-            </p>
-          </div>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+        <div className="text-left lg:text-center mb-10">
+          <h1 className="lastik text-4xl sm:text-5xl md:text-6xl text-zinc-900">
+            FAQS
+          </h1>
+        </div>
 
-          {loading ? (
-            <div className="space-y-12">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="h-8 w-40 bg-gray-200 rounded mb-4" />
-                  <div className="space-y-3">
-                    {[1, 2, 3].map((j) => (
-                      <div key={j} className="h-16 bg-gray-100 rounded-2xl" />
-                    ))}
-                  </div>
-                </div>
+        {loading ? (
+          <div className="space-y-3 animate-pulse">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-14 bg-zinc-100 rounded" />
+            ))}
+          </div>
+        ) : (
+          <>
+            <div className="hidden lg:flex items-center gap-6 sm:gap-8 overflow-x-auto pb-4 mb-8 border-b border-zinc-200 scrollbar-none">
+              {categories.map((cat) => (
+                <button
+                  key={cat.category}
+                  onClick={() => setActiveCategory(cat.category)}
+                  className={`shrink-0 lastik text-sm transition-colors pb-4 -mb-4 border-b-2 ${
+                    activeCategory === cat.category
+                      ? 'text-zinc-900 border-zinc-900'
+                      : 'text-zinc-400 border-transparent hover:text-zinc-600'
+                  }`}
+                >
+                  {cat.category}
+                </button>
               ))}
             </div>
-          ) : categories.length === 0 ? (
-            <p className="text-center text-gray-500">No FAQs available yet.</p>
-          ) : (
-            <div className="space-y-12">
+
+            <div className="lg:hidden space-y-10">
               {categories.map((cat) => (
                 <div key={cat.category}>
-                  <h2 className={`lastik text-2xl text-gray-900 mb-4`}>
-                    {cat.category}
-                  </h2>
-                  <div className="space-y-3">
+                  <h2 className="lastik text-lg text-zinc-900 mb-3">{cat.category}</h2>
+                  <div className="divide-y divide-zinc-200">
                     {cat.questions.map((faq) => (
                       <Accordion key={faq.id} q={faq.question} a={faq.answer} />
                     ))}
@@ -102,26 +115,30 @@ export default function FAQPage() {
                 </div>
               ))}
             </div>
-          )}
 
-          <div className="mt-20 bg-gray-50 rounded-3xl p-8 md:p-12 text-center">
-            <HelpCircle className="w-10 h-10 mx-auto mb-6 text-amber-500" />
-            <h2 className={`lastik text-2xl text-gray-900 mb-4`}>
-              Still Have Questions?
-            </h2>
-            <p className="text-gray-500 mb-6 max-w-xl mx-auto">
-              Can&apos;t find what you&apos;re looking for? Our customer service team is here to help.
-            </p>
-            <Link
-              href="/contact-us"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-amber-400 text-black font-bold rounded-xl hover:bg-amber-300 transition-colors text-sm"
-            >
-              Contact Us
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
+            <div className="hidden lg:block divide-y divide-zinc-200">
+              {activeQuestions.map((faq) => (
+                <Accordion key={faq.id} q={faq.question} a={faq.answer} />
+              ))}
+            </div>
+
+            <div className="mt-14 bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-2xl p-8 md:p-10 text-center">
+              <MessageCircle className="w-10 h-10 mx-auto mb-5 text-amber-400" />
+              <h2 className="text-xl font-bold text-white mb-2">Still Have Questions?</h2>
+              <p className="text-zinc-400 text-sm mb-6 max-w-md mx-auto">
+                Can&apos;t find what you&apos;re looking for? Our support team is here to help.
+              </p>
+              <Link
+                href="/contact-us"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-amber-400 text-zinc-900 font-semibold rounded-lg hover:bg-amber-300 transition-all text-sm"
+              >
+                Contact Us
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

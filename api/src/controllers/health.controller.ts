@@ -29,7 +29,7 @@ const checkCache = async (): Promise<ServiceHealth> => {
 const checkDatabase = async (): Promise<ServiceHealth> => {
   const start = Date.now();
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    await prisma.user.findFirst({ select: { id: true } });
     return { status: 'up', latency: Date.now() - start };
   } catch (error) {
     return {

@@ -38,10 +38,13 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma ./node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma
 COPY --from=builder /app/src ./src
+COPY --from=builder /app/src/proto ./dist/proto
 COPY --from=builder /app/tsconfig.json ./
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
+
+RUN chown -R nodejs:nodejs /app
 
 USER nodejs
 

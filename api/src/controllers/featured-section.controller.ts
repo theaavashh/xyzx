@@ -104,7 +104,17 @@ export const updateFeaturedSection: RequestHandler = asyncHandler(
       return;
     }
 
-    const section = await featuredSectionRepository.updateFeaturedSection(id, req.body);
+    const { title, subtitle, description, image, ctaUrl, ctaText, isActive, order } = req.body;
+    const section = await featuredSectionRepository.updateFeaturedSection(id, {
+      title,
+      subtitle: subtitle || undefined,
+      description: description || undefined,
+      image: image || undefined,
+      ctaUrl: ctaUrl || undefined,
+      ctaText: ctaText || undefined,
+      isActive: isActive !== undefined ? isActive : undefined,
+      order: order !== undefined ? order : undefined,
+    });
 
     sendSuccess(res, section, 'Featured section updated successfully');
   },

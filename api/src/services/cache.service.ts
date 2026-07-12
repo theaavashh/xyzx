@@ -84,6 +84,31 @@ export const createRedisCacheService = (options: CacheOptions = {}): ICacheServi
   let client: Redis | null = null;
   let connected = false;
 
+  const memoryStore = new Map<string, { value: string; expiry?: number }>();
+
+  const memorySet = (key: string, value: string, ttl?: number): void => {
+    const expiry = ttl
+      ? Date.now() + ttl * 1000
+      : defaultTtl > 0
+        ? Date.now() + defaultTtl * 1000
+        : undefined;
+    memoryStore.set(key, { value, expiry });
+  };
+
+  const memoryGet = <T>(key: string): T | null => {
+    const data = memoryStore.get(key);
+    if (!data) return null;
+    if (data.expiry && data.expiry < Date.now()) {
+      memoryStore.delete(key);
+      return null;
+    }
+    return JSON.parse(data.value) as T;
+  };
+
+  const memoryDel = (key: string): void => {
+    memoryStore.delete(key);
+  };
+
   const connect = async (): Promise<void> => {
     if (connected) return;
     
@@ -96,7 +121,7 @@ export const createRedisCacheService = (options: CacheOptions = {}): ICacheServi
         port: options.port ?? parseInt(process.env.REDIS_PORT ?? '6379', 10),
       });
     } catch (error) {
-      logger.error('Failed to connect Redis cache service', undefined, error as Error);
+      logger.error('Failed to connect Redis cache service, falling back to in-memory cache', undefined, error as Error);
       connected = false;
     }
   };
@@ -109,7 +134,12 @@ export const createRedisCacheService = (options: CacheOptions = {}): ICacheServi
   };
 
   const get = async <T>(key: string): Promise<T | null> => {
-    if (!connected) return null;
+    if (!connected) {
+      stats.misses++;
+      const cached = memoryGet<T>(key);
+      if (cached !== null) stats.hits++;
+      return cached;
+    }
     
     try {
       const data = await getClient().get(key);
@@ -121,24 +151,31 @@ export const createRedisCacheService = (options: CacheOptions = {}): ICacheServi
       return null;
     } catch (error) {
       stats.misses++;
-      logger.debug('Cache get error', { key, error: (error as Error).message });
-      return null;
+      logger.warn('Redis get failed, falling back to in-memory cache', { key, error: (error as Error).message });
+      const cached = memoryGet<T>(key);
+      if (cached !== null) stats.hits++;
+      return cached;
     }
   };
 
   const set = async <T>(key: string, value: T, ttl?: number): Promise<void> => {
+    const serialized = JSON.stringify(value);
+    const expiry = ttl ?? defaultTtl;
+
+    memorySet(key, serialized, expiry);
+
     if (!connected) return;
     
     try {
-      const serialized = JSON.stringify(value);
-      const expiry = ttl ?? defaultTtl;
       await getClient().setex(key, expiry, serialized);
     } catch (error) {
-      logger.debug('Cache set error', { key, error: (error as Error).message });
+      logger.warn('Redis set failed, using in-memory cache', { key, error: (error as Error).message });
     }
   };
 
   const del = async (key: string): Promise<void> => {
+    memoryDel(key);
+
     if (!connected) return;
     
     try {
@@ -149,49 +186,65 @@ export const createRedisCacheService = (options: CacheOptions = {}): ICacheServi
   };
 
   const clear = async (): Promise<void> => {
+    memoryStore.clear();
+    stats.hits = 0;
+    stats.misses = 0;
+    
     if (!connected) return;
     
     try {
       await getClient().flushdb();
-      stats.hits = 0;
-      stats.misses = 0;
     } catch (error) {
       logger.error('Cache clear error', undefined, error as Error);
     }
   };
 
   const has = async (key: string): Promise<boolean> => {
-    if (!connected) return false;
+    if (!connected) {
+      return memoryStore.has(key);
+    }
     
     try {
       const exists = await getClient().exists(key);
-      return exists === 1;
+      return exists === 1 || memoryStore.has(key);
     } catch {
-      return false;
+      return memoryStore.has(key);
     }
   };
 
   const keys = async (pattern: string = '*'): Promise<string[]> => {
-    if (!connected) return [];
+    const memKeys = Array.from(memoryStore.keys());
+    
+    if (!connected) return memKeys;
     
     try {
-      return await getClient().keys(pattern);
+      const redisKeys = await getClient().keys(pattern);
+      return [...new Set([...redisKeys, ...memKeys])];
     } catch {
-      return [];
+      return memKeys;
     }
   };
 
   const invalidatePattern = async (pattern: string): Promise<number> => {
-    if (!connected) return 0;
+    const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+    let count = 0;
+    for (const key of memoryStore.keys()) {
+      if (regex.test(key)) {
+        memoryStore.delete(key);
+        count++;
+      }
+    }
+
+    if (!connected) return count;
     
     try {
-      const allKeys = await keys(pattern);
+      const allKeys = await getClient().keys(pattern);
       if (allKeys.length > 0) {
         await getClient().del(...allKeys);
       }
-      return allKeys.length;
+      return allKeys.length + count;
     } catch {
-      return 0;
+      return count;
     }
   };
 
@@ -211,8 +264,9 @@ export const createRedisCacheService = (options: CacheOptions = {}): ICacheServi
   };
 
   const getStats = async (): Promise<CacheStats> => {
+    const totalKeys = memoryStore.size;
     if (!connected || !client) {
-      return { hits: stats.hits, misses: stats.misses, keys: 0 };
+      return { hits: stats.hits, misses: stats.misses, keys: totalKeys };
     }
     
     try {
@@ -220,14 +274,15 @@ export const createRedisCacheService = (options: CacheOptions = {}): ICacheServi
       return {
         hits: stats.hits,
         misses: stats.misses,
-        keys: keyCount,
+        keys: Math.max(keyCount, totalKeys),
       };
     } catch {
-      return { hits: stats.hits, misses: stats.misses, keys: 0 };
+      return { hits: stats.hits, misses: stats.misses, keys: totalKeys };
     }
   };
 
   const disconnect = async (): Promise<void> => {
+    memoryStore.clear();
     if (client) {
       await client.quit();
       client = null;
@@ -247,7 +302,7 @@ export const createRedisCacheService = (options: CacheOptions = {}): ICacheServi
     getStats,
     connect,
     disconnect,
-    isConnected: () => connected,
+    isConnected: () => connected || memoryStore.size > 0,
   };
 };
 

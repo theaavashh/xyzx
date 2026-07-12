@@ -21,7 +21,6 @@ export default function BannerForm({
   showActions = true,
 }: BannerFormProps) {
   const {
-    control,
     handleSubmit,
     watch,
     setValue,
@@ -30,6 +29,11 @@ export default function BannerForm({
     defaultValues: {
       title: '',
       isActive: true,
+      endDate: '',
+      buttonText: '',
+      buttonUrl: '',
+      backgroundColor: '',
+      textColor: '',
     },
     resolver: (values) => {
       const plainText = values.title.replace(/<[^>]*>/g, '').trim();
@@ -53,17 +57,35 @@ export default function BannerForm({
     if (banner) {
       setValue('title', banner.title);
       setValue('isActive', banner.isActive);
+      setValue('endDate', banner.endDate || '');
+      setValue('buttonText', banner.buttonText || '');
+      setValue('buttonUrl', banner.buttonUrl || '');
+      setValue('backgroundColor', banner.backgroundColor || '');
+      setValue('textColor', banner.textColor || '');
     } else {
       setValue('title', '');
       setValue('isActive', true);
+      setValue('endDate', '');
+      setValue('buttonText', '');
+      setValue('buttonUrl', '');
+      setValue('backgroundColor', '');
+      setValue('textColor', '');
     }
   }, [banner, setValue]);
 
   const onFormSubmit = (data: BannerFormData) => {
-    onSubmit(data);
+    const payload: BannerFormData = {
+      title: data.title,
+      isActive: data.isActive,
+      endDate: data.endDate || null,
+      buttonText: data.buttonText || null,
+      buttonUrl: data.buttonUrl || null,
+      backgroundColor: data.backgroundColor || null,
+      textColor: data.textColor || null,
+    };
+    onSubmit(payload);
   };
 
-  // Expose handleSubmit to window for modal footer submission
   useEffect(() => {
     (window as Window & { __bannerFormSubmit?: () => void }).__bannerFormSubmit = handleSubmit(onFormSubmit);
     return () => {
@@ -75,7 +97,6 @@ export default function BannerForm({
 
   return (
     <div className="space-y-6" id="banner-form">
-      {/* Basic Information */}
       <div>
         <label className="block text-md font-medium text-black mb-2">
           Banner Title & Content *
@@ -84,53 +105,151 @@ export default function BannerForm({
           value={titleValue || ''}
           onChange={(value) => setValue('title', value, { shouldValidate: true })}
           placeholder="e.g., Free Delivery on orders over NPR.10000. Don't miss discount."
-          className="border border-gray-300 rounded-md lastik"
+          className="border border-gray-300 rounded-md outer-sans"
           height={250}
         />
         {errors.title && (
           <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
         )}
         <p className="text-sm text-gray-700 mt-1">
-          Use the rich text editor to format your banner content with custom
-          styling
+          Use the rich text editor to format your banner content with custom styling
         </p>
       </div>
 
-      {/* Status */}
-      <div className="flex items-center">
-        <input
-          type="checkbox"
-          id="isActive"
-          checked={watch('isActive') || false}
-          onChange={(e) => setValue('isActive', e.target.checked)}
-          className="h-4 w-4 accent-[#D4AF37] checked:bg-[#D4AF37] checked:border-[#D4AF37] focus:ring-[#D4AF37] border-gray-300 rounded"
-        />
-        <label htmlFor="isActive" className="ml-2 block text-md text-black">
-          Active (visible on website)
-        </label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-md font-medium text-black mb-2">
+            End Date (for countdown)
+          </label>
+          <input
+            type="datetime-local"
+            value={watch('endDate') ? (watch('endDate') as string).slice(0, 16) : ''}
+            onChange={(e) => setValue('endDate', e.target.value ? new Date(e.target.value).toISOString() : '')}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+          />
+          <p className="text-sm text-gray-700 mt-1">
+            Leave empty for no countdown timer
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-md font-medium text-black mb-2">
+            Status
+          </label>
+          <div className="flex items-center h-[42px]">
+            <input
+              type="checkbox"
+              id="isActive"
+              checked={watch('isActive') || false}
+              onChange={(e) => setValue('isActive', e.target.checked)}
+              className="h-4 w-4 accent-[#D4AF37] checked:bg-[#D4AF37] checked:border-[#D4AF37] focus:ring-[#D4AF37] border-gray-300 rounded"
+            />
+            <label htmlFor="isActive" className="ml-2 block text-md text-black">
+              Active (visible on website)
+            </label>
+          </div>
+        </div>
       </div>
 
-      {/* Preview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-md font-medium text-black mb-2">
+            Button Text
+          </label>
+          <input
+            type="text"
+            value={watch('buttonText') as string}
+            onChange={(e) => setValue('buttonText', e.target.value)}
+            placeholder="e.g., SHOP NOW"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+          />
+        </div>
+
+        <div>
+          <label className="block text-md font-medium text-black mb-2">
+            Button URL
+          </label>
+          <input
+            type="text"
+            value={watch('buttonUrl') as string}
+            onChange={(e) => setValue('buttonUrl', e.target.value)}
+            placeholder="e.g., /sale"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-md font-medium text-black mb-2">
+            Background Color
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="color"
+              value={watch('backgroundColor') || '#ffffff'}
+              onChange={(e) => setValue('backgroundColor', e.target.value)}
+              className="h-[42px] w-[42px] border border-gray-300 rounded cursor-pointer"
+            />
+            <input
+              type="text"
+              value={watch('backgroundColor') as string}
+              onChange={(e) => setValue('backgroundColor', e.target.value)}
+              placeholder="#ffffff"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-md font-medium text-black mb-2">
+            Text Color
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="color"
+              value={watch('textColor') || '#000000'}
+              onChange={(e) => setValue('textColor', e.target.value)}
+              className="h-[42px] w-[42px] border border-gray-300 rounded cursor-pointer"
+            />
+            <input
+              type="text"
+              value={watch('textColor') as string}
+              onChange={(e) => setValue('textColor', e.target.value)}
+              placeholder="#000000"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+            />
+          </div>
+        </div>
+      </div>
+
       <div>
         <label className="block text-sm font-medium text-black mb-2">
           Preview
         </label>
-        <div className="p-4 rounded-md border-2 border-dashed border-gray-200 bg-[#D4AF37]/5">
+        <div
+          className="p-4 rounded-md border-2 border-dashed border-gray-200"
+          style={{
+            backgroundColor: watch('backgroundColor') || '#C6E2E7',
+            color: watch('textColor') || '#1F2937',
+          }}
+        >
           <div className="text-center">
             <div
-              className="text-md font-medium text-black"
+              className="text-md font-medium"
               dangerouslySetInnerHTML={{
                 __html: sanitizeHtml(titleValue || 'Banner content will appear here'),
               }}
             />
+            {watch('buttonText') && (
+              <span className="inline-block mt-2 text-xs font-bold uppercase underline underline-offset-4 opacity-80">
+                {watch('buttonText')}
+              </span>
+            )}
           </div>
         </div>
-        <p className="text-sm text-gray-700 mt-2">
-          Banner colors will use the global theme settings configured in Settings
-        </p>
       </div>
 
-      {/* Form Actions - Only shown when showActions is true (for standalone usage) */}
       {showActions && (
         <form
           onSubmit={handleSubmit(onFormSubmit)}
@@ -139,14 +258,14 @@ export default function BannerForm({
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2.5 text-black bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] lastik"
+            className="px-4 py-2.5 text-black bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] outer-sans"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2.5 bg-[#D4AF37] lastik text-white rounded-md hover:bg-[#b8962e] flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+            className="px-4 py-2.5 bg-[#D4AF37] outer-sans text-white rounded-md hover:bg-[#b8962e] flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
           >
             {isSubmitting ? (
               <>

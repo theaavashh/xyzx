@@ -75,6 +75,14 @@ export const createUser: RequestHandler = asyncHandler(
       role: role as 'user' | 'admin' | undefined,
     });
 
+    logger.info('User created', {
+      action: 'user_created',
+      targetUserId: user.id,
+      targetEmail: email,
+      role: role || 'user',
+      performedBy: req.user?.userId,
+    });
+
     sendCreated(res, user, 'User created successfully');
   },
 );
@@ -144,6 +152,13 @@ export const updateUser: RequestHandler = asyncHandler(
       isActive: isActive as boolean | undefined,
     });
 
+    logger.info('User updated', {
+      action: 'user_updated',
+      targetUserId: id,
+      changes: { name: !!name, email: !!email, role: !!role, isActive: isActive !== undefined },
+      performedBy: req.user?.userId,
+    });
+
     sendSuccess(res, user, 'User updated successfully');
   },
 );
@@ -171,6 +186,12 @@ export const deleteUser: RequestHandler = asyncHandler(
 
     await userRepository.deleteUser(id);
 
+    logger.info('User deleted', {
+      action: 'user_deleted',
+      targetUserId: id,
+      performedBy: req.user?.userId,
+    });
+
     sendSuccess(res, null, 'User deleted successfully');
   },
 );
@@ -192,6 +213,12 @@ export const toggleUserStatus: RequestHandler = asyncHandler(
 
     try {
       const user = await userRepository.toggleUserStatus(id);
+
+      logger.info('User status toggled', {
+        action: user.isActive ? 'user_activated' : 'user_deactivated',
+        targetUserId: id,
+        performedBy: req.user?.userId,
+      });
 
       sendSuccess(
         res,
@@ -227,6 +254,13 @@ export const updateUserRole: RequestHandler = asyncHandler(
 
     try {
       const user = await userRepository.updateUserRole(id, role);
+
+      logger.info('User role updated', {
+        action: 'user_role_changed',
+        targetUserId: id,
+        newRole: role,
+        performedBy: req.user?.userId,
+      });
 
       sendSuccess(res, user, 'User role updated successfully');
     } catch {

@@ -134,7 +134,7 @@ export default function ContentPagesPage() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black lastik">Content Pages</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Content Pages</h1>
             <p className="text-gray-600 mt-1">Manage website content pages including policies, FAQs, and informational pages</p>
           </div>
           <button type="button" onClick={openCreateModal}
@@ -226,7 +226,7 @@ export default function ContentPagesPage() {
               className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-black lastik">Edit Content Page</h2>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Edit Content Page</h2>
                   <button type="button" onClick={closeModal} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                     <X className="w-5 h-5 text-gray-500" />
                   </button>
@@ -277,7 +277,7 @@ export default function ContentPagesPage() {
               className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-black lastik">Create Content Page</h2>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Create Content Page</h2>
                   <button type="button" onClick={closeCreateModal} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                     <X className="w-5 h-5 text-gray-500" />
                   </button>

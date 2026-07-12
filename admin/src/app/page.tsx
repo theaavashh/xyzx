@@ -91,7 +91,7 @@ export default function AdminLogin() {
               disabled={otpValue.length !== 6 || isLoading}
               className="w-full bg-[#D4AF37] text-white py-3.5 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-base font-bold"
             >
-              {isLoading ? 'Verifying...' : 'Proceed'}
+              {isLoading ? 'Verifying...' : 'Verify'}
             </button>
             <div className="text-center">
               <button
@@ -112,7 +112,7 @@ export default function AdminLogin() {
         {step === 'forgotPassword' && !forgotSent && (
           <form onSubmit={handleForgotSubmit} className="space-y-5">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 lastik">
+              <h2 className="text-2xl font-bold text-gray-900 outer-sans">
                 Forgot Password
               </h2>
               <p className="text-base text-gray-500 mt-2 font-medium tracking-normal">

@@ -91,7 +91,21 @@ export const updateAddress: RequestHandler = asyncHandler(
       return;
     }
 
-    const { isDefault, ...rest } = req.body;
+    const { type, name, phone, street, city, state, zip, country, isDefault } = req.body;
+
+    const allowedFields: Record<string, string | undefined> = {
+      type: type as string,
+      name: name as string,
+      phone: phone as string,
+      street: street as string,
+      city: city as string,
+      state: state as string,
+      zip: zip as string,
+      country: country as string,
+    };
+    Object.keys(allowedFields).forEach((k) => {
+      if (allowedFields[k] === undefined) delete allowedFields[k];
+    });
 
     if (isDefault === true) {
       const address = await prisma.$transaction(async (tx) => {
@@ -101,7 +115,7 @@ export const updateAddress: RequestHandler = asyncHandler(
         });
         return tx.address.update({
           where: { id: addressId },
-          data: { ...rest, isDefault: true },
+          data: { ...allowedFields, isDefault: true },
         });
       });
       sendSuccess(res, address, 'Address updated successfully');
@@ -110,7 +124,7 @@ export const updateAddress: RequestHandler = asyncHandler(
 
     const address = await prisma.address.update({
       where: { id: addressId },
-      data: { ...rest, ...(isDefault === false ? { isDefault: false } : {}) },
+      data: { ...allowedFields, ...(isDefault === false ? { isDefault: false } : {}) },
     });
 
     sendSuccess(res, address, 'Address updated successfully');

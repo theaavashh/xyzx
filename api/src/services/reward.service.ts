@@ -20,22 +20,13 @@ interface RewardService {
 
 const calculateRewards = async (amount: number): Promise<number> => {
   try {
-    const settings = (await prisma.$queryRaw`
-      SELECT "amountUnit", "rewardValue" 
-      FROM "reward_settings" 
-      WHERE "isActive" = true 
-      ORDER BY "createdAt" DESC 
-      LIMIT 1
-    `) as any[];
+    const setting = await prisma.rewardSettings.findFirst({
+      where: { isActive: true },
+      orderBy: { createdAt: 'desc' },
+    });
 
-    let amountUnit = 100;
-    let rewardValue = 1;
-
-    if (settings.length > 0) {
-      const setting = settings[0];
-      amountUnit = setting.amountUnit;
-      rewardValue = setting.rewardValue;
-    }
+    const amountUnit = setting?.amountUnit ?? 100;
+    const rewardValue = setting?.rewardValue ?? 1;
 
     return Math.floor((amount / amountUnit) * rewardValue);
   } catch (error) {
@@ -50,20 +41,24 @@ const addOrderReward = async (
   orderAmount: number,
 ): Promise<void> => {
   try {
-    const existingReward = (await prisma.$queryRaw`
-      SELECT id FROM "user_rewards" 
-      WHERE "orderId" = ${orderId} AND "type" = 'EARNED'
-    `) as any[];
+    const existingReward = await prisma.userReward.findFirst({
+      where: { orderId, type: 'EARNED' },
+    });
 
-    if (existingReward.length > 0) return;
+    if (existingReward) return;
 
     const points = await calculateRewards(orderAmount);
     if (points <= 0) return;
 
-    await prisma.$queryRaw`
-      INSERT INTO "user_rewards" ("userId", "orderId", points, type, description, "createdAt", "updatedAt") 
-      VALUES (${userId}, ${orderId}, ${points}, 'EARNED', 'Rewards earned from order', NOW(), NOW())
-    `;
+    await prisma.userReward.create({
+      data: {
+        userId,
+        orderId,
+        points,
+        type: 'EARNED',
+        description: 'Rewards earned from order',
+      },
+    });
   } catch (error) {
     logger.error('Error adding order reward', { orderId, userId }, error as Error);
     throw error;
@@ -76,10 +71,14 @@ const addManualReward = async (
   description: string,
 ): Promise<void> => {
   try {
-    await prisma.$queryRaw`
-      INSERT INTO "user_rewards" ("userId", points, type, description, "createdAt", "updatedAt") 
-      VALUES (${userId}, ${points}, 'EARNED', ${description}, NOW(), NOW())
-    `;
+    await prisma.userReward.create({
+      data: {
+        userId,
+        points,
+        type: 'EARNED',
+        description,
+      },
+    });
   } catch (error) {
     logger.error('Error adding manual reward', { userId, points }, error as Error);
     throw error;
@@ -90,20 +89,19 @@ const getUserBalance = async (
   userId: string,
 ): Promise<{ totalEarned: number; totalRedeemed: number; balance: number }> => {
   try {
-    const earnedResult = (await prisma.$queryRaw`
-      SELECT COALESCE(SUM("points"), 0) as total_earned
-      FROM "user_rewards" 
-      WHERE "userId" = ${userId} AND "type" = 'EARNED' AND "isActive" = true
-    `) as any[];
+    const [earnedResult, redeemedResult] = await Promise.all([
+      prisma.userReward.aggregate({
+        where: { userId, type: 'EARNED', isActive: true },
+        _sum: { points: true },
+      }),
+      prisma.userReward.aggregate({
+        where: { userId, type: 'REDEEMED', isActive: true },
+        _sum: { points: true },
+      }),
+    ]);
 
-    const redeemedResult = (await prisma.$queryRaw`
-      SELECT COALESCE(SUM("points"), 0) as total_redeemed
-      FROM "user_rewards" 
-      WHERE "userId" = ${userId} AND "type" = 'REDEEMED' AND "isActive" = true
-    `) as any[];
-
-    const totalEarned = Number(earnedResult[0]?.total_earned || 0);
-    const totalRedeemed = Number(redeemedResult[0]?.total_redeemed || 0);
+    const totalEarned = earnedResult._sum.points ?? 0;
+    const totalRedeemed = redeemedResult._sum.points ?? 0;
 
     return { totalEarned, totalRedeemed, balance: totalEarned - totalRedeemed };
   } catch (error) {

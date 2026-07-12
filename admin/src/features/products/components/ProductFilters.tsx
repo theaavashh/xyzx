@@ -119,7 +119,7 @@ export default function ProductFilters({
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             >
               <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                <h3 className="text-base font-semibold text-gray-900">Filters</h3>
+                <h3 className="text-base font-semibold text-gray-900 outer-sans">Filters</h3>
                 <button
                   onClick={onCloseFilterPanel}
                   className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -129,7 +129,7 @@ export default function ProductFilters({
               </div>
               <div className="p-5 space-y-5">
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2 outer-sans">
                     <Tag className="w-4 h-4 text-gray-400" />
                     Category
                   </label>
@@ -146,7 +146,7 @@ export default function ProductFilters({
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2 outer-sans">
                     <div className="w-4 h-4 rounded-full border-2 border-gray-400" />
                     Status
                   </label>
@@ -162,7 +162,7 @@ export default function ProductFilters({
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2 outer-sans">
                     <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                     </svg>

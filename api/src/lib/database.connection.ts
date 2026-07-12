@@ -37,7 +37,7 @@ export const disconnectDB = async (): Promise<void> => {
 export const healthCheck = async (timeoutMs = 5000): Promise<boolean> => {
   try {
     await Promise.race([
-      prisma.$queryRaw`SELECT 1`,
+      prisma.user.findFirst({ select: { id: true } }),
       new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Database health check timeout')), timeoutMs),
       ),

@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import { createUser } from '../services/user.service';
 import { prisma } from '../lib/database';
 import bcrypt from 'bcryptjs';
 
@@ -7,8 +6,16 @@ dotenv.config();
 
 async function createAdminUser() {
   try {
+    const email = process.env.ADMIN_EMAIL || 'admin@rapharch.com';
+    const password = process.env.ADMIN_PASSWORD;
+
+    if (!password || password.length < 8) {
+      console.error('ADMIN_PASSWORD environment variable must be set (min 8 characters)');
+      process.exit(1);
+    }
+
     const existingUser = await prisma.user.findUnique({
-      where: { email: 'admin@rapharch.com' },
+      where: { email },
     });
 
     if (existingUser) {
@@ -20,11 +27,11 @@ async function createAdminUser() {
       return;
     }
 
-    const hashedPassword = await bcrypt.hash('admin123456', 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
     const adminUser = await prisma.user.create({
       data: {
-        name: 'Admin User',
-        email: 'admin@rapharch.com',
+        name: process.env.ADMIN_NAME || 'Admin User',
+        email,
         password: hashedPassword,
         role: 'admin',
       },

@@ -168,11 +168,11 @@ export default function HeroBannerPage() {
       <div className="space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black lastik">Hero Banners</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Hero Banners</h1>
             <p className="text-black text-lg mt-2">Manage homepage banners — bulk create supported</p>
           </div>
           <button type="button" onClick={openBulkModal}
-            className="bg-[#D4AF37] text-white px-4 py-2.5 lastik text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold">
+            className="bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold">
             <Plus className="w-4 h-4" />
             Add Banners
           </button>

@@ -67,7 +67,9 @@ export const blockBrowserNavigation = (
     next();
   } catch (error) {
     logger.error('Browser navigation block error', undefined, error as Error);
-    // Fail open - allow the request in case of middleware errors
-    next();
+    res.status(500).json({
+      success: false,
+      message: 'Access validation error',
+    });
   }
 };

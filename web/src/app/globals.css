@@ -3,6 +3,7 @@
 @theme {
   --font-sans: var(--font-inter, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
   --font-display: var(--font-poppins, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
+  --font-playfair: var(--font-playfair, "Playfair Display", Georgia, serif);
 }
 
 @keyframes shimmer {
@@ -30,7 +31,7 @@
 
 @font-face {
   font-family: "Swansea";
-  src: url("/font/TTF/SaansVF.woff2") format("truetype");
+  src: url("/font/HelveticaNowText.woff2") format("truetype");
   font-weight: 400;
   font-style: normal;
 }
@@ -166,6 +167,7 @@
 .animate-slide-up {
   animation: slideUp 0.3s ease-out;
 }
+
 
 body {
   background: var(--background);

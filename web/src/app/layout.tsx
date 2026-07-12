@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { CartProvider } from '@/contexts/CartContext';
 import CookieConsentModal from '@/components/CookieConsentModal';
-import LayoutWrapper from '@/components/LayoutWrapper';
+import ConditionalLayout from '@/components/ConditionalLayout';
 import TopBanner from '@/components/TopBanner';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AuthProvider } from '@/contexts/AuthContextTanStack';
@@ -139,7 +139,7 @@ export default function RootLayout({
           <AuthProvider>
             <CartProvider>
               <TopBanner />
-              <LayoutWrapper>{children}</LayoutWrapper>
+              <ConditionalLayout>{children}</ConditionalLayout>
               {/* <WhatsAppButton /> */}
               <CookieConsentModal />
               <ServiceWorkerRegister />

@@ -108,7 +108,18 @@ export const updateHeroBanner: RequestHandler = asyncHandler(
       return;
     }
 
-    const banner = await heroBannerRepository.updateHeroBanner(id, req.body);
+    const { title, subtitle, largeImage, smallImage, videoUrl, buttonUrl, buttonText, isActive, order } = req.body;
+    const banner = await heroBannerRepository.updateHeroBanner(id, {
+      title,
+      subtitle: subtitle || undefined,
+      largeImage: largeImage || undefined,
+      smallImage: smallImage || undefined,
+      videoUrl: videoUrl || undefined,
+      buttonUrl: buttonUrl || undefined,
+      buttonText: buttonText || undefined,
+      isActive: isActive !== undefined ? isActive : undefined,
+      order: order !== undefined ? order : undefined,
+    });
 
     sendSuccess(res, banner, 'Hero banner updated successfully');
     triggerRevalidation('hero-banners');

@@ -1,1 +1,0 @@
-export { fetchGalleryItems } from "./data";

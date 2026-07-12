@@ -5,6 +5,9 @@ import {
   heroBannerUpload,
   shopByCategoryUpload,
   categoryUpload,
+  categoryGridUpload,
+  heroSlideUpload,
+  imageGridUpload,
   featuredSectionUpload,
   salesBannerUpload,
   editorialUpload,
@@ -15,6 +18,9 @@ import {
   uploadHeroBannerImage,
   uploadShopByCategoryImage,
   uploadCategoryImage,
+  uploadCategoryGridImage,
+  uploadHeroSlideImage,
+  uploadImageGridImage,
   uploadFeaturedSectionImage,
   uploadSalesBannerImage,
   uploadEditorialImage,
@@ -63,6 +69,9 @@ router.post(
 const wrapMulter = (mw: any) => (req: Request, res: Response, next: NextFunction) =>
   mw(req, res, (err?: any) => err ? multerErrorHandler(err, req, res, next) : next());
 
+router.post('/hero-slide', authenticateToken, requireAdmin, wrapMulter(heroSlideUpload.single('file')), uploadHeroSlideImage);
+router.post('/category-grid', authenticateToken, requireAdmin, wrapMulter(categoryGridUpload.single('file')), uploadCategoryGridImage);
+router.post('/image-grid', authenticateToken, requireAdmin, wrapMulter(imageGridUpload.single('file')), uploadImageGridImage);
 router.post('/shop-by-category', authenticateToken, requireAdmin, wrapMulter(shopByCategoryUpload.single('file')), uploadShopByCategoryImage);
 router.post('/category', authenticateToken, requireAdmin, wrapMulter(categoryUpload.single('file')), uploadCategoryImage);
 router.post('/featured-section', authenticateToken, requireAdmin, wrapMulter(featuredSectionUpload.single('file')), uploadFeaturedSectionImage);

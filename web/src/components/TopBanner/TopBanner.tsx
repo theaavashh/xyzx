@@ -1,58 +1,49 @@
-import type { Metadata } from 'next';
-import { TopBannerCarousel, TopBannerStatic } from './components';
-import { fetchBanners } from './utils/api';
+'use client';
 
-interface TopBannerProps {
-  autoRotateInterval?: number;
-}
+import { useEffect, useState } from 'react';
+import type { Banner } from './types';
+import { TopBannerStatic } from './components/TopBannerStatic';
+import { TopBannerCarousel } from './components/TopBannerCarousel';
+import { TopBannerSkeleton } from './skeleton/TopBannerSkeleton';
 
-export async function generateMetadata(): Promise<Metadata> {
-  try {
-    const banners = await fetchBanners();
-    const bannerText = banners.map((b) => b.title).join(' | ');
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9999';
 
-    return {
-      other: {
-        'announcement-banner': bannerText,
-      },
-    };
-  } catch {
-    return {
-      other: {
-        'announcement-banner': '',
-      },
-    };
-  }
-}
+export default function TopBanner() {
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function TopBanner({
-  autoRotateInterval = 5000,
-}: TopBannerProps) {
-  try {
-    const banners = await fetchBanners();
+  useEffect(() => {
+    let cancelled = false;
 
-    if (!banners || banners.length === 0) {
-      return null;
+    async function load() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/v1/public/banners/active`, {
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        });
+        if (!res.ok) {
+          if (!cancelled) setLoading(false);
+          return;
+        }
+        const data = await res.json();
+        if (!cancelled) {
+          setBanners(data.data || []);
+          setLoading(false);
+        }
+      } catch {
+        if (!cancelled) setLoading(false);
+      }
     }
 
-    if (banners.length > 1) {
-      return (
-        <TopBannerCarousel
-          banners={banners}
-          enableRotation={true}
-          autoRotateInterval={autoRotateInterval}
-        />
-      );
-    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
 
-    const firstBanner = banners.at(0);
-    if (!firstBanner) return null;
+  if (loading) return <TopBannerSkeleton />;
+  if (banners.length === 0) return null;
 
-    return <TopBannerStatic banner={firstBanner} />;
-  } catch {
-    return null;
+  if (banners.length === 1) {
+    return <TopBannerStatic banner={banners[0]} />;
   }
-}
 
-export type { Banner, BannerResponse } from './types';
-export { fetchBannerMetadata, fetchBanners } from './utils/api';
+  return <TopBannerCarousel banners={banners} enableRotation autoRotateInterval={5000} />;
+}

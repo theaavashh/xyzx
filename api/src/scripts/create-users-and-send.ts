@@ -8,17 +8,25 @@ import { Resend } from 'resend';
 const prisma = new PrismaClient();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// IMPORTANT: Set ADMIN_PASSWORD env var before running this script.
+// WARNING: Hardcoded passwords in script files is a security risk.
+const adminPassword = process.env.ADMIN_PASSWORD;
+if (!adminPassword || adminPassword.length < 8) {
+  console.error('ADMIN_PASSWORD environment variable must be set (min 8 characters)');
+  process.exit(1);
+}
+
 const users = [
   {
     email: 'sabrina_thapalia@hotmail.com',
     name: 'Sabrina Thapalia',
-    password: 'Sabrina@123',
+    password: adminPassword,
     role: 'admin',
   },
   {
     email: 'maptech07@gmail.com',
     name: 'Maptech Admin',
-    password: 'Maptech@123',
+    password: adminPassword,
     role: 'admin',
   },
 ];

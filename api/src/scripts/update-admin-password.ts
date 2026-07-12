@@ -9,9 +9,19 @@ const prisma = new PrismaClient();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function updatePasswordAndSend() {
-  const email = 'aavash.ganeju@gmail.com';
-  const name = 'Aavash Ganeju';
-  const password = 'theaavashh';
+  const email = process.env.ADMIN_EMAIL;
+  if (!email) {
+    console.error('ADMIN_EMAIL environment variable is required');
+    process.exit(1);
+  }
+
+  const password = process.env.ADMIN_PASSWORD;
+  if (!password || password.length < 8) {
+    console.error('ADMIN_PASSWORD environment variable must be set (min 8 characters)');
+    process.exit(1);
+  }
+
+  const name = process.env.ADMIN_NAME || email.split('@')[0];
   const hashedPassword = await bcrypt.hash(password, 10);
 
   await prisma.user.update({
@@ -22,7 +32,7 @@ async function updatePasswordAndSend() {
   console.log(`Password updated for ${email}`);
 
   const { data, error } = await resend.emails.send({
-    from: 'RaphArch <info@rapharch.com.au>',
+    from: process.env.RESEND_FROM || 'RaphArch <info@rapharch.com.au>',
     to: [email],
     subject: 'Your RaphArch Admin Account Credentials',
     html: `
@@ -39,8 +49,10 @@ async function updatePasswordAndSend() {
                 <p style="color:#555555;font-size:15px;line-height:1.6;margin:0 0 24px;">Here are your updated login credentials:</p>
                 <table style="width:100%;border-collapse:collapse;margin:20px 0;background-color:#f9f9f9;border-radius:6px;">
                   <tr><td style="padding:12px 16px;border-bottom:1px solid #eee;font-weight:bold;color:#333;width:120px;">Email</td><td style="padding:12px 16px;border-bottom:1px solid #eee;color:#555;">${email}</td></tr>
-                  <tr><td style="padding:12px 16px;font-weight:bold;color:#333;">Password</td><td style="padding:12px 16px;color:#555;font-family:monospace;font-size:16px;">${password}</td></tr>
                 </table>
+                <p style="color:#888888;font-size:13px;line-height:1.6;margin:24px 0 0;">
+                  Your password has been updated. Please check the secure channel for your new password.
+                </p>
                 <table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="background-color:#D4AF37;border-radius:6px;"><a href="https://admin.rapharch.com.au" style="display:inline-block;padding:14px 32px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:600;border-radius:6px;">Login to Admin</a></td></tr></table>
               </td></tr>
               <tr><td style="background-color:#f9f9f9;padding:20px 40px;text-align:center;border-top:1px solid #eeeeee;"><p style="color:#999999;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} RaphArch. All rights reserved.</p></td></tr>

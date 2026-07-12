@@ -125,6 +125,7 @@ export const NAVIGATION_SECTIONS = [
         children: [
           { id: 'top-banner-page', label: 'Top Banner', icon: SliderIcon },
           { id: 'navigation', label: 'Navigation', icon: Menu },
+           { id: 'hero-slide', label: 'Hero Slides', icon: SliderIcon },
            { id: 'hero-banner', label: 'Hero Banner', icon: SliderIcon },
            {
             id: 'editorial-section',
@@ -137,10 +138,20 @@ export const NAVIGATION_SECTIONS = [
             icon: SliderIcon,
           },
            {
-            id: 'shop-by-categories',
-            label: 'Shop By Categories',
-            icon: Grid3X3,
-          },
+             id: 'category-grid',
+             label: 'Category Grid',
+             icon: Grid3X3,
+           },
+           {
+             id: 'image-grid',
+             label: 'Image Grid',
+             icon: Grid3X3,
+           },
+           {
+             id: 'shop-by-categories',
+             label: 'Shop By Categories',
+             icon: Grid3X3,
+           },
            
           {
             id: 'sales-banners',
@@ -240,6 +251,7 @@ export const ROUTE_MAP: Record<string, string> = {
   'content-management': '/analytics',
   'analytics': '/analytics',
   'top-banner-page': '/dashboard/top-banner',
+  'hero-slide': '/dashboard/hero-slide',
   'hero-banner': '/dashboard/hero-banner',
   'featured-sections': '/dashboard/featured-sections',
   'sales-banners': '/dashboard/sales-banners',
@@ -252,6 +264,8 @@ export const ROUTE_MAP: Record<string, string> = {
   'footer-section': '/dashboard/footer-section',
   'store': '/dashboard/store',
   'follow-section': '/dashboard/follow-section',
+  'category-grid': '/dashboard/category-grid',
+  'image-grid': '/dashboard/image-grid',
   'shop-by-categories': '/dashboard/shop-by-categories',
   'content-pages': '/dashboard/content',
   'cookie-policy': '/dashboard/content/cookie-policy',

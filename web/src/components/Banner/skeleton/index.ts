@@ -1,1 +1,0 @@
-export { BannerSkeleton } from "./BannerSkeleton";

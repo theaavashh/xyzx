@@ -78,7 +78,7 @@ export function Sidebar({
 function SidebarHeader({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex items-center justify-between h-14 px-3 border-b border-gray-200 flex-shrink-0">
-      <span className={`text-2xl font-semibold text-black tracking-wide lastik text-center`}>
+      <span className={`text-2xl font-semibold text-black tracking-wide outer-sans text-center`}>
         Admin CMS
       </span>
       <button

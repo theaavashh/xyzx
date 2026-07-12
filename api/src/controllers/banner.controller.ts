@@ -63,12 +63,17 @@ export const getBannerById: RequestHandler = asyncHandler(
 
 export const createBanner: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
-    const { title, isActive, position } = req.body;
+    const { title, isActive, position, endDate, buttonText, buttonUrl, backgroundColor, textColor } = req.body;
 
     const banner = await bannerRepository.createBanner({
       title,
       isActive: isActive !== undefined ? isActive : true,
       position: position || 'top',
+      endDate: endDate ? new Date(endDate) : undefined,
+      buttonText,
+      buttonUrl,
+      backgroundColor,
+      textColor,
     });
 
     sendCreated(res, banner, 'Banner created successfully');
@@ -78,7 +83,7 @@ export const createBanner: RequestHandler = asyncHandler(
 export const updateBanner: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const { title, isActive, position } = req.body;
+    const { title, isActive, position, endDate, buttonText, buttonUrl, backgroundColor, textColor } = req.body;
 
     if (!id) {
       sendBadRequest(res, 'Banner ID is required');
@@ -95,6 +100,11 @@ export const updateBanner: RequestHandler = asyncHandler(
     if (title !== undefined) updateData.title = title;
     if (isActive !== undefined) updateData.isActive = isActive;
     if (position !== undefined) updateData.position = position;
+    if (endDate !== undefined) updateData.endDate = endDate ? new Date(endDate) : null;
+    if (buttonText !== undefined) updateData.buttonText = buttonText;
+    if (buttonUrl !== undefined) updateData.buttonUrl = buttonUrl;
+    if (backgroundColor !== undefined) updateData.backgroundColor = backgroundColor;
+    if (textColor !== undefined) updateData.textColor = textColor;
 
     const banner = await bannerRepository.updateBanner(id, updateData);
 

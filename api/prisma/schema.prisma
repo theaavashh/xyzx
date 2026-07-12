@@ -23,15 +23,29 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
-  orders       Order[]
-  addresses    Address[]
-  userRewards  UserReward[]
+  orders        Order[]
+  addresses     Address[]
+  userRewards   UserReward[]
   notifications Notification[]
+  refreshTokens RefreshToken[]
   
-  @@index([role, isActive])
+   @@index([role, isActive])
   @@index([email, isActive])
   @@index([createdAt(sort: Desc)])
   @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenHash String   
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("refresh_tokens")
 }
 
 model Category {
@@ -56,13 +70,35 @@ model Category {
   @@map("categories")
 }
 
+model HeroSlide {
+  id          String   @id @default(uuid())
+  title       String
+  subtitle    String?
+  image       String
+  imageMobile String?
+  alt         String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive, order])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("hero_slides")
+}
+
 model Banner {
-  id        String   @id @default(uuid())
-  title     String
-  isActive  Boolean  @default(true)
-  position  String   @default("top")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String    @id @default(uuid())
+  title           String
+  isActive        Boolean   @default(true)
+  position        String    @default("top")
+  endDate         DateTime?
+  buttonText      String?
+  buttonUrl       String?
+  backgroundColor String?
+  textColor       String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   @@index([isActive, position])
   @@index([isActive, createdAt(sort: Desc)])
@@ -86,6 +122,40 @@ model HeroBanner {
   @@index([isActive, order])
   @@index([isActive, createdAt(sort: Desc)])
   @@map("hero_banners")
+}
+
+model CategoryGridItem {
+  id        String   @id @default(uuid())
+  title     String
+  subtitle  String?
+  image     String
+  link      String
+  alt       String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, order])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("category_grid_items")
+}
+
+model ImageGridItem {
+  id        String   @id @default(uuid())
+  src       String
+  alt       String
+  title     String?
+  subtitle  String?
+  link      String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, order])
+  @@index([isActive, createdAt(sort: Desc)])
+  @@map("image_grid_items")
 }
 
 model FeaturedSection {
@@ -1000,6 +1070,20 @@ model StoreSection {
 
   @@index([isActive])
   @@map("store_sections")
+}
+
+model AboutSection {
+  id        String   @id @default(uuid())
+  quote     String
+  ctaText   String   @default("More About Us")
+  ctaUrl    String   @default("/about")
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, order])
+  @@map("about_sections")
 }
 
 model ContactSubmission {

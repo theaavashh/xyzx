@@ -1,17 +1,15 @@
 import type { Metadata } from 'next';
-import Banner from '@/components/Banner';
 import DualCardSection from '@/components/DualCardSection';
 import EditorialSection from '@/components/EditorialSection';
-import FeaturedSection from '@/components/FeaturedSection';
 import Feature from '@/components/Feature';
-import InstagramFollow from '@/components/InstagramFollow';
 import OfflineCouponBanner from '@/components/OfflineCouponBanner';
-import Gallery from '@/components/Gallery';
+import Hero from '@/components/Hero';
 import HeroSection from '@/components/HeroSection';
+import { CategoryGrid } from '@/components/CategoryGrid';
 import Navbar from '@/components/Navbar';
-import NewArrivals from '@/components/NewArrivals';
-import RewardsSection from '@/components/RewardsSection';
-import SalesBanner from '@/components/SalesBanner/index';
+import NewIn from '@/components/NewIn';
+import TwoImageGrid from '@/components/TwoImageGrid';
+import AboutSection from '@/components/AboutSection';
 import { generateSEOMetadata } from '@/components/SEO';
 import ShopByCategory from '@/components/ShopByCategory';
 import VisitOurStore from '@/components/VisitOurStore';
@@ -20,7 +18,7 @@ import {
   WebsiteStructuredData,
 } from '@/components/StructuredData';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 export const metadata: Metadata = generateSEOMetadata({
   title: 'Premium Fashion & Footwear',
@@ -51,22 +49,21 @@ export default function Home() {
             <Navbar />
           </div>
           <HeroSection />
+         
         </div>
-        <EditorialSection />
-        {/* <DualCardSection /> */}
-        <FeaturedSection />
-        {/* <NewArrivals /> */}
-        <Gallery />
-        <ShopByCategory />
-        {/* <Banner /> */}
-
-        
-        <SalesBanner />
+        <CategoryGrid />
+        <NewIn />
+         <EditorialSection />
+          <ShopByCategory />
+        <Hero />
+        <AboutSection />
+        <TwoImageGrid />
+       
+        <DualCardSection />
         <VisitOurStore />
 
         <Feature />
 
-        <InstagramFollow />
       </div>
     </>
   );

@@ -57,7 +57,7 @@ export function EditorialSectionModal({
           >
             <div className="flex items-center justify-between p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
               <div>
-                <h2 className="text-2xl font-semibold text-black lastik">
+                <h2 className="text-2xl font-semibold text-black outer-sans">
                   {editingSection ? 'Edit Section' : 'New Section'}
                 </h2>
                 <p className="text-sm text-gray-500">{editingSection ? 'Update section details and products' : 'Create a new editorial showcase'}</p>

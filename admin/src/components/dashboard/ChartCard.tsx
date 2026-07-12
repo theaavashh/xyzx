@@ -25,7 +25,7 @@ const ChartCard: React.FC<ChartCardProps> = ({
           <div className={`p-2 rounded-lg bg-amber-50 ${iconColor}`}>
             <Icon className="w-5 h-5" />
           </div>
-          <h3 className="text-lg font-bold text-black tracking-wide lastik uppercase">{title}</h3>
+          <h3 className="text-lg font-bold text-black tracking-wide outer-sans uppercase">{title}</h3>
         </div>
         <div className="flex items-center gap-2">
           {filterDropdown}

@@ -88,6 +88,7 @@ export function useOrdersChart(period = '14d') {
       apiRequest<OrdersChartData[]>(
         `/api/v1/analytics/orders-chart?period=${period}`,
       ),
+    placeholderData: (previousData) => previousData,
     staleTime: 1000 * 60 * 5,
     retry: 2,
     refetchOnWindowFocus: true,

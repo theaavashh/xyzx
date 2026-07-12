@@ -85,8 +85,21 @@ body {
 
 }
 
+@font-face {
+  font-family: "MADE Outer Sans";
+  src: url('/fonts/MADE Outer Sans Bold PERSONAL USE.otf') format('opentype');
+  font-display: swap;
+  font-weight: bold;
+  font-style: normal;
+}
+
 .lastik{
   font-family: "Lastik";
+}
+
+.outer-sans{
+  font-family: "MADE Outer Sans", sans-serif;
+  font-weight: bold;
 }
 
 .swastik{

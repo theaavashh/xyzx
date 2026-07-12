@@ -65,11 +65,6 @@ export const createSalesBanner: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const { title, subtitle, image, buttonText, buttonUrl, isActive, order } = req.body;
 
-    if (!image) {
-      sendBadRequest(res, 'Image is required');
-      return;
-    }
-
     const banner = await salesBannerRepository.createSalesBanner({
       title,
       subtitle: subtitle || undefined,
@@ -99,7 +94,16 @@ export const updateSalesBanner: RequestHandler = asyncHandler(
       return;
     }
 
-    const banner = await salesBannerRepository.updateSalesBanner(id, req.body);
+    const { title, subtitle, image, buttonText, buttonUrl, isActive, order } = req.body;
+    const banner = await salesBannerRepository.updateSalesBanner(id, {
+      title,
+      subtitle: subtitle || undefined,
+      image,
+      buttonText: buttonText || undefined,
+      buttonUrl: buttonUrl || undefined,
+      isActive: isActive !== undefined ? isActive : undefined,
+      order: order !== undefined ? order : undefined,
+    });
 
     sendSuccess(res, banner, 'Sales banner updated successfully');
   },

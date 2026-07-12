@@ -43,6 +43,18 @@ interface ProductPreviewModalProps {
   onEdit: (product: Product) => void;
 }
 
+function resolveVariantName(variant: Variant, attributes: any): string {
+  if (!attributes || attributes.length === 0) return variant.name || '—';
+  const parts: string[] = [];
+  for (const attr of attributes) {
+    const val: string | undefined = (variant as any)[attr.id];
+    if (!val) continue;
+    const option = attr.options?.find((o: any) => o.id === val || o.value === val);
+    parts.push(option?.name || val);
+  }
+  return parts.join(' / ') || variant.name || '—';
+}
+
 export default function ProductPreviewModal({ product, onClose, onEdit }: ProductPreviewModalProps) {
   return (
     <AnimatePresence>
@@ -55,7 +67,7 @@ export default function ProductPreviewModal({ product, onClose, onEdit }: Produc
           onClick={onClose}
         >
           <motion.div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[85vh] overflow-hidden flex flex-col"
+            className="bg-white rounded-lg shadow-2xl w-full max-w-5xl max-h-[85vh] overflow-hidden flex flex-col"
             initial={{ scale: 0.96, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.96, opacity: 0 }}
@@ -64,7 +76,7 @@ export default function ProductPreviewModal({ product, onClose, onEdit }: Produc
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
               <div className="flex items-center gap-3 min-w-0">
-                <h2 className="text-lg font-semibold text-gray-900 truncate">{product.name}</h2>
+                <h2 className="text-lg font-semibold text-gray-900 truncate outer-sans">{product.name}</h2>
                 {product.isFeatured && <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />}
               </div>
               <div className="flex items-center gap-3 shrink-0">
@@ -240,16 +252,16 @@ export default function ProductPreviewModal({ product, onClose, onEdit }: Produc
                         <table className="w-full text-sm">
                           <thead className="bg-gray-50">
                             <tr>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Variant</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">SKU</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Price</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Stock</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase outer-sans">Variant</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase outer-sans">SKU</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase outer-sans">Price</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase outer-sans">Stock</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-100">
                             {product.variants.map((variant: Variant, idx: number) => (
                               <tr key={idx} className="hover:bg-gray-50">
-                                <td className="px-3 py-2 font-medium text-gray-900 text-xs">{variant.name || `Variant ${idx + 1}`}</td>
+                                <td className="px-3 py-2 font-medium text-gray-900 text-xs">{resolveVariantName(variant, product.variantAttributes)}</td>
                                 <td className="px-3 py-2 text-gray-500 font-mono text-xs">{variant.sku || '—'}</td>
                                 <td className="px-3 py-2 font-semibold text-gray-900 text-xs">${typeof variant.price === 'number' ? variant.price : (variant.price?.usd ?? '—')}</td>
                                 <td className="px-3 py-2"><StockBadge quantity={variant.stock ?? 0} /></td>

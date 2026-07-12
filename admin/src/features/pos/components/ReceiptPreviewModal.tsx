@@ -40,7 +40,7 @@ export default function ReceiptPreviewModal({
             )}
             <div className="bg-white rounded p-3 mb-4">
               <table className="w-full text-xs">
-                <thead><tr className="border-b border-gray-200"><th className="text-left py-2 font-medium text-gray-500">Item</th><th className="text-center py-2 font-medium text-gray-500">Qty</th><th className="text-right py-2 font-medium text-gray-500">Total</th></tr></thead>
+                <thead><tr className="border-b border-gray-200"><th className="text-left py-2 font-medium text-gray-500 outer-sans">Item</th><th className="text-center py-2 font-medium text-gray-500 outer-sans">Qty</th><th className="text-right py-2 font-medium text-gray-500 outer-sans">Total</th></tr></thead>
                 <tbody>
                   {sale.items.map(item => (
                     <tr key={item.id} className="border-b border-dotted border-gray-200">

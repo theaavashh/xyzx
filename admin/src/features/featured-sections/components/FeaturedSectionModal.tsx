@@ -74,7 +74,7 @@ export function FeaturedSectionModal({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h2 className="text-2xl font-semibold text-black lastik">
+              <h2 className="text-2xl font-semibold text-black outer-sans">
                 {editingSection ? 'Edit Section' : 'Add Section'}
               </h2>
               <button type="button" onClick={onClose} className="text-gray-400 hover:text-black focus:outline-none focus:ring-2 focus:ring-[#D4AF37] rounded-md" aria-label="Close modal">

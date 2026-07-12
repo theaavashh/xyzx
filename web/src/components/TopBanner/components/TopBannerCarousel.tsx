@@ -38,7 +38,17 @@ export function TopBannerCarousel({
     >
       <meta itemProp="name" content="Promotional Banner" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1 relative">
+        <button
+          onClick={previous}
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-10 sm:hidden flex items-center justify-center w-6 h-6"
+          aria-label="Previous banner"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
         <AnimatePresence mode="wait">
           <motion.div
             key={currentBanner.id}
@@ -51,6 +61,16 @@ export function TopBannerCarousel({
             <TopBannerContent banner={currentBanner} />
           </motion.div>
         </AnimatePresence>
+
+        <button
+          onClick={next}
+          className="absolute right-1 top-1/2 -translate-y-1/2 z-10 sm:hidden flex items-center justify-center w-6 h-6"
+          aria-label="Next banner"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
     </div>
   );

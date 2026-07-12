@@ -27,7 +27,7 @@ export default function InventoryFilters({
 }: InventoryFiltersProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <h2 className="text-xl font-bold text-black lastik mb-6">Update Stock</h2>
+      <h2 className="text-xl font-bold text-black outer-sans mb-6">Update Stock</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
           <label className="block text-sm font-medium text-black mb-2">Product ID</label>

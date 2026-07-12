@@ -14,7 +14,7 @@ export function LogoHeader() {
           priority
         />
       </div>
-      <h1 className={`text-2xl md:text-3xl font-bold text-black mb-2 tracking-normal lastik`}>
+      <h1 className={`text-2xl md:text-3xl font-bold text-black mb-2 tracking-normal outer-sans`}>
         Welcome back
       </h1>
       <p className="text-black text-base font-semibold tracking-normal">

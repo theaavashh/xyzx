@@ -64,7 +64,7 @@ export function Navbar({
                 <X className="w-5 h-5" />
               </button>
             )}
-            <h1 className="text-lg sm:text-2xl font-bold text-black truncate lastik tracking-wide">
+            <h1 className="text-lg sm:text-2xl font-bold text-black truncate outer-sans tracking-wide">
               {title}
             </h1>
           </div>
@@ -75,11 +75,6 @@ export function Navbar({
               onMarkAsRead={markAsRead}
               onMarkAllAsRead={markAllAsRead}
             />
-            {user?.email && (
-              <span className="text-sm text-gray-800 truncate max-w-[200px]">
-                {user.email}
-              </span>
-            )}
             <UserMenu
               user={user}
               userInitials={userInitials}

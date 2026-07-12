@@ -93,6 +93,10 @@ export const clearAll = async (userId: string) => {
   return prisma.notification.deleteMany({ where: { userId } });
 };
 
+export const findById = async (id: string) => {
+  return prisma.notification.findUnique({ where: { id } });
+};
+
 export const getUnreadCount = async (userId: string) => {
   return prisma.notification.count({ where: { userId, isRead: false } });
 };
@@ -107,4 +111,5 @@ export const notificationRepository = {
   deleteNotification,
   clearAll,
   getUnreadCount,
+  findById,
 };

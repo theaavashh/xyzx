@@ -110,7 +110,7 @@ export function StoreForm({
           <div className="p-6 md:p-10">
             <section className="bg-white">
               <div className="text-center mb-8">
-                <h2 className="lastik text-3xl sm:text-4xl text-gray-900 mb-4">
+                <h2 className="outer-sans text-3xl sm:text-4xl text-gray-900 mb-4">
                   {storeData.title || 'Visit Our Store'}
                 </h2>
                 <p className="text-gray-500 max-w-2xl mx-auto text-sm leading-relaxed font-light px-2">
@@ -133,7 +133,7 @@ export function StoreForm({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
                 <div className="space-y-4">
-                  <h3 className="lastik text-2xl text-gray-900 mb-4">Contact & Location</h3>
+                  <h3 className="outer-sans text-2xl text-gray-900 mb-4">Contact & Location</h3>
 
                   <div className="flex items-start gap-3 text-gray-500">
                     <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" />

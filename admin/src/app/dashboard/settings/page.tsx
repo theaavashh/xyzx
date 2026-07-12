@@ -251,7 +251,7 @@ function SettingsContent() {
     <DashboardLayout>
       <div className="max-w-7xl mx-auto p-3">
         <div className="mb-6 px-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-black lastik mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans mb-2">
             Site Settings & Configuration
           </h1>
           <p className="text-black text-lg">

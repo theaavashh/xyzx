@@ -41,7 +41,7 @@ const formatCartResponse = (cart: { items: Array<{
 export const getCart: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const sessionId = getSessionId(req);
-    const userId = req.user?.id || null;
+    const userId = req.user?.userId || null;
 
     const cart = await cartRepository.findOrCreateCart(sessionId, userId);
 
@@ -64,7 +64,7 @@ export const addToCart: RequestHandler = asyncHandler(
     }
 
     const sessionId = getSessionId(req);
-    const userId = req.user?.id || null;
+    const userId = req.user?.userId || null;
 
     const cart = await cartRepository.addToCart(
       sessionId,
@@ -87,7 +87,7 @@ export const updateCartItem: RequestHandler = asyncHandler(
     }
 
     const sessionId = getSessionId(req);
-    const userId = req.user?.id || null;
+    const userId = req.user?.userId || null;
 
     const cart = await cartRepository.updateCartItemQuantity(
       itemId,
@@ -104,7 +104,7 @@ export const removeCartItem: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const itemId = req.params.itemId as string;
     const sessionId = getSessionId(req);
-    const userId = req.user?.id || null;
+    const userId = req.user?.userId || null;
 
     const cart = await cartRepository.removeCartItem(itemId, sessionId, userId);
 
@@ -115,7 +115,7 @@ export const removeCartItem: RequestHandler = asyncHandler(
 export const clearCart: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const sessionId = getSessionId(req);
-    const userId = req.user?.id || null;
+    const userId = req.user?.userId || null;
 
     await cartRepository.clearCart(sessionId, userId);
 

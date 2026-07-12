@@ -1,64 +1,57 @@
 'use client';
 
+import { Plus } from 'lucide-react';
+import { useCallback, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import {
-  AboutForm,
-  useAboutData,
-  useSaveAboutData,
-} from '@/features/about';
-import type { AboutUsData } from '@/features/about';
-import { useState } from 'react';
+import type { AboutSection } from '@/features/about';
+import { useAboutSections, AboutSectionGrid, AboutSectionModal, AboutSectionDeleteAlert } from '@/features/about';
 
-export default function AboutUsPage() {
-  const { aboutData, setAboutData, isLoading } = useAboutData();
-  const { save, isSaving } = useSaveAboutData();
+export default function AboutPage() {
+  const { sections, isLoading, createSection, updateSection, deleteSection, toggleStatus } = useAboutSections();
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [previewMode, setPreviewMode] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingSection, setEditingSection] = useState<AboutSection | null>(null);
+  const [sectionToDelete, setSectionToDelete] = useState<AboutSection | null>(null);
 
-  const handleInputChange = (field: keyof AboutUsData, value: string | boolean) => {
-    setAboutData((prev) => (prev ? { ...prev, [field]: value } : prev));
-  };
+  const openModal = useCallback(() => { setEditingSection(null); setIsModalOpen(true); }, []);
+  const openEditModal = useCallback((s: AboutSection) => { setEditingSection(s); setIsModalOpen(true); }, []);
+  const closeModal = useCallback(() => { setIsModalOpen(false); }, []);
 
-  const handleSave = async () => {
-    if (!aboutData) return;
-    try {
-      const updated = await save(aboutData);
-      setAboutData(updated);
-      setIsEditing(false);
-    } catch {
-      // Error toast is handled in the hook
-    }
-  };
+  const handleSave = useCallback(
+    async (data: Parameters<typeof createSection>[0]) => {
+      if (editingSection) await updateSection(editingSection.id, data);
+      else await createSection(data);
+      closeModal();
+    },
+    [editingSection, createSection, updateSection, closeModal],
+  );
 
-  const handleCancel = () => {
-    setIsEditing(false);
-    setPreviewMode(false);
-  };
-
-  if (isLoading || !aboutData) {
-    return (
-      <DashboardLayout title="About Us">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D4AF37]"></div>
-        </div>
-      </DashboardLayout>
-    );
-  }
+  const handleDelete = useCallback(async () => {
+    if (!sectionToDelete) return;
+    await deleteSection(sectionToDelete);
+    setSectionToDelete(null);
+  }, [sectionToDelete, deleteSection]);
 
   return (
-    <DashboardLayout title="About Us">
-      <AboutForm
-        aboutData={aboutData}
-        isEditing={isEditing}
-        isSaving={isSaving}
-        previewMode={previewMode}
-        onInputChange={handleInputChange}
-        onSave={handleSave}
-        onCancel={handleCancel}
-        onTogglePreview={() => setPreviewMode(!previewMode)}
-        onToggleEdit={() => setIsEditing(true)}
-      />
+    <DashboardLayout title="About Section">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">About Section</h1>
+            <p className="text-black text-lg mt-2">Manage the about section quote and CTA</p>
+          </div>
+          <button type="button" onClick={openModal} className="bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold">
+            <Plus className="w-4 h-4" /> Add Section
+          </button>
+        </div>
+        <div className="rounded-xl border border-gray-200 bg-white">
+          <div className="p-6">
+            <AboutSectionGrid sections={sections} isLoading={isLoading} onEdit={openEditModal} onToggle={toggleStatus} onDelete={setSectionToDelete} onAdd={openModal} />
+          </div>
+        </div>
+      </div>
+      <AboutSectionModal isOpen={isModalOpen} editingSection={editingSection} onClose={closeModal} onSave={handleSave} />
+      <AboutSectionDeleteAlert isOpen={!!sectionToDelete} onClose={() => setSectionToDelete(null)} onConfirm={handleDelete} />
     </DashboardLayout>
   );
 }

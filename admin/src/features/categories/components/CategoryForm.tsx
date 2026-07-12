@@ -52,7 +52,7 @@ export default function CategoryForm({
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between border-b border-gray-200 p-4">
-            <h2 className="text-2xl font-semibold text-black lastik">
+            <h2 className="text-2xl font-semibold text-black outer-sans">
               {editingCategory ? 'Edit Category' : 'Add Category'}
             </h2>
             <button
@@ -76,8 +76,7 @@ export default function CategoryForm({
                     <input
                       {...field}
                       type="text"
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-black placeholder:text-gray-400 focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
-                      placeholder="e.g. Electronics"
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-black focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
                     />
                   )}
                 />
@@ -114,8 +113,7 @@ export default function CategoryForm({
                     <input
                       {...field}
                       type="text"
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-black placeholder:text-gray-400 focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
-                      placeholder="/categories/electronics"
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-black focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
                     />
                   )}
                 />
@@ -195,8 +193,7 @@ export default function CategoryForm({
                         {...field}
                         type="text"
                         maxLength={60}
-                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-black placeholder:text-gray-400 focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
-                        placeholder="SEO title (max 60 chars)"
+                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-black focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
                       />
                     )}
                   />
@@ -217,8 +214,7 @@ export default function CategoryForm({
                         {...field}
                         rows={3}
                         maxLength={160}
-                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-black placeholder:text-gray-400 focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37] resize-none"
-                        placeholder="Brief description for search engines (max 160 chars)"
+                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-black focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37] resize-none"
                       />
                     )}
                   />
@@ -243,8 +239,7 @@ export default function CategoryForm({
                     <input
                       {...field}
                       type="text"
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-black placeholder:text-gray-400 focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
-                      placeholder="Comma-separated keywords"
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-black focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
                     />
                   )}
                 />

@@ -37,7 +37,7 @@ export function SidebarItem({
             handleNavigation(item.id);
           }
         }}
-        className={`w-full flex items-center px-3 py-2 text-base font-medium rounded-md transition-all relative ${
+        className={`w-full flex items-center px-3 py-2 text-lg font-medium rounded-md transition-all relative ${
           isActive
             ? 'text-gray-900 bg-gray-100'
             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -45,7 +45,7 @@ export function SidebarItem({
       >
         {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-blue-500 rounded-full" />}
         <Icon className="w-5 h-5 mr-3 flex-shrink-0" />
-        <span className={`flex-1 text-left text-lg tracking-normal truncate `}>{item.label}</span>
+        <span className={`flex-1 text-left text-xl tracking-normal truncate `}>{item.label}</span>
         {hasChildren && (
           <ChevronRight
             className={`w-4 h-4 flex-shrink-0 transition-transform duration-150 ${
@@ -82,14 +82,14 @@ export function SidebarItem({
                     <div className="absolute left-0 top-3 w-3 border-t-2 border-gray-900" />
                     <button
                       onClick={() => handleNavigation(child.id, item.id)}
-                      className={`w-full flex items-center py-1.5 pl-6 pr-2 text-base font-medium rounded-md transition-all ${
+                      className={`w-full flex items-center py-1.5 pl-6 pr-2 text-lg font-medium rounded-md transition-all ${
                         isChildActive
                           ? 'text-gray-900 bg-gray-100'
                           : 'text-gray-800 hover:text-gray-900 hover:bg-gray-50'
                       }`}
                     >
                       <ChildIcon className="w-4 h-4 mr-2 flex-shrink-0 text-gray-600" />
-                      <span className="truncate">{child.label}</span>
+                      <span className="truncate text-lg">{child.label}</span>
                     </button>
                   </motion.div>
                 );

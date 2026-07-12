@@ -68,7 +68,7 @@ export function SidebarNav({
       <div className="flex gap-1 px-2 py-1 mb-3 bg-gray-50 rounded-md mx-2">
         <button
           onClick={() => setActiveTab('main')}
-          className={`flex-1 py-1.5 text-xl font-medium rounded-md transition-all lastik ${
+          className={`flex-1 py-1.5 text-xl font-medium rounded-md transition-all outer-sans ${
             activeTab === 'main'
               ? 'bg-[#D4AF37] text-white'
               : 'bg-gray-50 text-gray-500 hover:text-gray-700'
@@ -78,7 +78,7 @@ export function SidebarNav({
         </button>
         <button
           onClick={() => setActiveTab('content')}
-          className={`flex-1 py-1.5 text-xl font-medium rounded-md transition-all lastik ${
+          className={`flex-1 py-1.5 text-xl font-medium rounded-md transition-all outer-sans ${
             activeTab === 'content'
               ? 'bg-[#D4AF37] text-white'
               : 'bg-gray-50 text-gray-500 hover:text-gray-700'

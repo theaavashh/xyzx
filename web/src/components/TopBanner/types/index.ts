@@ -5,6 +5,9 @@ export interface Banner {
   position: string;
   backgroundColor?: string;
   textColor?: string;
+  endDate?: string;
+  buttonText?: string;
+  buttonUrl?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -32,29 +35,4 @@ export interface BannerMetadata {
   };
 }
 
-export const DEFAULT_BANNERS: Banner[] = [
-  {
-    id: 'default-1',
-    title: 'Free Shipping on orders over $400!',
-    isActive: true,
-    position: 'top',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'default-2',
-    title: 'New arrivals available now - Shop the collection',
-    isActive: true,
-    position: 'top',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'default-3',
-    title: 'Limited time offer - Up to 30% off selected items',
-    isActive: true,
-    position: 'top',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+

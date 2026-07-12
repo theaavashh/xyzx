@@ -62,14 +62,25 @@ export const getOrderById: RequestHandler = asyncHandler(
       return;
     }
 
+    if (req.user?.role !== 'admin' && order.userId !== req.user?.userId) {
+      sendNotFound(res, 'Order not found');
+      return;
+    }
+
     sendSuccess(res, order);
   },
 );
 
 export const createOrder: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      sendBadRequest(res, 'Not authenticated');
+      return;
+    }
+
     const {
-      userId,
       subtotal,
       tax,
       shipping,
@@ -187,13 +198,18 @@ export const cancelOrder: RequestHandler = asyncHandler(
       return;
     }
 
-    const exists = await orderRepository.existsById(id);
-    if (!exists) {
+    const order = await orderRepository.findOrderById(id);
+    if (!order) {
       sendNotFound(res, 'Order not found');
       return;
     }
 
-    const order = await orderRepository.cancelOrder(id, reason);
+    if (req.user?.role !== 'admin' && order.userId !== req.user?.userId) {
+      sendNotFound(res, 'Order not found');
+      return;
+    }
+
+    const cancelledOrder = await orderRepository.cancelOrder(id, reason);
 
     orderRepository.getOrderItems(id).then((items) => {
       if (items && Array.isArray(items)) {
@@ -210,6 +226,6 @@ export const cancelOrder: RequestHandler = asyncHandler(
       }
     });
 
-    sendSuccess(res, order, 'Order cancelled successfully');
+    sendSuccess(res, cancelledOrder, 'Order cancelled successfully');
   },
 );

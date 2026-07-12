@@ -26,14 +26,14 @@ export default function OrderTable({
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className="text-left py-3 px-4 font-medium text-gray-700">Order #</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-700">Customer</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-700">Items</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-700">Total</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-700">Status</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-700">Payment</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-700">Date</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-700">Actions</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Order #</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Customer</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Items</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Total</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Status</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Payment</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Date</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Actions</th>
             </tr>
           </thead>
           <tbody>

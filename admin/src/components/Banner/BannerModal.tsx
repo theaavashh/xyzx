@@ -39,7 +39,7 @@ export default function BannerModal({
           >
             {/* Fixed Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
-              <h2 className="text-2xl font-semibold text-black lastik ">
+              <h2 className="text-2xl font-semibold text-black outer-sans ">
                 {isEditMode ? 'Edit Banner' : 'Create New Banner'}
               </h2>
               <button

@@ -1,1 +1,0 @@
-export { GallerySkeleton } from "./GallerySkeleton";

@@ -83,7 +83,7 @@ export default function RewardsSection() {
           <p className="text-sm text-gray-500">
             Already a member?{' '}
             <Link
-              href="/auth/login"
+               href="/login"
               className="text-gray-900 font-semibold hover:underline"
             >
               Sign In

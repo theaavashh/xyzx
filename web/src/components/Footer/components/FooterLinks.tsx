@@ -19,9 +19,8 @@ const DEFAULT_SECTIONS: FooterSectionData[] = [
     isActive: true,
     links: [
       { id: 'about-company', name: 'Our Company', href: '/about', order: 1 },
-      { id: 'about-contact', name: 'Contact Us', href: '/contact', order: 2 },
-      { id: 'about-careers', name: 'Careers', href: '/careers', order: 3 },
-      { id: 'about-blog', name: 'Blog', href: '/blog', order: 4 },
+      { id: 'about-stores', name: 'Find a Store', href: '/stores', order: 2 },
+      { id: 'about-contact', name: 'Contact Us', href: '/contact', order: 3 },
     ],
   },
   {
@@ -88,7 +87,7 @@ export const FooterLinks = memo(function FooterLinks({ sections }: FooterLinksPr
               onClick={() => toggleSection(sectionId)}
               className="flex items-center justify-between w-full text-left md:cursor-default py-2 md:py-0"
             >
-              <h4 className="lastik text-base lg:text-xl font-semibold text-black uppercase tracking-wider">
+              <h4 className="lastik text-base lg:text-xl font-semibold text-black uppercase tracking-tight">
                 {section.title}
               </h4>
               {isOpen ? (

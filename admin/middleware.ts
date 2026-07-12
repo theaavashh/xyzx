@@ -32,19 +32,41 @@ export function middleware(request: NextRequest) {
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-  const connectSrc =
-    process.env.NODE_ENV === 'development'
-      ? "'self' http://localhost:9999 https://api.rapharch.com.au"
-      : "'self' https://api.rapharch.com.au http://localhost:9999";
+  const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9999';
+
+  const scriptSrc = process.env.NODE_ENV === 'development'
+    ? "'self' 'unsafe-inline' 'unsafe-eval'"
+    : "'self' 'unsafe-inline'";
+
+  const connectSrc = process.env.NODE_ENV === 'development'
+    ? `'self' ${apiUrl} https://api.rapharch.com.au`
+    : `'self' ${apiUrl} https://api.rapharch.com.au`;
 
   response.headers.set(
     'Content-Security-Policy',
-    `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' http://localhost:9999 https://api.rapharch.com.au; font-src 'self' data:; connect-src ${connectSrc}; frame-ancestors 'none'; base-uri 'self'; form-action 'self';`,
+    [
+      `default-src 'self'`,
+      `script-src ${scriptSrc}`,
+      `style-src 'self' 'unsafe-inline'`,
+      `img-src 'self' ${apiUrl} https://api.rapharch.com.au`,
+      `font-src 'self' data:`,
+      `connect-src ${connectSrc}`,
+      `frame-ancestors 'none'`,
+      `base-uri 'self'`,
+      `form-action 'self'`,
+    ].join('; '),
   );
   response.headers.set(
     'Permissions-Policy',
     'camera=(), microphone=(), geolocation=()',
   );
+
+  if (process.env.NODE_ENV === 'production') {
+    response.headers.set(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains; preload',
+    );
+  }
 
   return response;
 }

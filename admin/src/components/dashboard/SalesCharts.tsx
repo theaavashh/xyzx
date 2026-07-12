@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { BarChart3, ChevronDown } from 'lucide-react';
 import {
   Area,
@@ -31,20 +31,11 @@ function SalesCharts() {
 
   const selectedLabel = PERIOD_OPTIONS.find((o) => o.value === period)?.label;
 
-  if (isOrdersChartLoading) {
+  if (isOrdersChartLoading && !ordersChartData) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="animate-pulse h-96" />
-        <div className="animate-pulse h-96" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-md p-6 text-center">
-        <p className="text-red-600 font-semibold">Failed to load chart data</p>
-        <p className="text-red-500 text-sm mt-1">{(error as Error).message}</p>
+        <div className="animate-pulse h-96 bg-gray-100 rounded-xl" />
+        <div className="animate-pulse h-96 bg-gray-100 rounded-xl" />
       </div>
     );
   }

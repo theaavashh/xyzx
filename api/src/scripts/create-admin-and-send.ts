@@ -9,10 +9,10 @@ const prisma = new PrismaClient();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const admins = [
-  { email: 'aavash.ganeju@gmail.com', name: 'Aavash Ganeju', password: undefined },
-  { email: 'work.aavashh@gmail.com', name: 'Aavash Ganeju', password: undefined },
-  { email: 'sabrina_thapalia@hotmail.com', name: 'Sabrina Thapaliya', password: 'sabrinathapaliya' },
-  { email: 'maptech07@gmail.com', name: 'MapTech', password: 'maptech07' },
+  { email: 'aavash.ganeju@gmail.com', name: 'Aavash Ganeju', password: process.env.ADMIN_PASSWORD },
+  { email: 'work.aavashh@gmail.com', name: 'Aavash Ganeju', password: process.env.ADMIN_PASSWORD },
+  { email: 'sabrina_thapalia@hotmail.com', name: 'Sabrina Thapaliya', password: process.env.ADMIN_PASSWORD },
+  { email: 'maptech07@gmail.com', name: 'MapTech', password: process.env.ADMIN_PASSWORD },
 ];
 
 async function createAdminAndSendCredentials() {

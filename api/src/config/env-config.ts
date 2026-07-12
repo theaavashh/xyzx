@@ -61,27 +61,42 @@ export const getAppConfig = (): AppConfig => ({
     : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3004'],
 });
 
+const KNOWN_INSECURE_SECRETS = [
+  'default-secret-change-me',
+  'default-refresh-secret-change-me',
+  'dev-jwt-secret-do-not-use-in-production',
+  'dev-jwt-refresh-secret-do-not-use-in-production',
+];
+
 export const getJwtConfig = (): JwtConfig => {
   const secret = process.env.JWT_SECRET;
   const refreshSecret = process.env.JWT_REFRESH_SECRET;
 
-  if (!secret || secret === 'default-secret-change-me') {
+  if (!secret || KNOWN_INSECURE_SECRETS.includes(secret)) {
     throw new Error(
-      'JWT_SECRET environment variable must be set in production',
+      'JWT_SECRET environment variable must be set to a unique, secure value',
     );
   }
 
-  if (!refreshSecret || refreshSecret === 'default-refresh-secret-change-me') {
+  if (!refreshSecret || KNOWN_INSECURE_SECRETS.includes(refreshSecret)) {
     throw new Error(
-      'JWT_REFRESH_SECRET environment variable must be set in production',
+      'JWT_REFRESH_SECRET environment variable must be set to a unique, secure value',
     );
+  }
+
+  if (secret.length < 32) {
+    throw new Error('JWT_SECRET must be at least 32 characters');
+  }
+
+  if (refreshSecret.length < 32) {
+    throw new Error('JWT_REFRESH_SECRET must be at least 32 characters');
   }
 
   return {
     secret,
     refreshSecret,
     expiresIn: process.env.JWT_EXPIRES_IN || '15m',
-    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '1h',
+    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   };
 };
 

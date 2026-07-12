@@ -41,7 +41,7 @@ export async function GET() {
       priority: '0.7',
     },
     {
-      url: '/auth/login',
+      url: '/login',
       changefreq: 'monthly',
       priority: '0.6',
     },

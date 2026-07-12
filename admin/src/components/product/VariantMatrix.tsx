@@ -241,7 +241,7 @@ const VariantMatrix: React.FC<VariantMatrixProps> = ({
       const combinations: Record<string, string>[] = [];
 
       for (const option of attr.options) {
-        const newCurrent = { ...current, [attr.id]: option.id };
+        const newCurrent = { ...current, [attr.id]: (option as any).value || option.id };
         combinations.push(
           ...generateCombinations(attrs, index + 1, newCurrent),
         );

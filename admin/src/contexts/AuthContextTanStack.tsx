@@ -81,7 +81,7 @@ const AuthProviderInner: React.FC<AuthProviderProps> = ({ children }) => {
         return null;
       }
     },
-    enabled: typeof document !== 'undefined' && !!document.cookie.match(/(?:^|;\s*)refreshToken\s*=/),
+    enabled: typeof document !== 'undefined',
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
     refetchOnWindowFocus: false,

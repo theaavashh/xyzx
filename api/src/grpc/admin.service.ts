@@ -82,8 +82,24 @@ export const analyticsHandlers = make('analytics', {
   GetOrdersChart: (c, _r) => prisma.order.findMany({ take: 100, orderBy: { createdAt: 'desc' } }).then((d: any) => ok(JSON.stringify(d))),
   GetTrafficOverview: async (_c, _r) => ok(JSON.stringify({})),
   GetTopProducts: async (c, _r) => {
-    const limit = c.request.limit || 10;
-    const data = await prisma.$queryRawUnsafe(`SELECT p.id, p.name, SUM(oi.quantity) as total_sold FROM OrderItem oi JOIN Product p ON p.id = oi.productId GROUP BY p.id, p.name ORDER BY total_sold DESC LIMIT ${limit}`);
+    const limit = Math.min(Math.max(parseInt(c.request.limit) || 10, 1), 100);
+    const orderItems = await prisma.orderItem.groupBy({
+      by: ['productId'],
+      _sum: { quantity: true },
+      orderBy: { _sum: { quantity: 'desc' } },
+      take: limit,
+    });
+    const productIds = orderItems.map((i) => i.productId);
+    const products = await prisma.product.findMany({
+      where: { id: { in: productIds } },
+      select: { id: true, name: true },
+    });
+    const productMap = new Map(products.map((p) => [p.id, p.name]));
+    const data = orderItems.map((i) => ({
+      id: i.productId,
+      name: productMap.get(i.productId) || 'Unknown',
+      total_sold: i._sum.quantity || 0,
+    }));
     return ok(JSON.stringify(data));
   },
   GetRevenueMetrics: (c, _r) => prisma.order.findMany({ take: 100, orderBy: { createdAt: 'desc' } }).then((d: any) => ok(JSON.stringify(d))),
@@ -92,7 +108,18 @@ export const analyticsHandlers = make('analytics', {
     return ok(JSON.stringify(data));
   },
   GetCategoryPerformance: async (_c, _r) => {
-    const data = await prisma.$queryRawUnsafe(`SELECT c.id, c.name, COUNT(p.id) as product_count FROM Category c LEFT JOIN Product p ON p.categoryId = c.id GROUP BY c.id, c.name`);
+    const categories = await prisma.category.findMany({
+      select: {
+        id: true,
+        name: true,
+        _count: { select: { products: true } },
+      },
+    });
+    const data = categories.map((c) => ({
+      id: c.id,
+      name: c.name,
+      product_count: c._count.products,
+    }));
     return ok(JSON.stringify(data));
   },
 });

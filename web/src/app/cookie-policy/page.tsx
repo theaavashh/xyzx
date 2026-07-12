@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { generateSEOMetadata } from '@/components/SEO';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 interface ContentPage {
   id: string;
@@ -62,15 +63,19 @@ export default async function CookiePolicyPage() {
     notFound();
   }
 
+  const safeContent = await sanitizeHtml(page.content);
+
   return (
     <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 pt-24 pb-16">
-        <div className="max-w-4xl mx-auto">
-          <div
-            className="text-black prose prose-lg max-w-none prose-headings:text-black prose-h1:text-black prose-p:text-black prose-li:text-black prose-strong:text-black whitespace-pre-wrap"
-            dangerouslySetInnerHTML={{ __html: page.content }}
-          />
-        </div>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+        <span className="inline-block text-black/30 text-xs font-semibold tracking-[0.25em] uppercase mb-6 border-l-2 border-black/30 pl-4">
+          Cookies
+        </span>
+        <h1 className="lastik text-3xl sm:text-4xl md:text-5xl text-black mb-8">{page.title}</h1>
+        <div
+          className="prose prose-lg max-w-none prose-headings:text-black prose-h1:text-black prose-p:text-black/60 prose-li:text-black/60 prose-strong:text-black prose-a:text-black prose-a:no-underline hover:prose-a:underline whitespace-pre-wrap"
+          dangerouslySetInnerHTML={{ __html: safeContent }}
+        />
       </div>
     </div>
   );

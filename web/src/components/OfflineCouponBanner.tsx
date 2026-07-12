@@ -1,10 +1,22 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { HiXMark } from 'react-icons/hi2';
+import { fetchActiveCoupons } from './OfflineCouponBanner/utils/api';
 
 export default function OfflineCouponBanner() {
   const [hidden, setHidden] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const { data: coupons } = useQuery({
+    queryKey: ['coupons', 'active'],
+    queryFn: fetchActiveCoupons,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const coupon = coupons && coupons.length > 0 ? coupons[0] : null;
 
   useEffect(() => {
     const onScroll = () => setHidden(window.scrollY > 0);
@@ -13,13 +25,14 @@ export default function OfflineCouponBanner() {
   }, []);
 
   const handleCopy = async () => {
+    if (!coupon) return;
     try {
-      await navigator.clipboard.writeText('OFFLINE10');
+      await navigator.clipboard.writeText(coupon.code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
       const ta = document.createElement('textarea');
-      ta.value = 'OFFLINE10';
+      ta.value = coupon.code;
       document.body.appendChild(ta);
       ta.select();
       document.execCommand('copy');
@@ -29,24 +42,36 @@ export default function OfflineCouponBanner() {
     }
   };
 
+  if (dismissed || !coupon) return null;
+
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-50 border-t border-neutral-100 bg-white/90 backdrop-blur-md px-6 py-4 transition-all duration-300 md:hidden ${
+      className={`fixed bottom-0 left-0 right-0 z-50 bg-gray-50 px-5 py-10 transition-all duration-300 md:hidden ${
         hidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
       }`}
     >
-      <div className="mx-auto flex max-w-4xl items-center justify-between">
-        <div className="flex flex-col items-center gap-3">
-          <span className="text-lg font-medium text-black">Offer at checkout</span>
-          <span className="rounded-full bg-neutral-100 px-4 py-1.5 font-mono text-sm tracking-wider text-black">
-            Apply OFFLINE10
-          </span>
+      <button
+        type="button"
+        onClick={() => setDismissed(true)}
+        className="absolute top-2 right-2 text-black/40 hover:text-black transition-colors"
+        aria-label="Close"
+      >
+        <HiXMark className="w-4 h-4" />
+      </button>
+      <div className="mx-auto flex max-w-9xl items-center gap-4">
+        <div className="flex-1 min-w-0">
+          <p className="lastik text-sm text-black uppercase tracking-tight">
+            Offer at checkout
+          </p>
+          <p className="text-sm text-black mt-0.5 font-medium">
+            Use code <span className="px-2 py-0.5 rounded text-black font-semibold text-md tracking-widest">{coupon.code}</span> for an exclusive discount
+          </p>
         </div>
         <button
           onClick={handleCopy}
-          className="rounded-full bg-amber-400 px-8 py-3 text-sm font-semibold text-black transition-colors hover:bg-amber-300"
+          className="bg-black text-white px-4 py-1.5 rounded-md text-xs font-semibold transition-all hover:bg-zinc-800 active:scale-95 whitespace-nowrap flex-shrink-0"
         >
-          {copied ? 'Copied' : 'Copy code'}
+          {copied ? 'Copied!' : 'Copy'}
         </button>
       </div>
     </div>

@@ -2,22 +2,20 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Heart,
-  LogOut,
-  MapPin,
-  Menu,
-  MessageCircle,
-  Package,
-  Phone,
-  Search,
-  ShoppingCart,
-  Star,
-  User,
-  X,
-} from 'lucide-react';
+  HiBars3,
+  HiChevronDown,
+  HiChevronLeft,
+  HiChevronRight,
+  HiMagnifyingGlass,
+  HiMapPin,
+  HiPhone,
+  HiStar,
+  HiXMark,
+} from 'react-icons/hi2';
+import { FiHeart, FiLogOut, FiPackage } from 'react-icons/fi';
+import { CiShoppingCart } from 'react-icons/ci';
+import { CiUser } from 'react-icons/ci';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -26,27 +24,8 @@ import { useAuth } from '@/contexts/AuthContextTanStack';
 import { useCart } from '@/contexts/CartContext';
 import CartModal from '@/components/CartModal';
 
-interface NavLink {
-  label: string;
-  href: string;
-}
-
-interface NavColumn {
-  id: string;
-  title: string;
-  href: string;
-  order: number;
-  links: NavLink[];
-}
-
-interface NavItem {
-  id: string;
-  name: string;
-  href: string;
-  order: number;
-  isActive: boolean;
-  columns: NavColumn[];
-}
+import type { NavItem } from './Navbar/types';
+import { fetchNavItems } from './Navbar/utils/api';
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -63,6 +42,13 @@ export default function Navbar() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    fetchNavItems().then((data) => {
+      if (data.length > 0) setNavItems(data);
+      setIsLoading(false);
+    });
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 0);
     };
@@ -71,22 +57,15 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const fetchNavigation = async () => {
-      try {
-        const response = await fetch('/api/v1/public/navigation/active');
-        const data = await response.json();
-        if (data.success && data.data) {
-          setNavItems(data.data);
-        }
-      } catch {
-        setNavItems([]);
-      } finally {
-        setIsLoading(false);
-      }
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
     };
-
-    fetchNavigation();
-  }, []);
+  }, [isMenuOpen]);
 
   const handleCloseAllMenus = () => {
     setIsMenuOpen(false);
@@ -99,9 +78,9 @@ export default function Navbar() {
   return (
     <>
       {/* Top Bar - Logo & Icons */}
-      <div className={`bg-white border-b border-gray-100 transition-shadow ${isScrolled ? 'shadow-sm' : ''}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+      <div className={`bg-white border-b border-gray-200 transition-shadow ${isScrolled ? 'shadow-lg shadow-black/10' : ''}`}>
+        <div className="max-w-9xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 lg:h-14">
             {/* Left: Mobile menu + Search */}
             <div className="flex items-center lg:hidden gap-3">
               <button
@@ -110,7 +89,7 @@ export default function Navbar() {
                 className="text-gray-900 hover:text-gray-600 transition-colors"
                 aria-label="Open menu"
               >
-                <Menu className="h-6 w-6" strokeWidth={1.5} />
+                <HiBars3 className="h-6 w-6" />
               </button>
               <button
                 type="button"
@@ -118,7 +97,7 @@ export default function Navbar() {
                 onClick={() => setIsSearchOpen(true)}
                 aria-label="Search"
               >
-                <Search className="h-5 w-5" strokeWidth={1.5} />
+                <HiMagnifyingGlass className="h-5 w-5 lg:h-6 lg:w-6" />
               </button>
             </div>
 
@@ -133,13 +112,13 @@ export default function Navbar() {
                 alt="Rapharch Logo"
                 width={160}
                 height={160}
-                className="h-10 lg:h-14 w-auto object-cover"
+                className="h-8 lg:h-10 w-auto object-cover"
                 priority
               />
             </Link>
 
             {/* Right: Icons */}
-            <div className="flex items-center gap-0.5 sm:gap-1">
+            <div className="flex items-center gap-0">
               {/* Desktop Search */}
               <button
                 type="button"
@@ -147,16 +126,7 @@ export default function Navbar() {
                 onClick={() => setIsSearchOpen(true)}
                 aria-label="Search"
               >
-                <Search className="h-5 w-5" strokeWidth={1.5} />
-              </button>
-
-              {/* Wishlist */}
-              <button
-                type="button"
-                className="text-gray-900 hover:text-gray-600 transition-colors p-2"
-                aria-label="Wishlist"
-              >
-                <Heart className="h-5 w-5" strokeWidth={1.5} />
+                <HiMagnifyingGlass className="h-5 w-5 lg:h-6 lg:w-6" />
               </button>
 
               {/* User */}
@@ -171,8 +141,8 @@ export default function Navbar() {
                     className="flex items-center gap-1 text-gray-900 hover:text-gray-600 transition-colors p-2"
                     aria-label="User menu"
                   >
-                    <User className="h-5 w-5" strokeWidth={1.5} />
-                    <ChevronDown className="h-3 w-3" strokeWidth={1.5} />
+                    <CiUser className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={0.5} />
+                    <HiChevronDown className="h-3 w-3" />
                   </button>
 
                   <AnimatePresence>
@@ -199,7 +169,7 @@ export default function Navbar() {
                             className="flex items-center gap-3 px-4 py-2.5 text-base text-gray-700 hover:bg-gray-50 transition-colors"
                             onClick={() => setIsUserDropdownOpen(false)}
                           >
-                            <Package className="h-5 w-5" strokeWidth={1.5} />
+                            <FiPackage className="h-5 w-5" strokeWidth={0.5} />
                             My Orders
                           </Link>
                           <Link
@@ -207,7 +177,7 @@ export default function Navbar() {
                             className="flex items-center gap-3 px-4 py-2.5 text-base text-gray-700 hover:bg-gray-50 transition-colors"
                             onClick={() => setIsUserDropdownOpen(false)}
                           >
-                            <Star className="h-5 w-5" strokeWidth={1.5} />
+                            <HiStar className="h-5 w-5" />
                             Rewards
                           </Link>
                           <Link
@@ -215,7 +185,7 @@ export default function Navbar() {
                             className="flex items-center gap-3 px-4 py-2.5 text-base text-gray-700 hover:bg-gray-50 transition-colors"
                             onClick={() => setIsUserDropdownOpen(false)}
                           >
-                            <Heart className="h-5 w-5" strokeWidth={1.5} />
+                            <FiHeart className="h-5 w-5" strokeWidth={0.5} />
                             Wishlist
                           </Link>
                           <Link
@@ -223,7 +193,7 @@ export default function Navbar() {
                             className="flex items-center gap-3 px-4 py-2.5 text-base text-gray-700 hover:bg-gray-50 transition-colors"
                             onClick={() => setIsUserDropdownOpen(false)}
                           >
-                            <MapPin className="h-5 w-5" strokeWidth={1.5} />
+                            <HiMapPin className="h-5 w-5" />
                             Addresses
                           </Link>
                         </div>
@@ -237,7 +207,7 @@ export default function Navbar() {
                               logout();
                             }}
                           >
-                            <LogOut className="h-5 w-5" strokeWidth={1.5} />
+                            <FiLogOut className="h-5 w-5" strokeWidth={0.5} />
                             Logout
                           </button>
                         </div>
@@ -247,12 +217,12 @@ export default function Navbar() {
                 </div>
               ) : (
                 <Link
-                  href="/auth/login"
+                  href="/login"
                   className="hidden md:block text-gray-900 hover:text-gray-600 transition-colors p-2"
                   onClick={handleCloseAllMenus}
                   aria-label="Login"
                 >
-                  <User className="h-5 w-5" strokeWidth={1.5} />
+                  <CiUser className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={0.5} />
                 </Link>
               )}
 
@@ -264,16 +234,16 @@ export default function Navbar() {
                   onClick={logout}
                   aria-label="Logout"
                 >
-                  <User className="h-5 w-5" strokeWidth={1.5} />
-                </button>
+<CiUser className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={0.5} />
+                        </button>
               ) : (
                 <Link
-                  href="/auth/login"
-                  className="md:hidden text-gray-900 hover:text-gray-600 transition-colors p-2"
+                  href="/login"
+                  className="md:hidden text-gray-900 hover:text-gray-600 transition-colors "
                   onClick={handleCloseAllMenus}
                   aria-label="Login"
                 >
-                  <User className="h-5 w-5" strokeWidth={1.5} />
+                  <CiUser className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={0.5} />
                 </Link>
               )}
 
@@ -281,15 +251,13 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setIsCartOpen(true)}
-                className="text-gray-900 hover:text-gray-600 transition-colors p-2 relative"
+                className="text-gray-900 hover:text-gray-600 transition-colors p-2 flex items-center gap-1"
                 aria-label="Shopping cart"
               >
-                <ShoppingCart className="h-5 w-5" strokeWidth={1.5} />
-                {itemCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-black text-white text-sm rounded-full h-4 w-4 flex items-center justify-center text-sm">
-                    {itemCount}
-                  </span>
-                )}
+                <CiShoppingCart className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={0.5} />
+                <span className="text-sm font-medium tabular-nums">
+                  ({itemCount})
+                </span>
               </button>
             </div>
           </div>
@@ -297,11 +265,11 @@ export default function Navbar() {
       </div>
 
       {/* Bottom Bar - Navigation Items */}
-      <div className="hidden lg:block bg-white border-b border-gray-100 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center h-12">
+      <div className="hidden lg:block bg-white relative py-2">
+        <div className="max-w-9xl px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center h-10">
             {/* Desktop Nav Items */}
-            <div className="hidden lg:flex items-center justify-center gap-8 w-full">
+            <div className="hidden lg:flex items-center justify-center gap-32 w-full">
               {navItems.map((item) => (
                 <div
                   key={item.name}
@@ -311,12 +279,12 @@ export default function Navbar() {
                 >
                   <Link
                     href={item.href}
-                    className="text-base font-medium text-gray-900 hover:text-[#D4AF37] transition-colors py-3 inline-flex items-center gap-1"
+                    className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors py-3 inline-flex items-center gap-2"
                     onClick={handleCloseAllMenus}
                   >
                     {item.name}
                     {item.columns.length > 0 && (
-                      <ChevronDown className="h-4 w-4 transition-transform" strokeWidth={1.5} />
+                      <HiChevronDown className="h-4 w-4 transition-transform" />
                     )}
                   </Link>
                 </div>
@@ -331,7 +299,7 @@ export default function Navbar() {
       <AnimatePresence>
         {activeDropdown && (
           <motion.div
-            className="fixed left-0 right-0 top-[7.5rem] bg-white shadow-xl z-40 border-t border-gray-100"
+            className="fixed left-0 right-0 top-[9rem] bg-white shadow-xl z-40 "
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -339,7 +307,7 @@ export default function Navbar() {
             onMouseEnter={() => setActiveDropdown(activeDropdown)}
             onMouseLeave={() => setActiveDropdown(null)}
           >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-9xl px-4 sm:px-6 lg:px-8 py-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
                 {navItems
                   .find((item) => item.name === activeDropdown)
@@ -357,7 +325,7 @@ export default function Navbar() {
                           <li key={link.href}>
                             <Link
                               href={link.href}
-                              className="text-base text-gray-600 hover:text-black transition-colors"
+                              className="text-base text-gray-600 hover:text-gray-900 transition-colors"
                               onClick={handleCloseAllMenus}
                             >
                               {link.label}
@@ -378,7 +346,7 @@ export default function Navbar() {
         {isMenuOpen && (
           <>
             <motion.div
-              className="fixed inset-0 bg-black/40 z-[60]"
+              className="fixed inset-0 bg-black/40 z-[60] touch-none"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -386,7 +354,7 @@ export default function Navbar() {
             />
 
             <motion.div
-              className="fixed top-0 left-0 bottom-0 w-[85vw] max-w-sm bg-white z-[61] flex flex-col"
+              className="fixed top-0 left-0 bottom-0 w-[85vw] max-w-sm bg-white z-[61] flex flex-col overscroll-contain"
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
@@ -395,23 +363,14 @@ export default function Navbar() {
                 ease: [0.32, 0, 0.67, 0],
               }}
             >
-              <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100">
-                <Link href="/" onClick={handleCloseAllMenus}>
-                  <Image
-                    src="/icon.jpeg"
-                    alt="RaphArch"
-                    width={28}
-                    height={28}
-                    className="object-contain"
-                  />
-                </Link>
+              <div className="flex items-center justify-end px-5 py-4 border-b border-zinc-100">
                 <button
                   type="button"
                   onClick={handleCloseAllMenus}
                   className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors"
                   aria-label="Close menu"
                 >
-                  <X className="h-5 w-5 text-zinc-600" strokeWidth={1.5} />
+                  <HiXMark className="h-5 w-5 text-zinc-600" />
                 </button>
               </div>
 
@@ -420,17 +379,17 @@ export default function Navbar() {
                   {activeSubmenu ? (
                     <motion.div
                       key="submenu"
-                      initial={{ opacity: 0, x: 16 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 16 }}
-                      transition={{ duration: 0.2 }}
+                      initial={{ x: '-100%' }}
+                      animate={{ x: 0 }}
+                      exit={{ x: '-100%' }}
+                      transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
                     >
                       <button
                         type="button"
                         onClick={() => setActiveSubmenu(null)}
                         className="flex items-center gap-2 text-sm font-medium text-zinc-400 uppercase tracking-wider mb-5 hover:text-zinc-600 transition-colors"
                       >
-                        <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
+                        <HiChevronLeft className="h-5 w-5" />
                         Back
                       </button>
 
@@ -469,10 +428,10 @@ export default function Navbar() {
                   ) : (
                     <motion.div
                       key="main"
-                      initial={{ opacity: 0, x: 16 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 16 }}
-                      transition={{ duration: 0.2 }}
+                      initial={{ x: '-100%' }}
+                      animate={{ x: 0 }}
+                      exit={{ x: '-100%' }}
+                      transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
                     >
                       <div className="space-y-0.5">
                         {navItems.map((item) => (
@@ -483,7 +442,7 @@ export default function Navbar() {
                             className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-zinc-50 transition-colors text-left"
                           >
                             <span className="text-base font-medium text-zinc-800">{item.name}</span>
-                            {item.columns.length > 0 && <ChevronRight className="h-4 w-4 text-zinc-300" strokeWidth={1.5} />}
+                            {item.columns.length > 0 && <HiChevronRight className="h-4 w-4 text-zinc-300" />}
                           </button>
                         ))}
                       </div>
@@ -492,78 +451,74 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
 
-              <div className="border-t border-zinc-100 px-5 py-4 space-y-3">
-                <Link
-                  href="/contact-us"
-                  className="flex items-center gap-3 px-3 py-2.5 text-base text-zinc-600 hover:text-black rounded-lg hover:bg-zinc-50 transition-colors"
-                  onClick={handleCloseAllMenus}
-                >
-                  <Phone className="h-5 w-5" strokeWidth={1.5} />
-                  Contact Us
-                </Link>
-                <Link
-                  href="/stores"
-                  className="flex items-center gap-3 px-3 py-2.5 text-base text-zinc-600 hover:text-black rounded-lg hover:bg-zinc-50 transition-colors"
-                  onClick={handleCloseAllMenus}
-                >
-                  <MapPin className="h-5 w-5" strokeWidth={1.5} />
-                  Find a Store
-                </Link>
-                <a
-                  href="https://wa.me/1234567890?text=Hi%20RaphArch%2C%20I%20have%20a%20question."
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-3 py-2.5 text-base text-zinc-600 hover:text-black rounded-lg hover:bg-zinc-50 transition-colors"
-                >
-                  <MessageCircle className="h-5 w-5" strokeWidth={1.5} />
-                  Chat with us
-                </a>
-              </div>
+              {!activeSubmenu && (
+                <>
+                  <div className="border-t border-zinc-100 px-5 py-4 space-y-3">
+                    <Link
+                      href="/contact-us"
+                      className="flex items-center gap-3 px-3 py-2.5 text-base text-zinc-600 hover:text-black rounded-lg hover:bg-zinc-50 transition-colors"
+                      onClick={handleCloseAllMenus}
+                    >
+                      <HiPhone className="h-5 w-5" />
+                      Contact Us
+                    </Link>
+                    <Link
+                      href="/stores"
+                      className="flex items-center gap-3 px-3 py-2.5 text-base text-zinc-600 hover:text-black rounded-lg hover:bg-zinc-50 transition-colors"
+                      onClick={handleCloseAllMenus}
+                    >
+                      <HiMapPin className="h-5 w-5" />
+                      Find a Store
+                    </Link>
+                    
+                  </div>
 
-              <div className="border-t border-zinc-100 px-5 py-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => { setIsSearchOpen(true); setIsMenuOpen(false); }}
-                    className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors"
-                    aria-label="Search"
-                  >
-                    <Search className="h-4 w-4 text-zinc-600" strokeWidth={1.5} />
-                  </button>
-                  {isAuthenticated ? (
+                  <div className="border-t border-zinc-100 px-5 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => { setIsSearchOpen(true); setIsMenuOpen(false); }}
+                        className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors"
+                        aria-label="Search"
+                      >
+                        <HiMagnifyingGlass className="h-4 w-4 text-zinc-600" />
+                      </button>
+                      {isAuthenticated ? (
+                        <button
+                          type="button"
+                          onClick={logout}
+                          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors"
+                          aria-label="Logout"
+                        >
+                          <FiLogOut className="h-4 w-4 text-zinc-600" strokeWidth={0.5} />
+                        </button>
+                      ) : (
+                        <Link
+                          href="/login"
+                          onClick={handleCloseAllMenus}
+                          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors"
+                          aria-label="Login"
+                        >
+                          <CiUser className="h-4 w-4 text-zinc-600" strokeWidth={0.5} />
+                        </Link>
+                      )}
+                    </div>
                     <button
                       type="button"
-                      onClick={logout}
-                      className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors"
-                      aria-label="Logout"
+                      onClick={() => { handleCloseAllMenus(); setIsCartOpen(true); }}
+                      className="relative w-9 h-9 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors"
+                      aria-label="Cart"
                     >
-                      <LogOut className="h-4 w-4 text-zinc-600" strokeWidth={1.5} />
+                      <CiShoppingCart className="h-4 w-4 text-zinc-600" strokeWidth={0.5} />
+                      {itemCount > 0 && (
+                        <span className="absolute -top-0.5 -right-0.5 bg-zinc-900 text-white text-[10px] font-medium rounded-full h-4 w-4 flex items-center justify-center">
+                          {itemCount}
+                        </span>
+                      )}
                     </button>
-                  ) : (
-                    <Link
-                      href="/auth/login"
-                      onClick={handleCloseAllMenus}
-                      className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors"
-                      aria-label="Login"
-                    >
-                      <User className="h-4 w-4 text-zinc-600" strokeWidth={1.5} />
-                    </Link>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => { handleCloseAllMenus(); setIsCartOpen(true); }}
-                  className="relative w-9 h-9 flex items-center justify-center rounded-lg hover:bg-zinc-100 transition-colors"
-                  aria-label="Cart"
-                >
-                  <ShoppingCart className="h-4 w-4 text-zinc-600" strokeWidth={1.5} />
-                  {itemCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 bg-zinc-900 text-white text-[10px] font-medium rounded-full h-4 w-4 flex items-center justify-center">
-                      {itemCount}
-                    </span>
-                  )}
-                </button>
-              </div>
+                  </div>
+                </>
+              )}
             </motion.div>
           </>
         )}
@@ -572,66 +527,60 @@ export default function Navbar() {
       {/* Search Overlay */}
       <AnimatePresence>
         {isSearchOpen && (
-          <motion.div
-            className="fixed inset-0 bg-white z-50 h-[50vh]"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="container mx-auto px-4 py-6">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-semibold text-gray-900">
-                  Search
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => setIsSearchOpen(false)}
-                  className="text-gray-600 hover:text-black"
-                  aria-label="Close search"
-                >
-                  <X className="h-6 w-6" strokeWidth={1.5} />
-                </button>
-              </div>
-
-              <div className="relative mb-8">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" strokeWidth={1.5} />
-                <input
-                  type="text"
-                  placeholder="Search for products, brands, and more..."
-                  className="w-full pl-12 pr-4 py-3 border-b border-gray-300 text-xl focus:outline-none focus:border-black placeholder:text-gray-500"
-                  autoFocus
-                />
-              </div>
-
-              <div>
-                <h3 className="text-xl font-medium text-gray-900 mb-4">
-                  Popular Searches
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    'Shoes',
-                    'Hoodies',
-                    'T-Shirts',
-                    'Jeans',
-                    'Sneakers',
-                    'Jackets',
-                    'Shorts',
-                    'Sweaters',
-                  ].map((item) => (
-                    <button
-                      type="button"
-                      key={item}
-                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
-                      onClick={() => setIsSearchOpen(false)}
-                    >
-                      {item}
-                    </button>
-                  ))}
+          <>
+            <motion.div
+              className="relative bg-white border-b border-gray-200 z-50"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div className="relative">
+                  <HiMagnifyingGlass className="absolute left-0 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search for products, brands, and more..."
+                    className="w-full pl-8 pr-4 py-2 text-lg bg-transparent text-gray-900 focus:outline-none placeholder:text-gray-400 border-b border-gray-200 focus:border-gray-900"
+                    autoFocus
+                  />
+                </div>
+                <div className="mt-4">
+                  <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
+                    Popular Searches
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      'Shoes',
+                      'Hoodies',
+                      'T-Shirts',
+                      'Jeans',
+                      'Sneakers',
+                      'Jackets',
+                      'Shorts',
+                      'Sweaters',
+                    ].map((item) => (
+                      <button
+                        type="button"
+                        key={item}
+                        className="px-3 py-1.5 text-sm text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                        onClick={() => setIsSearchOpen(false)}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+            <motion.div
+              className="fixed inset-0 bg-black/20 z-40"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsSearchOpen(false)}
+            />
+          </>
         )}
       </AnimatePresence>
 

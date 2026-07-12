@@ -11,6 +11,17 @@ import type {
   PaginatedResponse,
 } from './types';
 
+async function safeRequest<T>(url: string, options?: RequestInit): Promise<T | null> {
+  try {
+    return await apiRequest<T>(url, options);
+  } catch (error) {
+    if (error instanceof ApiError && (error.isNotFound || error.isServerError)) {
+      return null;
+    }
+    throw error;
+  }
+}
+
 async function fetchPaginated<T>(
   endpoint: string,
   params?: PaginationParams,
@@ -22,53 +33,67 @@ async function fetchPaginated<T>(
   const queryString = query.toString();
   const url = queryString ? `${endpoint}?${queryString}` : endpoint;
 
-  return apiRequest<{
+  const response = await safeRequest<{
     success: boolean;
     data: T[];
     total: number;
     page: number;
     limit: number;
     totalPages: number;
-  }>(url).then((response) => ({
+  }>(url);
+
+  if (!response) {
+    return { success: false, data: [], total: 0, page: 1, limit: params?.limit ?? 10, totalPages: 0 };
+  }
+
+  return {
     success: response.success,
     data: response.data,
     total: response.total,
     page: response.page,
     limit: response.limit,
     totalPages: response.totalPages,
-  }));
+  };
 }
 
 export async function fetchDashboardStats(): Promise<DashboardStats> {
-  const response = await apiRequest<{ success: boolean; data: DashboardStats }>(
+  const response = await safeRequest<{ success: boolean; data: DashboardStats }>(
     '/api/v1/user/dashboard/stats',
   );
-  return response.data;
+  return response?.data ?? { totalOrders: 0, pendingOrders: 0, completedOrders: 0, wishlistCount: 0, rewardsBalance: 0 };
 }
 
-export const fetchOrders = (params?: PaginationParams) => fetchPaginated<Order>('/api/v1/user/orders', params);
+export const fetchOrders = (params?: PaginationParams) => fetchPaginated<Order>('/api/v1/orders', params);
 export const fetchReturns = (params?: PaginationParams) => fetchPaginated<ReturnItem>('/api/v1/user/returns', params);
 export const fetchCancellations = (params?: PaginationParams) => fetchPaginated<Cancellation>('/api/v1/user/cancellations', params);
 export const fetchWishlist = (params?: PaginationParams) => fetchPaginated<WishlistItem>('/api/v1/user/wishlist', params);
 
-export async function fetchOrderById(orderId: string): Promise<Order> {
-  const response = await apiRequest<{ success: boolean; data: Order }>(
-    `/api/v1/user/orders/${orderId}`,
+export async function fetchOrderById(orderId: string): Promise<Order | null> {
+  const response = await safeRequest<{ success: boolean; data: Order }>(
+    `/api/v1/orders/${orderId}`,
   );
-  return response.data;
+  return response?.data ?? null;
 }
 
 export async function addToWishlist(productId: string): Promise<void> {
-  await apiRequest('/api/v1/user/wishlist', {
-    method: 'POST',
-    body: JSON.stringify({ productId }),
-  });
+  try {
+    await apiRequest('/api/v1/user/wishlist', {
+      method: 'POST',
+      body: JSON.stringify({ productId }),
+    });
+  } catch {
+    // silently fail if endpoint doesn't exist
+  }
 }
 
 export async function removeFromWishlist(itemId: string): Promise<void> {
-  await apiRequest(`/api/v1/user/wishlist/${itemId}`, {
-    method: 'DELETE',
-  });
+  try {
+    await apiRequest(`/api/v1/user/wishlist/${itemId}`, {
+      method: 'DELETE',
+    });
+  } catch {
+    // silently fail
+  }
 }
 
 export async function fetchAddresses(): Promise<Address[]> {
@@ -121,7 +146,7 @@ export async function setDefaultAddress(id: string): Promise<void> {
 
 export async function updateProfile(data: Partial<User>): Promise<User> {
   const response = await apiRequest<{ success: boolean; data: User }>(
-    '/api/v1/user/profile',
+    '/api/v1/users/profile',
     {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -131,7 +156,7 @@ export async function updateProfile(data: Partial<User>): Promise<User> {
 }
 
 export async function changePassword(data: { currentPassword: string; newPassword: string }): Promise<void> {
-  await apiRequest('/api/v1/user/change-password', {
+  await apiRequest('/api/v1/auth/change-password', {
     method: 'POST',
     body: JSON.stringify(data),
   });

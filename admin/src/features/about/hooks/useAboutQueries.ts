@@ -1,108 +1,87 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { clientLogger } from '@/lib/logger';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import type { AboutUsData } from '../types';
+import type { AboutSection, AboutSectionFormData } from '../types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9999';
+export function useAboutSections() {
+  const [sections, setSections] = useState<AboutSection[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isMutating, setIsMutating] = useState(false);
 
-function mapContentToAbout(data: Record<string, any>): AboutUsData {
-  return {
-    id: data.id,
-    slug: data.slug,
-    title: data.title || '',
-    content: data.content || '',
-    metaTitle: data.metaTitle || '',
-    metaDescription: data.metaDescription || '',
-    isActive: data.isActive ?? true,
-    createdAt: data.createdAt,
-    updatedAt: data.updatedAt,
-    lastUpdated: data.updatedAt || data.createdAt,
-  };
-}
-
-export function useAboutData() {
-  const [aboutData, setAboutData] = useState<AboutUsData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-    const loadData = async () => {
-      try {
-        const response = await fetch(`${API_BASE}/api/v1/content/slug/about`);
-        if (response.ok) {
-          const result = await response.json();
-          if (mounted) setAboutData(mapContentToAbout(result.data));
-        } else {
-          // Page doesn't exist yet — provide defaults
-          if (mounted) {
-            setAboutData({
-              title: 'About RaphArch',
-              content: '',
-              metaTitle: 'About RaphArch - Premium Fashion',
-              metaDescription: 'Learn about RaphArch, your destination for premium fashion and footwear.',
-              isActive: true,
-            });
-          }
-        }
-      } catch {
-        toast.error('Failed to load about us data');
-        if (mounted) {
-          setAboutData({
-            title: 'About RaphArch',
-            content: '',
-            metaTitle: 'About RaphArch - Premium Fashion',
-            metaDescription: 'Learn about RaphArch, your destination for premium fashion and footwear.',
-            isActive: true,
-          });
-        }
-      } finally {
-        if (mounted) setIsLoading(false);
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await globalThis.fetch('/api/v1/about');
+      if (res.ok) {
+        const data = await res.json();
+        setSections(data.data || []);
+      } else {
+        clientLogger.error(`Failed to fetch about sections: ${res.status}`);
+        toast.error(`Failed to fetch about sections (${res.status}).`);
       }
-    };
-    loadData();
-    return () => { mounted = false; };
+    } catch (error) {
+      clientLogger.error('Error fetching about sections:', error);
+      toast.error('An error occurred while fetching about sections.');
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  return { aboutData, setAboutData, isLoading };
-}
+  useEffect(() => { load(); }, [load]);
 
-export function useSaveAboutData() {
-  const [isSaving, setIsSaving] = useState(false);
-
-  const save = async (data: AboutUsData): Promise<AboutUsData> => {
-    setIsSaving(true);
+  const handleResponse = async (
+    url: string,
+    options: RequestInit,
+    successMsg: string,
+  ) => {
+    setIsMutating(true);
     try {
-      const response = await fetch(`${API_BASE}/api/v1/content/about`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          key: 'about',
-          title: data.title,
-          content: data.content,
-          metaTitle: data.metaTitle || undefined,
-          metaDescription: data.metaDescription || undefined,
-          isActive: data.isActive,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || 'Failed to save about us page');
+      const res = await globalThis.fetch(url, { credentials: 'include', ...options });
+      if (res.ok) {
+        toast.success(successMsg);
+        await load();
+        return true;
       }
-
-      const result = await response.json();
-      toast.success('About Us page updated successfully!');
-      return mapContentToAbout(result.data);
+      const errData = await res.json();
+      toast.error(errData.message || 'Request failed');
+      return false;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to save about us page';
-      toast.error(message);
-      throw error;
+      clientLogger.error('Mutation error:', error);
+      toast.error('An error occurred. Please try again.');
+      return false;
     } finally {
-      setIsSaving(false);
+      setIsMutating(false);
     }
   };
 
-  return { save, isSaving };
+  const createSection = useCallback(
+    (data: AboutSectionFormData) =>
+      handleResponse('/api/v1/about', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }, 'About section created'),
+    [],
+  );
+
+  const updateSection = useCallback(
+    (id: string, data: AboutSectionFormData) =>
+      handleResponse(`/api/v1/about/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }, 'About section updated'),
+    [],
+  );
+
+  const deleteSection = useCallback(
+    (section: AboutSection) =>
+      handleResponse(`/api/v1/about/${section.id}`, { method: 'DELETE' }, 'About section deleted'),
+    [],
+  );
+
+  const toggleStatus = useCallback(
+    (section: AboutSection) =>
+      handleResponse(`/api/v1/about/${section.id}/toggle`, { method: 'PATCH' }, `About section ${section.isActive ? 'deactivated' : 'activated'}`),
+    [],
+  );
+
+  return {
+    sections, isLoading, isMutating, refetch: load,
+    createSection, updateSection, deleteSection, toggleStatus,
+  };
 }

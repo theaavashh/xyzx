@@ -2,7 +2,7 @@
 set -e
 
 echo "[entrypoint] Pushing Prisma schema..."
-prisma db push --skip-generate --accept-data-loss
+prisma migrate deploy
 
 echo "[entrypoint] Auto-creating admin user..."
 tsx src/scripts/auto-create-admin.ts

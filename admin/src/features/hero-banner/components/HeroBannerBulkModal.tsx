@@ -72,7 +72,7 @@ export function HeroBannerBulkModal({
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0">
               <div>
-                <h2 className="text-2xl font-semibold text-black lastik">
+                <h2 className="text-2xl font-semibold text-black outer-sans">
                   {editingBanner ? 'Edit Banner' : 'Add Banners'}
                 </h2>
                 <p className="text-sm text-gray-500">

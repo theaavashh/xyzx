@@ -22,7 +22,7 @@ export function SidebarSection({
 }: SidebarSectionProps) {
   return (
     <div className="mt-3 first:mt-0">
-      <h2 className="text-base font-semibold text-gray-500 uppercase tracking-normal px-3 mb-1.5 lastik">
+      <h2 className="text-lg font-semibold text-gray-500 uppercase tracking-normal px-3 mb-1.5 outer-sans">
         {title}
       </h2>
       <div className="space-y-0.5">

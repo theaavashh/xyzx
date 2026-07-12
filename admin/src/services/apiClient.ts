@@ -84,6 +84,16 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  if (typeof document !== 'undefined') {
+    const accessToken = document.cookie
+      .split(';')
+      .find(c => c.trim().startsWith('accessToken='))
+      ?.split('=')[1];
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${decodeURIComponent(accessToken)}`;
+    }
+  }
+
   if (isMutationMethod(config.method)) {
     const token = getCsrfToken();
     if (token) {

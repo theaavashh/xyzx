@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 import { logger } from '../utils/logger';
 
@@ -21,7 +22,16 @@ export const apiKeyAuth = (req: Request, res: Response, next: NextFunction) => {
 
     const validApiKeys = process.env.API_KEYS?.split(',') || [];
 
-    if (!validApiKeys.includes(apiKey)) {
+    const isValid = validApiKeys.some((validKey) => {
+      if (validKey.length !== apiKey.length) return false;
+      try {
+        return timingSafeEqual(Buffer.from(validKey), Buffer.from(apiKey));
+      } catch {
+        return false;
+      }
+    });
+
+    if (!isValid) {
       logger.warn('Invalid API key attempt');
       return res.status(404).end();
     }

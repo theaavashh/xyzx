@@ -153,6 +153,6 @@ export function DiscountTable({ coupons, onEdit, onToggleStatus, onDelete }: Dis
 
 function Th({ children }: { children: React.ReactNode }) {
   return (
-    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm">{children}</th>
+    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm outer-sans">{children}</th>
   );
 }

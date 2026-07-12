@@ -145,7 +145,8 @@ export const createUser = async (data: {
   isActive?: boolean;
   permissions?: string[];
 }): Promise<UserPublic> => {
-  const hashedPassword = await bcrypt.hash(data.password, 10);
+  const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12', 10);
+  const hashedPassword = await bcrypt.hash(data.password, saltRounds);
   const user = await prisma.user.create({
     data: {
       name: data.name,
@@ -173,7 +174,10 @@ export const updateUser = async (
   },
 ): Promise<UserPublic> => {
   const updateData: Prisma.UserUpdateInput = { ...data };
-  if (data.password) updateData.password = await bcrypt.hash(data.password, 10);
+  if (data.password) {
+    const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12', 10);
+    updateData.password = await bcrypt.hash(data.password, saltRounds);
+  }
 
   const user = await prisma.user.update({
     where: { id },

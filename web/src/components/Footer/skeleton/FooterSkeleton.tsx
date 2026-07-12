@@ -1,7 +1,7 @@
 export function FooterSkeleton() {
   return (
     <section className="bg-[#F2EBCC] border-t border-gray-100 py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-12">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="space-y-4">

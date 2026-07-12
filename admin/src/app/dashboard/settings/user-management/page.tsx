@@ -86,7 +86,7 @@ export default function UserManagementPage() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black lastik">
+            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">
               User Management
             </h1>
             <p className="text-black text-lg mt-2">
@@ -95,7 +95,7 @@ export default function UserManagementPage() {
           </div>
           <button
             onClick={openCreateModal}
-            className="bg-[#D4AF37] text-white px-4 py-2.5 lastik text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold"
+            className="bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold"
           >
             <Plus className="w-5 h-5" />
             Add New User
