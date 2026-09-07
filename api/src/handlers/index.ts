@@ -7,7 +7,6 @@ export * from '../controllers/category.controller';
 export * from '../controllers/banner.controller';
 export * from '../controllers/hero-banner.controller';
 export * from '../controllers/featured-section.controller';
-export * from '../controllers/shop-by-category.controller';
 export * from '../controllers/navigation.controller';
 export * from '../controllers/footer-catalog.controller';
 export * from '../controllers/footer-section.controller';

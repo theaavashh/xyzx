@@ -13,6 +13,7 @@ import type { User } from '@/types';
 import { useIdleTimeout } from '@/hooks/useIdleTimeout';
 import { useTokenRefresh } from '@/hooks/useTokenRefresh';
 import { fetchProfile, loginRequest, logoutRequest, tokenRefreshManager } from '@/services/apiClient';
+import { clearAccessToken, getAccessToken } from '@/utils/authToken';
 
 export type { User };
 export { queryClient };
@@ -51,6 +52,7 @@ const AuthProviderInner: React.FC<AuthProviderProps> = ({ children }) => {
       // Ignore logout errors
     }
     tokenRefreshManager.reset();
+    clearAccessToken();
     document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     router.replace('/');
@@ -81,7 +83,7 @@ const AuthProviderInner: React.FC<AuthProviderProps> = ({ children }) => {
         return null;
       }
     },
-    enabled: typeof document !== 'undefined',
+    enabled: typeof document !== 'undefined' && !!getAccessToken(),
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
     refetchOnWindowFocus: false,

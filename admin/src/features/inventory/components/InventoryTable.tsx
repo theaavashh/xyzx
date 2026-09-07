@@ -13,18 +13,17 @@ export default function InventoryTable({ lowStock, logs }: InventoryTableProps) 
     <>
       {lowStock.length > 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
-          <h2 className="text-lg font-bold text-black outer-sans mb-6">
+          <h2 className="text-lg font-bold text-black mb-6">
             Low Stock Alerts ({lowStock.length})
           </h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[600px]">
               <thead>
                 <tr className="border-b border-amber-200 text-left">
-                  <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs outer-sans">Product</th>
-                  <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs outer-sans">SKU</th>
-                  <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs outer-sans">Current</th>
-                  <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs outer-sans">Threshold</th>
-                  <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs outer-sans">Status</th>
+                  <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs">Product</th>
+                  <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs">SKU</th>
+                  <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs">Threshold</th>
+                  <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -32,7 +31,6 @@ export default function InventoryTable({ lowStock, logs }: InventoryTableProps) 
                   <tr key={p.id} className="border-b border-amber-100">
                     <td className="py-3 text-black font-medium">{p.name}</td>
                     <td className="py-3 text-gray-600">{p.sku || '-'}</td>
-                    <td className="py-3 font-mono text-black">{p.quantity}</td>
                     <td className="py-3 text-black">{p.lowStockThreshold}</td>
                     <td className="py-3">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
@@ -50,17 +48,17 @@ export default function InventoryTable({ lowStock, logs }: InventoryTableProps) 
       )}
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-bold text-black outer-sans mb-6">Recent Stock Changes</h2>
+        <h2 className="text-lg font-bold text-black mb-6">Recent Stock Changes</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[700px]">
             <thead>
               <tr className="border-b border-gray-200 text-left">
-                <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs outer-sans">Product</th>
-                <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs outer-sans">Type</th>
-                <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs outer-sans">Qty</th>
-                <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs outer-sans">Change</th>
-                <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs outer-sans">Source</th>
-                <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs outer-sans">Time</th>
+                <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs">Product</th>
+                <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs">Type</th>
+                <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs">Qty</th>
+                <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs">Change</th>
+                <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs">Source</th>
+                <th className="pb-3 font-semibold text-gray-500 uppercase tracking-wider text-xs">Time</th>
               </tr>
             </thead>
             <tbody>

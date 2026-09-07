@@ -1,6 +1,6 @@
 export function FeatureSkeleton() {
   return (
-    <section className="bg-white py-8">
+    <section className="bg-[#F7F6F3] py-8">
       <div className="container mx-auto px-4 py-6 pb-2">
         <div className="hidden md:grid md:grid-cols-3 gap-8 mb-8 md:mb-12">
           {Array.from({ length: 3 }).map((_, i) => (

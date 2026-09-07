@@ -23,13 +23,15 @@ export const createDelivery: RequestHandler = asyncHandler(
 
     logger.info('Delivery created', { deliveryId: delivery.id, orderId });
 
-    notificationRepository.createNotification({
-      userId: delivery.order.userId,
-      title: 'Shipment Created',
-      message: `Your order #${delivery.order.orderNumber} shipment has been created.`,
-      type: 'DELIVERY',
-      orderId,
-    }).catch(() => {});
+    if (delivery.order.userId) {
+      notificationRepository.createNotification({
+        userId: delivery.order.userId,
+        title: 'Shipment Created',
+        message: `Your order #${delivery.order.orderNumber} shipment has been created.`,
+        type: 'DELIVERY',
+        orderId,
+      }).catch(() => {});
+    }
 
     sendSuccess(res, delivery, 'Delivery created');
   },
@@ -110,13 +112,15 @@ export const updateDeliveryStatus: RequestHandler = asyncHandler(
     };
 
     if (status && statusMessages[status]) {
-      notificationRepository.createNotification({
-        userId: delivery.order.userId,
-        title: `Delivery Update: ${status.replace(/_/g, ' ')}`,
-        message: statusMessages[status],
-        type: 'DELIVERY',
-        orderId,
-      }).catch(() => {});
+      if (delivery.order.userId) {
+        notificationRepository.createNotification({
+          userId: delivery.order.userId,
+          title: `Delivery Update: ${status.replace(/_/g, ' ')}`,
+          message: statusMessages[status],
+          type: 'DELIVERY',
+          orderId,
+        }).catch(() => {});
+      }
     }
 
     logger.info('Delivery status updated', { orderId, status, updatedBy: req.user?.userId });

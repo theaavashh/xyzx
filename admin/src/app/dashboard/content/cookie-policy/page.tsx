@@ -28,7 +28,7 @@ export default function CookiePolicyPage() {
       <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex justify-between items-center mb-6 border-b pb-4">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Cookie Policy Editor</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-black">Cookie Policy Editor</h2>
             <p className="text-sm text-gray-500 mt-1">Edit your cookie policy content</p>
           </div>
           <button onClick={handleSave} disabled={loading}

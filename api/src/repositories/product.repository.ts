@@ -98,19 +98,36 @@ export const findProducts = async (
     );
     const skip = (page - 1) * limit;
 
-    const [data, total] = await Promise.all([
+    const [idRows, total] = await Promise.all([
       prisma.product.findMany({
         where,
         orderBy,
         skip,
         take: limit,
-        include: { category: selectCategory },
+        select: { id: true },
       }),
       prisma.product.count({ where }),
     ]);
 
+    if (idRows.length === 0) {
+      return {
+        data: [],
+        pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+      };
+    }
+
+    const orderedIds = idRows.map((row) => row.id);
+    const data = await prisma.product.findMany({
+      where: { id: { in: orderedIds } },
+      include: { category: selectCategory },
+    });
+    const dataById = new Map(data.map((product) => [product.id, product]));
+    const orderedData = orderedIds
+      .map((id) => dataById.get(id))
+      .filter((product): product is ProductWithCategory => Boolean(product));
+
     return {
-      data: data as ProductWithCategory[],
+      data: orderedData,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     };
   });

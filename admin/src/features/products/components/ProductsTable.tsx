@@ -104,7 +104,7 @@ export default function ProductsTable({
           <div className="mx-auto w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mb-4">
             <AlertCircle className="w-7 h-7 text-red-500" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 outer-sans">Error Loading Products</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Error Loading Products</h3>
           <p className="mt-1 text-sm text-gray-500">{error}</p>
         </div>
       </motion.div>
@@ -122,7 +122,7 @@ export default function ProductsTable({
           <div className="mx-auto w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-4">
             <Package className="w-8 h-8 text-gray-300" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 outer-sans">
+          <h3 className="text-lg font-semibold text-gray-900">
             {hasActiveFilters ? 'No Results Found' : 'No Products Yet'}
           </h3>
           <p className="mt-1 text-sm text-gray-500">
@@ -177,14 +177,14 @@ export default function ProductsTable({
                   className="h-4 w-4 rounded border-gray-300 text-[#D4AF37] focus:ring-[#D4AF37] cursor-pointer"
                 />
               </th>
-              <th className="w-10 px-2 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">#</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">Image</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">Product</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">Variants</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">Category</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">Price</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">Stock</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">Status</th>
+              <th className="w-10 px-2 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">#</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Image</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Variants</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -225,7 +225,7 @@ export default function ProductsTable({
                         <img
                           src={getImageUrl(product.images[0])}
                           alt={product.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                           onError={(e) => {
                             (e.currentTarget as HTMLImageElement).src = '/image.png';
                           }}

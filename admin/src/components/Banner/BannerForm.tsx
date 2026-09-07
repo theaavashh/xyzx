@@ -105,7 +105,7 @@ export default function BannerForm({
           value={titleValue || ''}
           onChange={(value) => setValue('title', value, { shouldValidate: true })}
           placeholder="e.g., Free Delivery on orders over NPR.10000. Don't miss discount."
-          className="border border-gray-300 rounded-md outer-sans"
+          className="border border-gray-300 rounded-md"
           height={250}
         />
         {errors.title && (
@@ -123,6 +123,11 @@ export default function BannerForm({
           </label>
           <input
             type="datetime-local"
+            min={(() => {
+              const now = new Date();
+              const pad = (n: number) => String(n).padStart(2, '0');
+              return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+            })()}
             value={watch('endDate') ? (watch('endDate') as string).slice(0, 16) : ''}
             onChange={(e) => setValue('endDate', e.target.value ? new Date(e.target.value).toISOString() : '')}
             className="w-full px-3 py-2 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
@@ -258,14 +263,14 @@ export default function BannerForm({
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2.5 text-black bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] outer-sans"
+            className="px-4 py-2.5 text-black bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2.5 bg-[#D4AF37] outer-sans text-white rounded-md hover:bg-[#b8962e] flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+            className="px-4 py-2.5 bg-[#D4AF37] text-white rounded-md hover:bg-[#b8962e] flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
           >
             {isSubmitting ? (
               <>

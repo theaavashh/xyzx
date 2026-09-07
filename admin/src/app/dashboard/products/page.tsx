@@ -1,7 +1,7 @@
 'use client';
 
 import { Plus } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import EnhancedProductForm from '@/components/EnhancedProductForm';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -12,7 +12,6 @@ import {
   useUpdateProduct,
   useToggleProductStatus,
   fetchProductById,
-  ProductStatsCards,
   ProductFilters,
   ProductsTable,
   ProductPreviewModal,
@@ -72,14 +71,6 @@ export default function ProductsPage() {
       ? productsQuery.error.message
       : 'Failed to load products'
     : null;
-
-  const stats = useMemo(() => {
-    const total = pagination.total;
-    const active = products.filter((p) => p.isActive).length;
-    const inactive = total - active;
-    const lowStock = products.filter((p) => p.quantity > 0 && p.quantity <= 5).length;
-    return { total, active, inactive, lowStock };
-  }, [products, pagination.total]);
 
   const hasActiveFilters = !!(searchQuery || categoryFilter || statusFilter);
 
@@ -182,7 +173,7 @@ export default function ProductsPage() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-black outer-sans tracking-tight">Products</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-black tracking-tight">Products</h1>
             <p className="text-gray-500 text-base mt-1">
               Manage your product catalog
             </p>
@@ -192,19 +183,12 @@ export default function ProductsPage() {
               setEditingProduct(null);
               setShowAddModal(true);
             }}
-            className="bg-[#D4AF37] text-white px-5 py-2.5 outer-sans text-base rounded-lg hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all"
+            className="bg-[#D4AF37] text-white px-5 py-2.5 text-base rounded-lg hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all"
           >
             <Plus className="w-4 h-4" />
             <span>Add Product</span>
           </button>
         </div>
-
-        <ProductStatsCards
-          total={stats.total}
-          active={stats.active}
-          inactive={stats.inactive}
-          lowStock={stats.lowStock}
-        />
 
         <ProductFilters
           searchQuery={searchQuery}

@@ -120,7 +120,7 @@ export default function MediaUploader({
                 {mediaType === 'video' ? (
                   <video
                     src={previewUrl}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                     controls
                   />
                 ) : (
@@ -129,7 +129,7 @@ export default function MediaUploader({
                     alt="Preview"
                     width={400}
                     height={225}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                     unoptimized
                   />
                 )}

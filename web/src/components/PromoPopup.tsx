@@ -40,7 +40,7 @@ export default function PromoPopup() {
       <div className="bg-white rounded-lg max-w-md w-full relative overflow-hidden shadow-2xl">
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 z-10 bg-white rounded-full p-1"
+          className="absolute top-4 right-4 text-zinc-600 hover:text-zinc-600 z-10 bg-white rounded-full p-1"
         >
           <X size={24} />
         </button>
@@ -54,10 +54,10 @@ export default function PromoPopup() {
         </div>
 
         <div className="p-8">
-          <h2 className="text-center text-2xl font-bold text-gray-900 mb-1">
+          <h2 className="swansea text-center text-2xl font-bold text-zinc-600 mb-1">
             UNLOCK YOUR
           </h2>
-          <h3 className="text-center text-3xl font-bold text-gray-900 mb-6">
+          <h3 className="swansea text-center text-3xl font-bold text-zinc-600 mb-6">
             15% OFF DISCOUNT
           </h3>
 
@@ -88,9 +88,8 @@ export default function PromoPopup() {
             </button>
           </form>
 
-          <p className="text-xs text-center text-gray-600 mt-4">
-            By entering your email address, you agree to receive promotional
-            emails from Princess Polly. View our{' '}
+          <p className="text-xs text-center text-zinc-600 mt-4">
+            By entering your email address, you agree to receive promotional            emails from RaphArch. View our{''}
             <a href="/privacy-policy" className="text-blue-600 hover:underline">
               Privacy Policy
             </a>{' '}
@@ -101,8 +100,8 @@ export default function PromoPopup() {
             .
           </p>
 
-          <p className="text-xs text-center text-gray-500 mt-2">
-            Discount excludes sales & gift cards.
+          <p className="text-xs text-center text-zinc-600 mt-2">
+Discount excludes sales & gift cards.
           </p>
         </div>
       </div>

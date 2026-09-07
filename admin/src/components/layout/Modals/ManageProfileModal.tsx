@@ -6,6 +6,7 @@ import { User, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContextTanStack';
+import { authHeaders } from '@/utils/authHeaders';
 
 interface ManageProfileModalProps {
   isOpen: boolean;
@@ -16,7 +17,7 @@ const updateProfile = async (data: { name: string; email: string }) => {
   const response = await fetch('/api/v1/users/profile', {
     method: 'PUT',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(data),
   });
 
@@ -113,7 +114,7 @@ export const ManageProfileModal = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
-          onClick={onClose}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
           role="dialog"
           aria-modal="true"
           aria-labelledby="manage-profile-title"
@@ -128,7 +129,7 @@ export const ManageProfileModal = ({
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 id="manage-profile-title" className="text-xl font-bold text-black outer-sans">
+                <h2 id="manage-profile-title" className="text-xl font-bold text-black">
                   Manage Profile
                 </h2>
                 <button

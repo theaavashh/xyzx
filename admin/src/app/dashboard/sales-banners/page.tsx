@@ -140,7 +140,7 @@ export default function SalesBannersPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Sales Banners</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black">Sales Banners</h1>
             <p className="text-black text-lg mt-2">Manage promotional sales banners with CTAs</p>
           </div>
           <button

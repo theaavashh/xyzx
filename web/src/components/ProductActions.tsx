@@ -106,16 +106,16 @@ export default function ProductActions({
     <div className="space-y-8">
       {/* Header Info */}
       <div className="border-b border-gray-200 pb-6">
-        <h1 className="text-3xl font-medium text-black">
+        <h1 className="swansea text-3xl font-medium text-zinc-600">
           {product.name}
         </h1>
-        <p className=" text-gray-500 mt-1 font-normal">{product.category}</p>
+        <p className=" text-zinc-600 mt-1 font-normal">{product.category}</p>
         <div className="mt-4">
-          <p className="text-3xl general-sans text-gray-900">
+          <p className="text-3xl general-sans text-zinc-600">
             ${product.price.toFixed(0)}
           </p>
           {product.originalPrice > product.price && (
-            <p className="text-lg text-gray-500 line-through mt-1">
+            <p className="text-lg text-zinc-600 line-through mt-1">
               ${product.originalPrice.toFixed(0)}
             </p>
           )}
@@ -125,7 +125,7 @@ export default function ProductActions({
       {/* Color Selection */}
       <div>
         <div className="flex justify-between items-center mb-4">
-          <span className="text-lg font-medium text-gray-500">
+          <span className="text-lg font-medium text-zinc-600">
             {currentColor
               ? `Color: ${getColorName(currentColor)}`
               : 'Select Color'}
@@ -133,7 +133,7 @@ export default function ProductActions({
           <button
             type="button"
             onClick={openSizeGuide}
-            className="text-base text-gray-500 hover:text-gray-800"
+            className="text-base text-zinc-600 hover:text-zinc-600"
           >
             Size Guide
           </button>
@@ -161,7 +161,7 @@ export default function ProductActions({
               {/* Color Name */}
               <span
                 className={`text-xs font-medium ${
-                  currentColor === color ? 'text-black' : 'text-gray-600'
+                  currentColor === color ? 'text-zinc-600' : 'text-zinc-600'
                 }`}
               >
                 {getColorName(color)}
@@ -179,7 +179,7 @@ export default function ProductActions({
       {/* Size Selection */}
       <div>
         <div className="flex justify-between items-center mb-4">
-          <span className="text-base font-medium text-gray-500">
+          <span className="text-base font-medium text-zinc-600">
             {selectedSize ? `Size: ${selectedSize}` : 'Select Size'}
           </span>
         </div>
@@ -190,8 +190,8 @@ export default function ProductActions({
               onClick={() => setSelectedSize(size)}
               className={`py-3 border rounded-md text-base ${
                 selectedSize === size
-                  ? 'border-black text-gray-500'
-                  : 'border-gray-200 text-gray-900 hover:border-gray-800'
+                  ? 'border-black text-zinc-600'
+                  : 'border-gray-200 text-zinc-600 hover:border-gray-800'
               }`}
             >
               {size}
@@ -206,7 +206,7 @@ export default function ProductActions({
       </div>
 
       {/* Klarna / Payment Info Placeholder */}
-      <div className="text-md text-gray-500">
+      <div className="text-base text-zinc-600">
         <p>
           Reward point of{' '}
           <span className="font-bold">{(product.price / 4).toFixed(0)}</span>{' '}
@@ -227,7 +227,7 @@ export default function ProductActions({
         </button>
         <button
           onClick={handleFavorite}
-          className="w-full border border-gray-300 text-gray-900 py-4 rounded-full text-base font-medium hover:border-gray-800 transition-colors flex items-center justify-center gap-2"
+          className="w-full border border-gray-300 text-zinc-600 py-4 rounded-full text-base font-medium hover:border-gray-800 transition-colors flex items-center justify-center gap-2"
         >
           Favorite
           <svg
@@ -247,22 +247,22 @@ export default function ProductActions({
       </div>
 
       {/* Shipping Info */}
-      <div className="text-sm text-gray-500 space-y-2 pt-4">
-        <p className="font-medium text-gray-900">Shipping</p>
+      <div className="text-sm text-zinc-600 space-y-2 pt-4">
+        <p className="font-medium text-zinc-600">Shipping</p>
         <p>You'll see our shipping options at checkout.</p>
         <div className="space-y-1 pt-2">
-          <p className="underline cursor-pointer hover:text-gray-800">
+          <p className="underline cursor-pointer hover:text-zinc-600">
             Return Policy
           </p>
-          <p className="underline cursor-pointer hover:text-gray-800">
+          <p className="underline cursor-pointer hover:text-zinc-600">
             Free 7 days return
           </p>
         </div>
       </div>
 
       {/* Description */}
-      <div className="pt-6 text-base text-gray-900 leading-relaxed font-light">
-        <p>{product.description}</p>
+      <div className="pt-6 text-base text-zinc-600 leading-relaxed font-light">
+        <div dangerouslySetInnerHTML={{ __html: product.description }} />
         <ul className="list-disc pl-5 mt-4 space-y-1">
           {product.features?.slice(0, 3).map((feature, i) => (
             <li key={i} className="pl-2">
@@ -296,7 +296,7 @@ export default function ProductActions({
               onClick={() => toggleAccordion(section.id)}
               className="flex justify-between items-center w-full py-6 text-left group"
             >
-              <span className="text-lg font-medium text-gray-900 group-hover:text-gray-600">
+              <span className="text-lg font-medium text-zinc-600 group-hover:text-zinc-600">
                 {section.title}
               </span>
               <svg
@@ -316,7 +316,7 @@ export default function ProductActions({
               </svg>
             </button>
             {openAccordion === section.id && (
-              <div className="pb-6 text-base text-gray-500">
+              <div className="pb-6 text-base text-zinc-600">
                 {section.content}
               </div>
             )}

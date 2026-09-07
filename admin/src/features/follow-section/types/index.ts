@@ -1,12 +1,3 @@
-export interface ServiceItem {
-  id?: string;
-  title: string;
-  description: string;
-  image: string;
-  order: number;
-  isActive: boolean;
-}
-
 export interface SocialLink {
   id?: string;
   name: string;
@@ -19,43 +10,32 @@ export interface SocialLink {
 
 export interface FollowSection {
   id: string;
-  brandName: string;
-  street: string;
-  city: string;
-  state: string;
-  zip: string;
-  country: string;
   copyrightText: string;
   designerCredit: string;
   showPaymentIcons: boolean;
   isActive: boolean;
-  serviceItems: ServiceItem[];
+  serviceItems: { title: string; description: string; image: string; order: number; isActive: boolean }[];
   socialLinks: SocialLink[];
   createdAt: string;
   updatedAt: string;
 }
 
-export const ICON_OPTIONS = [
-  'Facebook',
-  'Instagram',
-  'Twitter',
-  'Youtube',
-  'Music',
-  'Linkedin',
-  'Github',
-];
+export interface FollowSectionFormState {
+  copyrightText: string;
+  designerCredit: string;
+  showPaymentIcons: boolean;
+  isActive: boolean;
+  facebookUrl: string;
+  instagramUrl: string;
+  tiktokUrl: string;
+}
 
-export const DEFAULT_FORM_STATE: Partial<FollowSection> = {
-  brandName: 'Rapharch',
-  street: '123 Fashion Avenue',
-  city: 'New York',
-  state: 'NY',
-  zip: '10001',
-  country: 'United States',
+export const DEFAULT_FORM_STATE: FollowSectionFormState = {
   copyrightText: 'All rights reserved.',
   designerCredit: 'Designed by: M.A.P Tech Pvt. Ltd.',
   showPaymentIcons: true,
   isActive: true,
-  serviceItems: [],
-  socialLinks: [],
+  facebookUrl: '',
+  instagramUrl: '',
+  tiktokUrl: '',
 };

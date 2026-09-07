@@ -1,6 +1,7 @@
 'use client';
 
 import { clientLogger } from '@/lib/logger';
+import { authHeaders } from '@/utils/authHeaders';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import type { AboutSection, AboutSectionFormData } from '../types';
@@ -13,7 +14,7 @@ export function useAboutSections() {
   const load = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await globalThis.fetch('/api/v1/about');
+      const res = await globalThis.fetch('/api/v1/about', { headers: authHeaders() });
       if (res.ok) {
         const data = await res.json();
         setSections(data.data || []);
@@ -58,25 +59,25 @@ export function useAboutSections() {
 
   const createSection = useCallback(
     (data: AboutSectionFormData) =>
-      handleResponse('/api/v1/about', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }, 'About section created'),
+      handleResponse('/api/v1/about', { method: 'POST', headers: authHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify(data) }, 'About section created'),
     [],
   );
 
   const updateSection = useCallback(
     (id: string, data: AboutSectionFormData) =>
-      handleResponse(`/api/v1/about/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }, 'About section updated'),
+      handleResponse(`/api/v1/about/${id}`, { method: 'PUT', headers: authHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify(data) }, 'About section updated'),
     [],
   );
 
   const deleteSection = useCallback(
     (section: AboutSection) =>
-      handleResponse(`/api/v1/about/${section.id}`, { method: 'DELETE' }, 'About section deleted'),
+      handleResponse(`/api/v1/about/${section.id}`, { method: 'DELETE', headers: authHeaders() }, 'About section deleted'),
     [],
   );
 
   const toggleStatus = useCallback(
     (section: AboutSection) =>
-      handleResponse(`/api/v1/about/${section.id}/toggle`, { method: 'PATCH' }, `About section ${section.isActive ? 'deactivated' : 'activated'}`),
+      handleResponse(`/api/v1/about/${section.id}/toggle`, { method: 'PATCH', headers: authHeaders() }, `About section ${section.isActive ? 'deactivated' : 'activated'}`),
     [],
   );
 

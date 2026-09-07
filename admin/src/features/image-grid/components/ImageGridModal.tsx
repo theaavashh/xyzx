@@ -25,7 +25,6 @@ export function ImageGridModal({
 }: ImageGridModalProps) {
   const [form, setForm] = useState<ImageGridForm>({
     src: '',
-    alt: '',
     title: '',
     subtitle: '',
     link: '',
@@ -40,7 +39,6 @@ export function ImageGridModal({
       if (editingItem) {
         setForm({
           src: editingItem.src,
-          alt: editingItem.alt,
           title: editingItem.title || '',
           subtitle: editingItem.subtitle || '',
           link: editingItem.link || '',
@@ -50,7 +48,6 @@ export function ImageGridModal({
       } else {
         setForm({
           src: '',
-          alt: '',
           title: '',
           subtitle: '',
           link: '',
@@ -124,7 +121,7 @@ export function ImageGridModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 flex items-end justify-center z-50 sm:items-center p-4"
-          onClick={onClose}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
           <motion.div
             initial={{ y: '100%' }}
@@ -136,7 +133,7 @@ export function ImageGridModal({
           >
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-semibold text-black outer-sans">
+                <h2 className="text-2xl font-semibold text-black">
                   {editingItem ? 'Edit Image Grid Item' : 'Create Image Grid Item'}
                 </h2>
                 <button
@@ -166,7 +163,7 @@ export function ImageGridModal({
                     <img
                       src={form.src}
                       alt="Preview"
-                      className="w-full h-48 object-cover rounded-lg border border-gray-200 bg-gray-100"
+                      className="w-full h-48 object-contain rounded-lg border border-gray-200 bg-gray-100"
                       crossOrigin="anonymous"
                       onError={(e) => {
                         clientLogger.error('Failed to load image:', form.src);
@@ -211,21 +208,6 @@ export function ImageGridModal({
                     </div>
                   </div>
                 )}
-              </div>
-
-              <div>
-                <label htmlFor="alt" className="block text-sm font-medium text-gray-700 mb-1">
-                  Alt Text *
-                </label>
-                <input
-                  id="alt"
-                  type="text"
-                  value={form.alt}
-                  onChange={(e) => handleFormChange('alt', e.target.value)}
-                  placeholder="e.g., New Arrivals - Discover the latest styles"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-black placeholder:text-gray-400"
-                  required
-                />
               </div>
 
               <div>

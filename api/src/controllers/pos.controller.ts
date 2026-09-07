@@ -3,6 +3,7 @@ import { asyncHandler, sendBadRequest, sendNotFound, sendSuccess } from '../util
 import { logger } from '../utils/logger';
 import { orderRepository } from '../repositories/order.repository';
 import { inventoryRepository } from '../repositories/inventory.repository';
+import { notifyNewOrder } from '../services/order-notification.service';
 
 export const createPosSale: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
@@ -48,11 +49,20 @@ export const createPosSale: RequestHandler = asyncHandler(
         })),
       });
 
-      await inventoryRepository.deductStockForOrder(items, order.id, 'STORE');
+      const stockResult = await inventoryRepository.deductStockForOrder(items, order.id, 'STORE');
+      if (!stockResult.success) {
+        await orderRepository.cancelOrder(order.id, 'Insufficient stock');
+        sendBadRequest(res, 'One or more items are out of stock');
+        return;
+      }
 
       await orderRepository.updateOrderStatus(order.id, 'CONFIRMED');
 
       const fullOrder = await orderRepository.findOrderById(order.id);
+
+      notifyNewOrder(fullOrder ?? order).catch((error) => {
+        logger.error('Failed to notify admins of POS sale', { orderId: order.id }, error);
+      });
 
       logger.info('POS sale completed', { orderId: order.id, total, itemCount: items.length });
 

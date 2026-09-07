@@ -22,11 +22,11 @@ export default function CheckoutSuccessPage() {
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+        <h1 className="text-2xl font-bold text-zinc-600 mb-4">
           Payment Successful!
         </h1>
 
-        <p className="text-gray-600 mb-8">
+        <p className="text-zinc-600 mb-8">
           Thank you for your purchase. Your order has been confirmed and will be
           processed shortly.
         </p>
@@ -41,7 +41,7 @@ export default function CheckoutSuccessPage() {
 
           <a
             href="/orders"
-            className="block w-full bg-gray-200 text-gray-800 py-3 px-4 rounded-md font-medium hover:bg-gray-300 transition-colors"
+            className="block w-full bg-gray-200 text-zinc-600 py-3 px-4 rounded-md font-medium hover:bg-gray-300 transition-colors"
           >
             View Orders
           </a>

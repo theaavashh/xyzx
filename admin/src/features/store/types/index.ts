@@ -6,6 +6,8 @@ export interface StoreHours {
 
 export interface StoreSection {
   id?: string;
+  pageTitle?: string;
+  pageDescription?: string;
   title: string;
   subtitle?: string;
   description: string;

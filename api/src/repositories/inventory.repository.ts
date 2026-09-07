@@ -27,6 +27,20 @@ export interface InventoryLogEntry {
   product?: { name: string; sku: string | null; slug: string };
 }
 
+export interface VariantInventoryRow {
+  variantId: string;
+  productId: string;
+  productName: string;
+  productSku: string | null;
+  color: string | null;
+  size: string | null;
+  pattern: string | null;
+  sku: string | null;
+  quantity: number;
+  lowStockThreshold: number;
+  isActive: boolean;
+}
+
 const CACHE_PREFIX = 'inventory';
 
 export const getStock = async (productId: string): Promise<number> => {
@@ -95,39 +109,52 @@ export const deductStockForOrder = async (
   items: Array<{ productId: string; quantity: number }>,
   orderId: string,
   source: 'ONLINE' | 'STORE' = 'ONLINE',
-): Promise<void> => {
-  const operations = items.map(async (item) => {
+): Promise<{ success: boolean; failedItem?: string }> => {
+  for (const item of items) {
     const product = await prisma.product.findUnique({
       where: { id: item.productId },
       select: { id: true, quantity: true, manageStock: true, trackQuantity: true },
     });
 
-    if (!product || !product.manageStock || !product.trackQuantity) return;
+    if (!product || !product.manageStock || !product.trackQuantity) continue;
 
-    const newQuantity = Math.max(0, product.quantity - item.quantity);
+    // Atomic update: only deduct if sufficient stock exists
+    const result = await prisma.$executeRaw`
+      UPDATE products
+      SET quantity = GREATEST(0, quantity - ${item.quantity})
+      WHERE id = ${item.productId}
+        AND manageStock = true
+        AND trackQuantity = true
+        AND quantity >= ${item.quantity}
+    `;
 
-    await prisma.$transaction([
-      prisma.product.update({
-        where: { id: item.productId },
-        data: { quantity: newQuantity },
-      }),
-      prisma.inventoryLog.create({
-        data: {
-          productId: item.productId,
-          changeType: 'STOCK_DEDUCTED',
-          quantity: -item.quantity,
-          previousQuantity: product.quantity,
-          newQuantity,
-          source,
-          orderId,
-          reason: `Order ${orderId}`,
-        },
-      }),
-    ]);
-  });
+    if (result === 0) {
+      // Insufficient stock — this item cannot be fulfilled
+      return { success: false, failedItem: item.productId };
+    }
 
-  await Promise.all(operations);
+    // Read back the actual quantity after deduction for logging
+    const updated = await prisma.product.findUnique({
+      where: { id: item.productId },
+      select: { quantity: true },
+    });
+
+    await prisma.inventoryLog.create({
+      data: {
+        productId: item.productId,
+        changeType: 'STOCK_DEDUCTED',
+        quantity: -item.quantity,
+        previousQuantity: product.quantity,
+        newQuantity: updated?.quantity ?? 0,
+        source,
+        orderId,
+        reason: `Order ${orderId}`,
+      },
+    });
+  }
+
   await cacheService.invalidatePattern(`${CACHE_PREFIX}:*`);
+  return { success: true };
 };
 
 export const restoreStockForOrder = async (
@@ -135,37 +162,41 @@ export const restoreStockForOrder = async (
   orderId: string,
   reason: string = 'Order cancelled',
 ): Promise<void> => {
-  const operations = items.map(async (item) => {
+  for (const item of items) {
     const product = await prisma.product.findUnique({
       where: { id: item.productId },
       select: { id: true, quantity: true, manageStock: true },
     });
 
-    if (!product || !product.manageStock) return;
+    if (!product || !product.manageStock) continue;
 
-    const newQuantity = product.quantity + item.quantity;
+    // Atomic update: add stock back
+    await prisma.$executeRaw`
+      UPDATE products
+      SET quantity = quantity + ${item.quantity}
+      WHERE id = ${item.productId}
+        AND manageStock = true
+    `;
 
-    await prisma.$transaction([
-      prisma.product.update({
-        where: { id: item.productId },
-        data: { quantity: newQuantity },
-      }),
-      prisma.inventoryLog.create({
-        data: {
-          productId: item.productId,
-          changeType: 'STOCK_RETURNED',
-          quantity: item.quantity,
-          previousQuantity: product.quantity,
-          newQuantity,
-          source: 'RETURN',
-          orderId,
-          reason,
-        },
-      }),
-    ]);
-  });
+    const updated = await prisma.product.findUnique({
+      where: { id: item.productId },
+      select: { quantity: true },
+    });
 
-  await Promise.all(operations);
+    await prisma.inventoryLog.create({
+      data: {
+        productId: item.productId,
+        changeType: 'STOCK_RETURNED',
+        quantity: item.quantity,
+        previousQuantity: product.quantity,
+        newQuantity: updated?.quantity ?? product.quantity + item.quantity,
+        source: 'RETURN',
+        orderId,
+        reason,
+      },
+    });
+  }
+
   await cacheService.invalidatePattern(`${CACHE_PREFIX}:*`);
 };
 
@@ -250,6 +281,85 @@ export const getInventoryStats = async (): Promise<{
   };
 };
 
+export const getVariantInventory = async (): Promise<VariantInventoryRow[]> => {
+  const variants = await prisma.productVariant.findMany({
+    where: { product: { manageStock: true } },
+    include: { product: { select: { name: true, sku: true } } },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  return variants.map((v) => ({
+    variantId: v.id,
+    productId: v.productId,
+    productName: v.product.name,
+    productSku: v.product.sku,
+    color: v.color,
+    size: v.size,
+    pattern: v.pattern,
+    sku: v.sku,
+    quantity: v.quantity,
+    lowStockThreshold: v.lowStockThreshold,
+    isActive: v.isActive,
+  }));
+};
+
+export const updateVariantStock = async (
+  variantId: string,
+  data: StockUpdateData,
+): Promise<{ previousQuantity: number; newQuantity: number }> => {
+  const variant = await prisma.productVariant.findUnique({
+    where: { id: variantId },
+    select: { quantity: true, productId: true },
+  });
+
+  if (!variant) throw new Error('Variant not found');
+  if (!variant.productId) throw new Error('Variant is not linked to a product');
+
+  const previousQuantity = variant.quantity;
+  let newQuantity: number;
+
+  switch (data.changeType) {
+    case 'STOCK_ADDED':
+      newQuantity = previousQuantity + data.quantity;
+      break;
+    case 'STOCK_DEDUCTED':
+      newQuantity = Math.max(0, previousQuantity - data.quantity);
+      break;
+    case 'STOCK_ADJUSTED':
+      newQuantity = data.quantity;
+      break;
+    default:
+      throw new Error(`Invalid change type: ${data.changeType}`);
+  }
+
+  const [log] = await prisma.$transaction([
+    prisma.productVariant.update({
+      where: { id: variantId },
+      data: { quantity: newQuantity },
+    }),
+    prisma.inventoryLog.create({
+      data: {
+        productId: variant.productId,
+        variantId,
+        changeType: data.changeType,
+        quantity: Math.abs(
+          data.changeType === 'STOCK_DEDUCTED' ? -data.quantity : data.quantity,
+        ),
+        previousQuantity,
+        newQuantity,
+        source: data.source || 'MANUAL',
+        orderId: data.orderId,
+        reason: data.reason,
+        performedBy: data.performedBy,
+      },
+    }),
+  ]);
+
+  await cacheService.invalidatePattern(`${CACHE_PREFIX}:*`);
+
+  return { previousQuantity, newQuantity };
+};
+
 export const inventoryRepository = {
   getStock,
   updateStock,
@@ -258,4 +368,6 @@ export const inventoryRepository = {
   getInventoryLogs,
   getLowStockProducts,
   getInventoryStats,
+  getVariantInventory,
+  updateVariantStock,
 };

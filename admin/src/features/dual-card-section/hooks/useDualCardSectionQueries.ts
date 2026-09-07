@@ -1,5 +1,6 @@
 'use client';
 
+import { authHeaders } from '@/utils/authHeaders';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import type { DualCard, DualCardSection, DualCardFormState } from '../types';
@@ -26,6 +27,7 @@ export function useDualCardSections() {
     try {
       const response = await fetch(`${API_BASE}/api/v1/dual-card-sections`, {
         credentials: 'include',
+        headers: authHeaders(),
       });
       if (response.ok) {
         const data = await response.json();
@@ -95,7 +97,7 @@ export function useDualCardSections() {
 
       const response = await fetch(url, {
         method: editingSection ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify(form),
       });
@@ -120,6 +122,7 @@ export function useDualCardSections() {
       const response = await fetch(`${API_BASE}/api/v1/dual-card-sections/${section.id}`, {
         method: 'DELETE',
         credentials: 'include',
+        headers: authHeaders(),
       });
 
       if (response.ok) {
@@ -140,6 +143,7 @@ export function useDualCardSections() {
       const response = await fetch(`${API_BASE}/api/v1/dual-card-sections/${section.id}/toggle`, {
         method: 'PATCH',
         credentials: 'include',
+        headers: authHeaders(),
       });
 
       if (response.ok) {
@@ -174,7 +178,7 @@ export function useDualCardSections() {
       const orders = newOrder.map((s, i) => ({ id: s.id, order: i }));
       const response = await fetch(`${API_BASE}/api/v1/dual-card-sections/reorder`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify({ orders }),
       });
@@ -209,6 +213,7 @@ export function useDualCardSections() {
         const response = await fetch(`${API_BASE}/api/v1/upload/dual-card`, {
           method: 'POST',
           credentials: 'include',
+          headers: authHeaders(),
           body: formData,
         });
 

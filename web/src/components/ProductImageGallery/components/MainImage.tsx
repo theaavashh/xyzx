@@ -35,7 +35,7 @@ export const MainImage = memo(function MainImage({
           <div className="text-center p-4">
             <div className="w-16 h-16 mx-auto mb-3 bg-gray-300 rounded-full flex items-center justify-center">
               <svg
-                className="w-8 h-8 text-gray-400"
+                className="w-8 h-8 text-zinc-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -49,10 +49,10 @@ export const MainImage = memo(function MainImage({
                 />
               </svg>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-zinc-600">
               {fallbackText || 'Image unavailable'}
             </p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-zinc-600 mt-1">
               Retried {retryCount} times
             </p>
             {onRetry && (

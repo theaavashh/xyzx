@@ -15,7 +15,7 @@ function Accordion({ q, a }: { q: string; a: string }) {
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between gap-4 py-5 text-left group"
       >
-        <span className="text-sm font-medium text-zinc-900 group-hover:text-zinc-600 transition-colors pr-4">
+        <span className="text-sm md:text-base lg:text-lg font-medium text-zinc-900 group-hover:text-zinc-600 transition-colors pr-4">
           {q}
         </span>
         {open ? (
@@ -26,7 +26,7 @@ function Accordion({ q, a }: { q: string; a: string }) {
       </button>
       {open && (
         <div className="pb-5">
-          <p className="text-sm text-zinc-500 leading-relaxed">{a}</p>
+          <p className="text-sm md:text-base lg:text-lg text-zinc-500 leading-relaxed">{a}</p>
         </div>
       )}
     </div>
@@ -72,9 +72,9 @@ export default function FAQPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-        <div className="text-left lg:text-center mb-10">
-          <h1 className="lastik text-4xl sm:text-5xl md:text-6xl text-zinc-900">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+        <div className="text-left lg:text-center mb-6 mt-6 md:mt-10 lg:mt-12">
+          <h1 className="bound-regular text-2xl sm:text-3xl md:text-4xl text-zinc-900">
             FAQS
           </h1>
         </div>
@@ -92,7 +92,7 @@ export default function FAQPage() {
                 <button
                   key={cat.category}
                   onClick={() => setActiveCategory(cat.category)}
-                  className={`shrink-0 lastik text-sm transition-colors pb-4 -mb-4 border-b-2 ${
+                  className={`shrink-0 swansea text-sm md:text-base lg:text-lg transition-colors pb-4 -mb-4 border-b-2 ${
                     activeCategory === cat.category
                       ? 'text-zinc-900 border-zinc-900'
                       : 'text-zinc-400 border-transparent hover:text-zinc-600'
@@ -106,7 +106,7 @@ export default function FAQPage() {
             <div className="lg:hidden space-y-10">
               {categories.map((cat) => (
                 <div key={cat.category}>
-                  <h2 className="lastik text-lg text-zinc-900 mb-3">{cat.category}</h2>
+                  <h2 className="swansea text-lg text-zinc-900 mb-3">{cat.category}</h2>
                   <div className="divide-y divide-zinc-200">
                     {cat.questions.map((faq) => (
                       <Accordion key={faq.id} q={faq.question} a={faq.answer} />
@@ -122,7 +122,7 @@ export default function FAQPage() {
               ))}
             </div>
 
-            <div className="mt-14 bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-2xl p-8 md:p-10 text-center">
+            <div className="mt-24 bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-2xl p-8 md:p-10 text-center">
               <MessageCircle className="w-10 h-10 mx-auto mb-5 text-amber-400" />
               <h2 className="text-xl font-bold text-white mb-2">Still Have Questions?</h2>
               <p className="text-zinc-400 text-sm mb-6 max-w-md mx-auto">
@@ -130,7 +130,7 @@ export default function FAQPage() {
               </p>
               <Link
                 href="/contact-us"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-amber-400 text-zinc-900 font-semibold rounded-lg hover:bg-amber-300 transition-all text-sm"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-amber-300 transition-all text-sm"
               >
                 Contact Us
                 <ArrowRight className="w-4 h-4" />

@@ -123,7 +123,7 @@ export function DualCardSectionGrid({
               <div key={card.id} className="relative">
                 <div className="aspect-[4/5] rounded overflow-hidden bg-gray-100">
                   {card.src ? (
-                    <img src={card.src} alt={card.alt} className="w-full h-full object-cover" />
+                    <img src={card.src} alt={card.alt} className="w-full h-full object-contain" />
                   ) : (
                     <div className="flex items-center justify-center h-full">
                       <ImageIcon className="w-8 h-8 text-gray-300" />

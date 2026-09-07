@@ -1,3 +1,5 @@
+import { csrfHeaders } from '@/utils/csrf';
+
 export class ApiError extends Error {
   public readonly status: number;
   public readonly statusText: string;
@@ -61,14 +63,17 @@ export async function apiRequest<T>(
   // Use relative paths to leverage Next.js rewrites and avoid CORS issues
   const url = endpoint;
 
+  const method = options.method?.toUpperCase() ?? 'GET';
+
   const config: RequestInit = {
+    ...options,
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      ...options.headers,
+      ...(options.headers as Record<string, string> | undefined),
+      ...csrfHeaders(method),
     },
-    credentials: 'include',
-    ...options,
   };
 
   try {

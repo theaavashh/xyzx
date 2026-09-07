@@ -114,7 +114,7 @@ export function QuickAddBottomSheet({ product, isOpen, onClose }: QuickAddBottom
                   {product.image ? (
                     <Image src={resolveImageUrl(product.image)} alt={product.name} fill className="object-cover" sizes="80px" />
                   ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs">No img</div>
+                    <div className="absolute inset-0 flex items-center justify-center text-zinc-600 text-xs">No img</div>
                   )}
                 </div>
                 <div className="min-w-0">

@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@plugin "@tailwindcss/typography";
+
 @theme {
   --font-sans: var(--font-inter, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
   --font-display: var(--font-poppins, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
@@ -31,7 +33,7 @@
 
 @font-face {
   font-family: "Swansea";
-  src: url("/font/HelveticaNowText.woff2") format("truetype");
+  src: url("/font/26d0ba92e140f0dc-s.p.woff2") format("truetype");
   font-weight: 400;
   font-style: normal;
 }
@@ -41,20 +43,35 @@
 }
 
 @font-face {
-  font-family: "Lastik";
-  src: url("/font/TTF/MADE Outer Sans Bold PERSONAL USE.otf") format("opentype");
+  font-family: "Inter-Roman" ;
+  src: url('/font/Inter-roman.cyrillic.var-1b95e5893a8f19de4da502401f544ecffe7ee4e0499400433936f45efb174500.woff2') format("woff2");
+  font-weight: 400;
+}
+
+.inter{
+  font-family: "Inter-Roman", sans-serif;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/font/instrumentsans_n5.1ce463e1cc056566f977610764d93d4704464858.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
 }
 
-@font-face {
-  font-family: "Swastik";
-  src: url("/font/TTF/LastikFreeFont-Free.ttf");
+.interns{
+  font-family: 'Inter', sans-serif;
 }
 
-.lastik{
-  font-family: "Lastik";
+@font-face {
+  font-family: "Bound-Regular";
+  src: url('/font/Bounded-Regular.ttf');
+
 }
+.bound-regular{
+  font-family: "Bound-Regular";
+}
+
 .general-sans-normal {
   font-family: "General Sans Normal", sans-serif;
 }
@@ -168,13 +185,47 @@
   animation: slideUp 0.3s ease-out;
 }
 
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.3s ease-out;
+}
+
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  
 }
 
 input{
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: inherit;
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }

@@ -12,6 +12,7 @@ interface CategoryFormProps {
   onSubmit: (data: CategoryFormData) => Promise<void>;
   onCancel: () => void;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  getFullImageUrl: (path: string) => string;
 }
 
 export default function CategoryForm({
@@ -23,6 +24,7 @@ export default function CategoryForm({
   onSubmit,
   onCancel,
   handleImageUpload,
+  getFullImageUrl,
 }: CategoryFormProps) {
   const { control, formState: { errors }, watch } = form;
   const categoryName = watch('name');
@@ -39,9 +41,7 @@ export default function CategoryForm({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) onCancel();
-        }}
+        onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel(); }}
       >
         <motion.div
           className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-hide"
@@ -52,7 +52,7 @@ export default function CategoryForm({
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between border-b border-gray-200 p-4">
-            <h2 className="text-2xl font-semibold text-black outer-sans">
+            <h2 className="text-2xl font-semibold text-black">
               {editingCategory ? 'Edit Category' : 'Add Category'}
             </h2>
             <button
@@ -133,11 +133,11 @@ export default function CategoryForm({
                     <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center transition hover:border-[#D4AF37] h-full flex flex-col items-center justify-center min-h-[140px]">
                       {field.value ? (
                         <div className="space-y-3">
-                          <img
-                            src={field.value}
-                            alt="Preview"
-                            className="mx-auto rounded-lg object-cover max-w-[160px] max-h-[120px]"
-                          />
+                           <img
+                             src={getFullImageUrl(field.value)}
+                             alt="Preview"
+                             className="mx-auto rounded-lg object-contain max-w-[160px] max-h-[120px]"
+                           />
                           <button
                             type="button"
                             onClick={() => field.onChange('')}

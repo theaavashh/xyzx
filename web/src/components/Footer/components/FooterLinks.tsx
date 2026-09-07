@@ -20,7 +20,7 @@ const DEFAULT_SECTIONS: FooterSectionData[] = [
     links: [
       { id: 'about-company', name: 'Our Company', href: '/about', order: 1 },
       { id: 'about-stores', name: 'Find a Store', href: '/stores', order: 2 },
-      { id: 'about-contact', name: 'Contact Us', href: '/contact', order: 3 },
+      { id: 'about-contact', name: 'Contact Us', href: '/contact-us', order: 3 },
     ],
   },
   {
@@ -32,7 +32,8 @@ const DEFAULT_SECTIONS: FooterSectionData[] = [
       { id: 'policy-privacy', name: 'Privacy Policy', href: '/privacy', order: 1 },
       { id: 'policy-terms', name: 'Terms of Service', href: '/terms', order: 2 },
       { id: 'policy-shipping', name: 'Shipping & Returns', href: '/shipping', order: 3 },
-      { id: 'policy-faq', name: 'FAQ', href: '/faq', order: 4 },
+      { id: 'policy-return', name: 'Return Policy', href: '/return-policy', order: 4 },
+      { id: 'policy-faq', name: 'FAQ', href: '/faq', order: 5 },
     ],
   },
 ];
@@ -76,7 +77,7 @@ export const FooterLinks = memo(function FooterLinks({ sections }: FooterLinksPr
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-12">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-12">
       {displaySections.map((section, index) => {
         const sectionId = section.id ?? `section-${index}`;
         const isOpen = openSections.includes(sectionId);
@@ -87,13 +88,13 @@ export const FooterLinks = memo(function FooterLinks({ sections }: FooterLinksPr
               onClick={() => toggleSection(sectionId)}
               className="flex items-center justify-between w-full text-left md:cursor-default py-2 md:py-0"
             >
-              <h4 className="lastik text-base lg:text-xl font-semibold text-black uppercase tracking-tight">
+              <h4 className="swansea text-base lg:text-lg font-extrabold text-zinc-900 tracking-wider uppercase">
                 {section.title}
               </h4>
               {isOpen ? (
-                <Minus className="w-5 h-5 text-black md:hidden" />
+                <Minus className="w-5 h-5 text-zinc-600 md:hidden" />
               ) : (
-                <Plus className="w-5 h-5 text-black md:hidden" />
+                <Plus className="w-5 h-5 text-zinc-600 md:hidden" />
               )}
             </button>
             <div className="hidden md:block">
@@ -102,7 +103,7 @@ export const FooterLinks = memo(function FooterLinks({ sections }: FooterLinksPr
                   <li key={link.id ?? `link-${index}-${linkIndex}`}>
                     <Link
                       href={link.href}
-                      className="text-base lg:text-xl text-black hover:opacity-60 transition-opacity"
+                      className="text-base lg:text-xl text-zinc-600 hover:opacity-60 transition-opacity"
                     >
                       {link.name}
                     </Link>
@@ -125,7 +126,7 @@ export const FooterLinks = memo(function FooterLinks({ sections }: FooterLinksPr
                       <li key={link.id ?? `link-${index}-${linkIndex}`}>
                         <Link
                           href={link.href}
-                          className="text-base lg:text-xl text-black hover:opacity-60 transition-opacity"
+                          className="text-base lg:text-xl text-zinc-600 hover:opacity-60 transition-opacity"
                         >
                           {link.name}
                         </Link>

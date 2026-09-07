@@ -34,7 +34,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       return (
         <div className="flex items-center justify-center min-h-[200px] p-8">
           <div className="text-center">
-            <p className="text-gray-500 text-sm">Something went wrong loading this section.</p>
+            <p className="text-zinc-600 text-sm">Something went wrong loading this section.</p>
           </div>
         </div>
       );

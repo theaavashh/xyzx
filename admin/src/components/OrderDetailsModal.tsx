@@ -107,7 +107,7 @@ export default function OrderDetailsModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black bg-opacity-50 z-40"
-            onClick={onClose}
+            onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
           />
 
           {/* Modal */}

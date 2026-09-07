@@ -32,7 +32,7 @@ export default function BannerList({
           <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4">
             <Package className="w-8 h-8 text-black" />
           </div>
-          <h3 className="text-xl font-medium text-black mb-2 outer-sans">
+          <h3 className="text-xl font-medium text-black mb-2">
             No banners created yet
           </h3>
           <p className="text-gray-600 text-xl mb-4">

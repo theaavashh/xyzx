@@ -2,7 +2,7 @@ import type { FeatureData } from '../types';
 
 export async function fetchFeature(): Promise<FeatureData | null> {
   try {
-    const response = await fetch('/api/v1/public/follow-section/public');
+    const response = await fetch('/api/v1/public/follow-section/active');
 
     if (!response.ok) {
       return null;

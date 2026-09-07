@@ -89,7 +89,7 @@ export const analyticsHandlers = make('analytics', {
       orderBy: { _sum: { quantity: 'desc' } },
       take: limit,
     });
-    const productIds = orderItems.map((i) => i.productId);
+    const productIds = orderItems.map((i) => i.productId).filter((id): id is string => id !== null);
     const products = await prisma.product.findMany({
       where: { id: { in: productIds } },
       select: { id: true, name: true },
@@ -97,7 +97,7 @@ export const analyticsHandlers = make('analytics', {
     const productMap = new Map(products.map((p) => [p.id, p.name]));
     const data = orderItems.map((i) => ({
       id: i.productId,
-      name: productMap.get(i.productId) || 'Unknown',
+      name: productMap.get(i.productId as string) || 'Unknown',
       total_sold: i._sum.quantity || 0,
     }));
     return ok(JSON.stringify(data));

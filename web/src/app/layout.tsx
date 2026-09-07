@@ -6,7 +6,7 @@ import ConditionalLayout from '@/components/ConditionalLayout';
 import TopBanner from '@/components/TopBanner';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { AuthProvider } from '@/contexts/AuthContextTanStack';
-import { inter, poppins } from './fonts';
+import { BannerHeightProvider } from '@/contexts/BannerHeightContext';
 import { LenisProvider } from '@/components/LenisProvider';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 
@@ -134,17 +134,19 @@ export default function RootLayout({
         />
         <link rel="manifest" href="/site.webmanifest" />
       </head>
-      <body className={`swansea antialiased`}>
+      <body className="interns antialiased">
         <LenisProvider>
-          <AuthProvider>
-            <CartProvider>
-              <TopBanner />
-              <ConditionalLayout>{children}</ConditionalLayout>
-              {/* <WhatsAppButton /> */}
-              <CookieConsentModal />
-              <ServiceWorkerRegister />
-            </CartProvider>
-          </AuthProvider>
+          <BannerHeightProvider>
+            <AuthProvider>
+              <CartProvider>
+                <TopBanner />
+                <ConditionalLayout>{children}</ConditionalLayout>
+                {/* <WhatsAppButton /> */}
+                <CookieConsentModal />
+                <ServiceWorkerRegister />
+              </CartProvider>
+            </AuthProvider>
+          </BannerHeightProvider>
         </LenisProvider>
       </body>
     </html>

@@ -88,7 +88,7 @@ export function Shortcuts() {
       <Card>
         <CardContent className="p-4 sm:p-5">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-black outer-sans uppercase tracking-wide">Quick Shortcuts</h3>
+            <h3 className="text-base font-bold text-black uppercase tracking-wide">Quick Shortcuts</h3>
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -133,9 +133,9 @@ export function Shortcuts() {
       </Card>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onMouseDown={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}>
           <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-semibold text-black outer-sans mb-4">Add Shortcut</h3>
+            <h3 className="text-xl font-semibold text-black mb-4">Add Shortcut</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Label</label>

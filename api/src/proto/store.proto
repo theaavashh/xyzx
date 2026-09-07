@@ -57,17 +57,6 @@ service FooterSectionService {
   rpc ReorderFooterSections(cms.ReorderRequest) returns (common.ApiResponse);
 }
 
-service ShopByCategoryService {
-  rpc GetActiveShopByCategories(common.Empty) returns (ListShopByCategoriesResponse);
-  rpc GetAllShopByCategories(common.Empty) returns (ListShopByCategoriesResponse);
-  rpc GetShopByCategoryById(cms.GetByIdRequest) returns (ShopByCategoryResponse);
-  rpc CreateShopByCategory(CreateShopByCategoryRequest) returns (ShopByCategoryResponse);
-  rpc UpdateShopByCategory(UpdateShopByCategoryRequest) returns (ShopByCategoryResponse);
-  rpc DeleteShopByCategory(cms.GetByIdRequest) returns (common.ApiResponse);
-  rpc ToggleShopByCategoryStatus(cms.GetByIdRequest) returns (ShopByCategoryResponse);
-  rpc ReorderShopByCategories(cms.ReorderRequest) returns (common.ApiResponse);
-}
-
 service StoreService {
   rpc GetPublicStore(common.Empty) returns (StoreResponse);
   rpc GetStore(common.Empty) returns (StoreResponse);
@@ -93,9 +82,6 @@ message UpdateFooterCatalogRequest { string id = 1; string title = 2; string hre
 message CreateFooterSectionRequest { string title = 1; int32 order = 2; bool isActive = 3; string links = 4; }
 message UpdateFooterSectionRequest { string id = 1; string title = 2; int32 order = 3; bool isActive = 4; string links = 5; }
 
-message CreateShopByCategoryRequest { string title = 1; string image = 2; string link = 3; int32 order = 4; bool isActive = 5; }
-message UpdateShopByCategoryRequest { string id = 1; string title = 2; string image = 3; string link = 4; int32 order = 5; bool isActive = 6; }
-
 message UpdateStoreRequest { string title = 1; string subtitle = 2; string description = 3; string address = 4; string city = 5; string state = 6; string zip = 7; string country = 8; string phone = 9; string email = 10; string image = 11; string mapEmbedUrl = 12; string ctaText = 13; string ctaUrl = 14; string hours = 15; bool isActive = 16; }
 
 message Category { string id = 1; string name = 2; string slug = 3; string image = 4; bool isActive = 5; string createdAt = 6; string updatedAt = 7; }
@@ -104,7 +90,6 @@ message Cart { string id = 1; string sessionId = 2; string userId = 3; repeated 
 message NavigationItem { string id = 1; string name = 2; string href = 3; int32 order = 4; bool isActive = 5; string columns = 6; string createdAt = 7; string updatedAt = 8; }
 message FooterCatalog { string id = 1; string title = 2; string href = 3; int32 order = 4; bool isActive = 5; string links = 6; string createdAt = 7; string updatedAt = 8; }
 message FooterSection { string id = 1; string title = 2; int32 order = 3; bool isActive = 4; string links = 5; string createdAt = 6; string updatedAt = 7; }
-message ShopByCategory { string id = 1; string title = 2; string image = 3; string link = 4; int32 order = 5; bool isActive = 6; string createdAt = 7; string updatedAt = 8; }
 message Store { string id = 1; string title = 2; string subtitle = 3; string description = 4; string address = 5; string city = 6; string state = 7; string zip = 8; string country = 9; string phone = 10; string email = 11; string image = 12; string mapEmbedUrl = 13; string ctaText = 14; string ctaUrl = 15; string hours = 16; bool isActive = 17; string createdAt = 18; string updatedAt = 19; }
 
 message CategoryResponse { bool success = 1; string message = 2; Category data = 3; common.Error error = 4; }
@@ -116,6 +101,4 @@ message FooterCatalogResponse { bool success = 1; string message = 2; FooterCata
 message ListFooterCatalogsResponse { bool success = 1; string message = 2; repeated FooterCatalog data = 3; common.Pagination pagination = 4; common.Error error = 5; }
 message FooterSectionResponse { bool success = 1; string message = 2; FooterSection data = 3; common.Error error = 4; }
 message ListFooterSectionsResponse { bool success = 1; string message = 2; repeated FooterSection data = 3; common.Pagination pagination = 4; common.Error error = 5; }
-message ShopByCategoryResponse { bool success = 1; string message = 2; ShopByCategory data = 3; common.Error error = 4; }
-message ListShopByCategoriesResponse { bool success = 1; string message = 2; repeated ShopByCategory data = 3; common.Pagination pagination = 4; common.Error error = 5; }
 message StoreResponse { bool success = 1; string message = 2; Store data = 3; common.Error error = 4; }

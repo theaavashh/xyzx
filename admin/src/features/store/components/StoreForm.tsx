@@ -9,20 +9,24 @@ interface StoreFormProps {
   storeData: StoreSection;
   isEditing: boolean;
   isSaving: boolean;
+  isUploading: boolean;
   onInputChange: (field: keyof StoreSection, value: string | boolean | StoreHours[]) => void;
   onSave: () => void;
   onCancel: () => void;
   onToggleEdit: () => void;
+  onImageUpload: () => void;
 }
 
 export function StoreForm({
   storeData,
   isEditing,
   isSaving,
+  isUploading,
   onInputChange,
   onSave,
   onCancel,
   onToggleEdit,
+  onImageUpload,
 }: StoreFormProps) {
   const [showPreview, setShowPreview] = useState(true);
 
@@ -44,7 +48,7 @@ export function StoreForm({
   };
 
   const inputClass = (disabled?: boolean) =>
-    `w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-sm transition-shadow ${disabled ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : 'bg-white'}`;
+    `w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-sm transition-shadow ${disabled ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : 'bg-white text-black'}`;
 
   const labelClass = 'block text-sm font-medium text-gray-700 mb-1.5';
 
@@ -110,7 +114,7 @@ export function StoreForm({
           <div className="p-6 md:p-10">
             <section className="bg-white">
               <div className="text-center mb-8">
-                <h2 className="outer-sans text-3xl sm:text-4xl text-gray-900 mb-4">
+                <h2 className="text-3xl sm:text-4xl text-gray-900 mb-4">
                   {storeData.title || 'Visit Our Store'}
                 </h2>
                 <p className="text-gray-500 max-w-2xl mx-auto text-sm leading-relaxed font-light px-2">
@@ -133,7 +137,7 @@ export function StoreForm({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
                 <div className="space-y-4">
-                  <h3 className="outer-sans text-2xl text-gray-900 mb-4">Contact & Location</h3>
+                  <h3 className="text-2xl text-gray-900 mb-4">Contact & Location</h3>
 
                   <div className="flex items-start gap-3 text-gray-500">
                     <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" />
@@ -218,11 +222,40 @@ export function StoreForm({
           <div className={sectionCard}>
             <h2 className={sectionHeader}>
               <Building2 className="w-4 h-4 text-[#D4AF37]" />
-              Basic Information
+              Page Header
             </h2>
             <div className="space-y-4">
               <div>
-                <label className={labelClass}>Title *</label>
+                <label className={labelClass}>Page Title</label>
+                <input
+                  type="text"
+                  value={storeData.pageTitle || ''}
+                  onChange={(e) => onInputChange('pageTitle', e.target.value)}
+                  className={inputClass()}
+                  placeholder="VISIT US"
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Page Description</label>
+                <textarea
+                  value={storeData.pageDescription || ''}
+                  onChange={(e) => onInputChange('pageDescription', e.target.value)}
+                  rows={2}
+                  className={inputClass()}
+                  placeholder="Experience RaphArch firsthand..."
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={sectionCard}>
+            <h2 className={sectionHeader}>
+              <Building2 className="w-4 h-4 text-[#D4AF37]" />
+              Store Details
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label className={labelClass}>Store Title *</label>
                 <input
                   type="text"
                   value={storeData.title}
@@ -339,23 +372,43 @@ export function StoreForm({
             </h2>
             <div className="space-y-4">
               <div>
-                <label className={labelClass}>Store Image URL</label>
-                <input
-                  type="text"
-                  value={storeData.image || ''}
-                  onChange={(e) => onInputChange('image', e.target.value)}
-                  className={inputClass()}
-                  placeholder="https://example.com/store-image.jpg"
-                />
-                {storeData.image && (
-                  <div className="mt-2 relative w-full h-32 rounded-lg overflow-hidden bg-gray-100">
+                <label className={labelClass}>Store Image</label>
+                {isEditing ? (
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={onImageUpload}
+                      disabled={isUploading}
+                      className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[#D4AF37] border border-[#D4AF37] rounded-lg hover:bg-[#D4AF37] hover:text-white transition-colors disabled:opacity-50"
+                    >
+                      <ImageIcon className="w-4 h-4" />
+                      {isUploading ? 'Uploading...' : storeData.image ? 'Change Image' : 'Upload Image'}
+                    </button>
+                    {storeData.image && (
+                      <div className="relative w-full h-48 rounded-lg overflow-hidden bg-gray-100">
+                        <Image
+                          src={storeData.image}
+                          alt="Store preview"
+                          fill
+                          className="object-contain"
+                          unoptimized
+                        />
+                      </div>
+                    )}
+                  </div>
+                ) : storeData.image ? (
+                  <div className="relative w-full h-48 rounded-lg overflow-hidden bg-gray-100">
                     <Image
                       src={storeData.image}
                       alt="Store preview"
                       fill
-                      className="object-cover"
+                      className="object-contain"
                       unoptimized
                     />
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-32 rounded-lg bg-gray-100 border-2 border-dashed border-gray-300">
+                    <p className="text-sm text-gray-400">No image uploaded</p>
                   </div>
                 )}
               </div>
@@ -461,7 +514,7 @@ export function StoreForm({
             </button>
             <button
               onClick={onSave}
-              disabled={isSaving || !storeData.title.trim() || !storeData.city.trim() || !storeData.state.trim() || !storeData.country.trim()}
+              disabled={isSaving}
               className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
             >
               <Save className="w-4 h-4" /> {isSaving ? 'Saving...' : 'Save Changes'}

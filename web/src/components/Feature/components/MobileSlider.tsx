@@ -46,7 +46,7 @@ export const MobileSlider = memo(function MobileSlider({ items }: MobileSliderPr
                     />
                   </div>
                   <div className="text-left ml-2">
-                    <h3 className="text-lg font-semibold text-gray-800 whitespace-nowrap">
+                    <h3 className="text-lg font-semibold text-zinc-600 whitespace-nowrap">
                       {service.title}
                     </h3>
                   </div>

@@ -13,7 +13,7 @@ import {
 } from './cms.service';
 import {
   categoryHandlers, cartHandlers, navigationHandlers,
-  footerCatalogHandlers, footerSectionHandlers, shopByCategoryHandlers, storeHandlers,
+  footerCatalogHandlers, footerSectionHandlers, storeHandlers,
 } from './store.service';
 import {
   staffHandlers, analyticsHandlers, settingsHandlers,
@@ -69,7 +69,6 @@ const SERVICE_REGISTRATIONS: ServiceRegistration[] = [
   { protoFile: 'store.proto', packagePath: ['rapharch', 'store'], serviceName: 'NavigationService', handlers: navigationHandlers },
   { protoFile: 'store.proto', packagePath: ['rapharch', 'store'], serviceName: 'FooterCatalogService', handlers: footerCatalogHandlers },
   { protoFile: 'store.proto', packagePath: ['rapharch', 'store'], serviceName: 'FooterSectionService', handlers: footerSectionHandlers },
-  { protoFile: 'store.proto', packagePath: ['rapharch', 'store'], serviceName: 'ShopByCategoryService', handlers: shopByCategoryHandlers },
   { protoFile: 'store.proto', packagePath: ['rapharch', 'store'], serviceName: 'StoreService', handlers: storeHandlers },
   { protoFile: 'admin.proto', packagePath: ['rapharch', 'admin'], serviceName: 'StaffService', handlers: staffHandlers },
   { protoFile: 'admin.proto', packagePath: ['rapharch', 'admin'], serviceName: 'AnalyticsService', handlers: analyticsHandlers },

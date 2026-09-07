@@ -117,7 +117,7 @@ export function PopupBannerForm({
               <img
                 src={image}
                 alt="Banner preview"
-                className="w-full max-w-md h-48 object-cover rounded-lg"
+                className="w-full max-w-md h-48 object-contain rounded-lg"
               />
               <button
                 onClick={removeImage}

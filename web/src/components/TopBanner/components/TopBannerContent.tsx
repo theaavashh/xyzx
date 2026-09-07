@@ -16,15 +16,15 @@ export function TopBannerContent({ banner }: TopBannerContentProps) {
 
   return (
     <>
-      <div className="w-full flex flex-col items-center sm:flex-row sm:justify-center lg:grid lg:grid-cols-3 gap-2 sm:gap-4">
+      <div className="w-full flex flex-col items-center gap-1 lg:flex-row lg:justify-between lg:items-center">
         {showCountdown && (
-          <div className="lg:justify-self-start">
+          <div className="lg:flex-shrink-0">
             <CountdownTimer endDate={banner.endDate!} textColor={banner.textColor} />
           </div>
         )}
 
         <p
-          className="text-lg sm:text-xl font-semibold tracking-tight text-center sm:text-left lg:text-center"
+          className="text-sm sm:text-sm lg:text-base font-medium tracking-wide text-center lg:flex-1"
           itemProp="description"
         >
           {safeTitle}
@@ -33,7 +33,7 @@ export function TopBannerContent({ banner }: TopBannerContentProps) {
         {showButton && (
           <a
             href={banner.buttonUrl!}
-            className="hidden sm:inline-block lg:justify-self-end text-sm font-bold tracking-widest uppercase hover:opacity-60 transition-opacity duration-200 whitespace-nowrap"
+            className="lg:flex-shrink-0 text-xs sm:text-sm font-bold tracking-widest uppercase hover:opacity-60 transition-opacity duration-200 whitespace-nowrap"
             style={{ color: banner.textColor }}
           >
             {banner.buttonText}

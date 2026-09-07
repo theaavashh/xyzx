@@ -28,6 +28,20 @@ export interface LowStockProduct {
   lowStockThreshold: number;
 }
 
+export interface VariantInventoryRow {
+  variantId: string;
+  productId: string;
+  productName: string;
+  productSku: string | null;
+  color: string | null;
+  size: string | null;
+  pattern: string | null;
+  sku: string | null;
+  quantity: number;
+  lowStockThreshold: number;
+  isActive: boolean;
+}
+
 export const sourceColors: Record<string, string> = {
   ONLINE: 'bg-blue-100 text-blue-700',
   STORE: 'bg-orange-100 text-orange-700',

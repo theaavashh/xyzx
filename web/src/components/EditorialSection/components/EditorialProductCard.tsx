@@ -30,12 +30,12 @@ export const EditorialProductCard = memo(function EditorialProductCard({
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-              <span className="text-xs text-gray-400">No image</span>
+              <span className="text-xs text-zinc-600">No image</span>
             </div>
           )}
 
           {product.badge && (
-            <span className="absolute top-3 left-3 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest bg-white text-black">
+            <span className="absolute top-3 left-3 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest bg-white text-zinc-600">
               {product.badge}
             </span>
           )}
@@ -47,7 +47,7 @@ export const EditorialProductCard = memo(function EditorialProductCard({
                 e.preventDefault();
                 e.stopPropagation();
               }}
-              className="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 bg-white text-black text-xs font-bold tracking-wider uppercase px-5 py-2.5 rounded-sm shadow-md hover:bg-gray-100 flex items-center gap-2"
+              className="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 bg-white text-zinc-600 text-xs font-bold tracking-wider uppercase px-5 py-2.5 rounded-sm shadow-md hover:bg-gray-100 flex items-center gap-2"
             >
               <Eye className="w-3.5 h-3.5" />
               Quick View
@@ -57,13 +57,13 @@ export const EditorialProductCard = memo(function EditorialProductCard({
 
         <div className="mt-4">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-sm font-medium text-gray-900 group-hover:text-gray-500 transition-colors truncate">
+            <h3 className="text-sm font-medium text-zinc-600 group-hover:text-zinc-600 transition-colors truncate">
               {product.name}
             </h3>
             <div className="flex items-center gap-2 shrink-0">
-              <span className="text-sm text-gray-700">${product.price.toFixed(2)}</span>
+              <span className="text-sm text-zinc-600">${product.price.toFixed(2)}</span>
               {product.originalPrice > product.price && (
-                <span className="text-xs text-gray-400 line-through">
+                <span className="text-xs text-zinc-600 line-through">
                   ${product.originalPrice.toFixed(2)}
                 </span>
               )}

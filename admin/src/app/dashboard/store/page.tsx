@@ -7,7 +7,7 @@ import type { StoreSection } from '@/features/store';
 
 export default function StorePage() {
   const { storeData, setStoreData, isLoading } = useStore();
-  const { save, isSaving } = useSaveStore();
+  const { save, isSaving, uploadImage, isUploading } = useSaveStore();
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -30,6 +30,21 @@ export default function StorePage() {
     setIsEditing(false);
   };
 
+  const handleImageUpload = async () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file || !storeData) return;
+      const url = await uploadImage(file);
+      if (url) {
+        setStoreData((prev) => prev ? { ...prev, image: url } : prev);
+      }
+    };
+    input.click();
+  };
+
   if (isLoading || !storeData) {
     return (
       <DashboardLayout title="Store">
@@ -46,10 +61,12 @@ export default function StorePage() {
         storeData={storeData}
         isEditing={isEditing}
         isSaving={isSaving}
+        isUploading={isUploading}
         onInputChange={handleInputChange}
         onSave={handleSave}
         onCancel={handleCancel}
         onToggleEdit={() => setIsEditing(true)}
+        onImageUpload={handleImageUpload}
       />
     </DashboardLayout>
   );

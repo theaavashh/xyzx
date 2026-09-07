@@ -163,7 +163,7 @@ export default function ProductDetailsModal({
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-black bg-opacity-50"
-            onClick={onClose}
+            onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
           />
 
           {/* Modal */}
@@ -242,7 +242,7 @@ export default function ProductDetailsModal({
                               src={product.images[activeImageIndex]}
                               alt={product.name}
                               fill
-                              className="object-cover"
+                              className="object-contain"
                             />
                           </div>
 
@@ -263,7 +263,7 @@ export default function ProductDetailsModal({
                                     src={image}
                                     alt={`${product.name} ${index + 1}`}
                                     fill
-                                    className="object-cover"
+                                    className="object-contain"
                                   />
                                 </button>
                               ))}

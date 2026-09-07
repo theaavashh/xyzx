@@ -54,7 +54,7 @@ export function NavigationTree({
           <button
             type="button"
             onClick={onCreateNew}
-            className="flex items-center gap-2 bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] transition-colors font-semibold"
+            className="flex items-center gap-2 bg-[#D4AF37] text-white px-4 py-2.5 text-lg rounded-md hover:bg-[#b8962e] transition-colors font-semibold"
           >
             <Plus className="w-4 h-4" />
             Create Navigation Item

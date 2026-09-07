@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/nextjs';
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { queryClient } from '@/lib/queryClient';
 import { isMutationMethod, getCsrfToken } from '@/utils/csrf';
+import { getAccessToken, setAccessToken } from '@/utils/authToken';
 import { getErrorMessage } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:9999';
@@ -40,6 +41,12 @@ class TokenRefreshManager {
         this.refreshFailed = true;
         queryClient.setQueryData(['profile'], null);
         throw new Error('Token refresh failed');
+      }
+
+      // Store the new access token from the refresh response
+      const newAccessToken = response.data?.data?.accessToken;
+      if (newAccessToken) {
+        setAccessToken(newAccessToken);
       }
     } catch {
       this.refreshFailed = true;
@@ -84,22 +91,13 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  if (typeof document !== 'undefined') {
-    const accessToken = document.cookie
-      .split(';')
-      .find(c => c.trim().startsWith('accessToken='))
-      ?.split('=')[1];
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${decodeURIComponent(accessToken)}`;
-    }
+  // Use the stored access token (from login response) as Bearer auth.
+  // This bypasses CSRF entirely (the CSRF middleware skips when Bearer is present).
+  const accessToken = getAccessToken();
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
   }
 
-  if (isMutationMethod(config.method)) {
-    const token = getCsrfToken();
-    if (token) {
-      config.headers['X-CSRF-Token'] = token;
-    }
-  }
   return config;
 });
 
@@ -147,6 +145,28 @@ api.interceptors.response.use(
         return Promise.reject(error);
       } finally {
         tokenRefreshManager.setRefreshing(false);
+      }
+    }
+
+    if (error.response?.status && error.response.status >= 400 && error.response.data) {
+      const data = error.response.data as Record<string, unknown>;
+      const serverMessage = data.message;
+      const serverErrors = data.errors;
+
+      let extractedMessage = typeof serverMessage === 'string' ? serverMessage : '';
+
+      if (Array.isArray(serverErrors) && serverErrors.length > 0) {
+        const fieldMessages = serverErrors
+          .map((e: { field?: string; message?: string }) => e.message || e)
+          .join(', ');
+        extractedMessage = extractedMessage ? `${extractedMessage}: ${fieldMessages}` : fieldMessages;
+      }
+
+      if (extractedMessage) {
+        const enhancedError = new Error(extractedMessage);
+        (enhancedError as any).status = error.response.status;
+        (enhancedError as any).response = error.response;
+        return Promise.reject(enhancedError);
       }
     }
 
@@ -225,11 +245,15 @@ export interface ProfileResponse {
 }
 
 export async function loginRequest(email: string, password: string): Promise<LoginResponse> {
-  return apiRequest<LoginResponse>('/api/v1/auth/login', 'POST', { email, password });
+  return apiRequest<LoginResponse>('/api/v1/auth/login', 'POST', { email, password, role: 'admin' });
 }
 
 export async function verifyOtpRequest(email: string, otp: string): Promise<LoginResponse> {
   return apiRequest<LoginResponse>('/api/v1/auth/verify-otp', 'POST', { email, otp });
+}
+
+export async function resendOtpRequest(email: string): Promise<LoginResponse> {
+  return apiRequest<LoginResponse>('/api/v1/auth/resend-otp', 'POST', { email });
 }
 
 export async function forgotPasswordRequest(email: string): Promise<LoginResponse> {

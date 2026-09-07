@@ -15,6 +15,7 @@ interface EditorialSectionModalProps {
   isOpen: boolean;
   editingSection: EditorialSection | null;
   form: EditorialSectionFormData;
+  formErrors?: Partial<Record<keyof EditorialSectionFormData, string>>;
   isFetchingProducts: boolean;
   fetchedProducts: ProductItem[];
   selectedProductIds: Set<string>;
@@ -30,6 +31,7 @@ export function EditorialSectionModal({
   isOpen,
   editingSection,
   form,
+  formErrors = {},
   isFetchingProducts,
   fetchedProducts,
   selectedProductIds,
@@ -46,7 +48,7 @@ export function EditorialSectionModal({
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={onClose}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
@@ -57,7 +59,7 @@ export function EditorialSectionModal({
           >
             <div className="flex items-center justify-between p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
               <div>
-                <h2 className="text-2xl font-semibold text-black outer-sans">
+                <h2 className="text-2xl font-semibold text-black">
                   {editingSection ? 'Edit Section' : 'New Section'}
                 </h2>
                 <p className="text-sm text-gray-500">{editingSection ? 'Update section details and products' : 'Create a new editorial showcase'}</p>
@@ -74,14 +76,16 @@ export function EditorialSectionModal({
                   <input type="text" value={form.season}
                     onChange={(e) => onFormChange('season', e.target.value)}
                     placeholder="SPRING / SUMMER 26"
-                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-black text-sm placeholder:text-gray-400" />
+                    className={`w-full px-3.5 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-black text-sm placeholder:text-gray-400 ${formErrors.season ? 'border-red-500' : 'border-gray-300'}`} />
+                  {formErrors.season && <p className="text-xs text-red-500">{formErrors.season}</p>}
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold text-gray-700">Title <span className="text-red-400">*</span></label>
                   <input type="text" value={form.title}
                     onChange={(e) => onFormChange('title', e.target.value)}
                     placeholder="New Collection"
-                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-black text-sm placeholder:text-gray-400" />
+                    className={`w-full px-3.5 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-black text-sm placeholder:text-gray-400 ${formErrors.title ? 'border-red-500' : 'border-gray-300'}`} />
+                  {formErrors.title && <p className="text-xs text-red-500">{formErrors.title}</p>}
                 </div>
               </div>
 
@@ -133,13 +137,14 @@ export function EditorialSectionModal({
                     onFormChange('featureType', val);
                     if (val) onFetchProducts(val);
                   }}
-                  className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-black bg-white"
+                  className={`w-full px-3.5 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-black bg-white ${formErrors.featureType ? 'border-red-500' : 'border-gray-300'}`}
                 >
                   <option value="">Select a feature...</option>
                   {FEATURE_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
                   ))}
                 </select>
+                {formErrors.featureType && <p className="text-xs text-red-500">{formErrors.featureType}</p>}
 
                 {isFetchingProducts && (
                   <div className="flex items-center gap-2.5 py-3 text-sm text-gray-500">
@@ -175,7 +180,7 @@ export function EditorialSectionModal({
                             title={product.name}
                           >
                             {thumb ? (
-                              <img src={thumb} alt={product.name} className="w-full h-full object-cover" />
+                              <img src={thumb} alt={product.name} className="w-full h-full object-contain" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center bg-gray-100">
                                 <ImageIcon className="w-4 h-4 text-gray-300" />

@@ -2,6 +2,7 @@ import { apiRequest, ApiError } from '@/lib/api';
 import type {
   DashboardStats,
   Order,
+  OrderItem,
   ReturnItem,
   Cancellation,
   WishlistItem,
@@ -63,16 +64,107 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
   return response?.data ?? { totalOrders: 0, pendingOrders: 0, completedOrders: 0, wishlistCount: 0, rewardsBalance: 0 };
 }
 
-export const fetchOrders = (params?: PaginationParams) => fetchPaginated<Order>('/api/v1/orders', params);
+type ApiOrderItem = {
+  id: string;
+  quantity: number;
+  price: number;
+  size?: string | null;
+  color?: string | null;
+  product?: { id: string; name: string; images?: string[] } | null;
+};
+
+type ApiOrder = {
+  id: string;
+  orderNumber: string;
+  status: string;
+  total: number;
+  createdAt: string;
+  paymentMethod?: string | null;
+  trackingNumber?: string | null;
+  trackingUrl?: string | null;
+  shippingName?: string | null;
+  shippingPhone?: string | null;
+  shippingAddress?: string | null;
+  shippingCity?: string | null;
+  shippingState?: string | null;
+  shippingZip?: string | null;
+  shippingCountry?: string | null;
+  billingName?: string | null;
+  billingPhone?: string | null;
+  billingAddress?: string | null;
+  billingCity?: string | null;
+  billingState?: string | null;
+  billingZip?: string | null;
+  billingCountry?: string | null;
+  orderItems?: ApiOrderItem[];
+};
+
+function mapAddress(role: 'shipping' | 'billing', api: ApiOrder): Address {
+  const name = role === 'shipping' ? api.shippingName : api.billingName;
+  const phone = role === 'shipping' ? api.shippingPhone : api.billingPhone;
+  const street = role === 'shipping' ? api.shippingAddress : api.billingAddress;
+  const city = role === 'shipping' ? api.shippingCity : api.billingCity;
+  const state = role === 'shipping' ? api.shippingState : api.billingState;
+  const zip = role === 'shipping' ? api.shippingZip : api.billingZip;
+  const country = role === 'shipping' ? api.shippingCountry : api.billingCountry;
+
+  return {
+    id: `${role}-address`,
+    type: 'home',
+    name: name ?? api.shippingName ?? '',
+    phone: phone ?? api.shippingPhone ?? '',
+    street: street ?? api.shippingAddress ?? '',
+    city: city ?? api.shippingCity ?? '',
+    state: state ?? api.shippingState ?? '',
+    zip: zip ?? api.shippingZip ?? '',
+    country: country ?? api.shippingCountry ?? '',
+    isDefault: false,
+  };
+}
+
+function mapApiOrder(api: ApiOrder): Order {
+  const items: OrderItem[] = (api.orderItems ?? []).map((oi) => ({
+    id: oi.id,
+    productId: oi.product?.id ?? '',
+    productName: oi.product?.name ?? 'Product',
+    productImage: oi.product?.images?.[0] ?? '',
+    quantity: oi.quantity,
+    price: oi.price,
+    size: oi.size ?? undefined,
+    color: oi.color ?? undefined,
+  }));
+
+  return {
+    id: api.id,
+    orderNumber: api.orderNumber,
+    date: api.createdAt,
+    status: (api.status?.toLowerCase() ?? 'pending') as Order['status'],
+    total: api.total,
+    itemCount: items.reduce((sum, i) => sum + i.quantity, 0),
+    items,
+    shippingAddress: mapAddress('shipping', api),
+    billingAddress: mapAddress('billing', api),
+    paymentMethod: api.paymentMethod ?? 'N/A',
+    trackingNumber: api.trackingNumber ?? undefined,
+    trackingUrl: api.trackingUrl ?? undefined,
+  };
+}
+
+export const fetchOrders = async (
+  params?: PaginationParams,
+): Promise<PaginatedResponse<Order>> => {
+  const result = await fetchPaginated<ApiOrder>('/api/v1/orders/me', params);
+  return { ...result, data: result.data.map(mapApiOrder) };
+};
 export const fetchReturns = (params?: PaginationParams) => fetchPaginated<ReturnItem>('/api/v1/user/returns', params);
 export const fetchCancellations = (params?: PaginationParams) => fetchPaginated<Cancellation>('/api/v1/user/cancellations', params);
 export const fetchWishlist = (params?: PaginationParams) => fetchPaginated<WishlistItem>('/api/v1/user/wishlist', params);
 
 export async function fetchOrderById(orderId: string): Promise<Order | null> {
-  const response = await safeRequest<{ success: boolean; data: Order }>(
+  const response = await safeRequest<{ success: boolean; data: ApiOrder }>(
     `/api/v1/orders/${orderId}`,
   );
-  return response?.data ?? null;
+  return response?.data ? mapApiOrder(response.data) : null;
 }
 
 export async function addToWishlist(productId: string): Promise<void> {

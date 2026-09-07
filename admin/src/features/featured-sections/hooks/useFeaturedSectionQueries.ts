@@ -1,6 +1,7 @@
 'use client';
 
 import { clientLogger } from '@/lib/logger';
+import { authHeaders } from '@/utils/authHeaders';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import type { FeaturedSection, FeaturedSectionFormData } from '../types';
@@ -13,7 +14,7 @@ export function useFeaturedSections() {
   const load = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await globalThis.fetch('/api/v1/featured-sections');
+      const res = await globalThis.fetch('/api/v1/featured-sections', { headers: authHeaders() });
       if (res.ok) {
         const data = await res.json();
         setFeaturedSections(data.data || []);
@@ -58,25 +59,25 @@ export function useFeaturedSections() {
 
   const createSection = useCallback(
     (data: FeaturedSectionFormData) =>
-      handleResponse('/api/v1/featured-sections', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }, 'Featured section created'),
+      handleResponse('/api/v1/featured-sections', { method: 'POST', headers: authHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify(data) }, 'Featured section created'),
     [],
   );
 
   const updateSection = useCallback(
     (id: string, data: FeaturedSectionFormData) =>
-      handleResponse(`/api/v1/featured-sections/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }, 'Featured section updated'),
+      handleResponse(`/api/v1/featured-sections/${id}`, { method: 'PUT', headers: authHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify(data) }, 'Featured section updated'),
     [],
   );
 
   const deleteSection = useCallback(
     (section: FeaturedSection) =>
-      handleResponse(`/api/v1/featured-sections/${section.id}`, { method: 'DELETE' }, 'Featured section deleted'),
+      handleResponse(`/api/v1/featured-sections/${section.id}`, { method: 'DELETE', headers: authHeaders() }, 'Featured section deleted'),
     [],
   );
 
   const toggleStatus = useCallback(
     (section: FeaturedSection) =>
-      handleResponse(`/api/v1/featured-sections/${section.id}/toggle`, { method: 'PATCH' }, `Featured section ${section.isActive ? 'deactivated' : 'activated'}`),
+      handleResponse(`/api/v1/featured-sections/${section.id}/toggle`, { method: 'PATCH', headers: authHeaders() }, `Featured section ${section.isActive ? 'deactivated' : 'activated'}`),
     [],
   );
 
@@ -93,7 +94,7 @@ export function useFeaturedSections() {
       setIsMutating(true);
       globalThis.fetch('/api/v1/featured-sections/reorder', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify({ orders: updated.map((s, i) => ({ id: s.id, order: i })) }),
       }).then((res) => {
@@ -118,7 +119,7 @@ export function useFeaturedSections() {
           try {
             const fd = new FormData();
             fd.append('file', file);
-            const res = await globalThis.fetch('/api/v1/upload/featured-section', { method: 'POST', credentials: 'include', body: fd });
+            const res = await globalThis.fetch('/api/v1/upload/featured-section', { method: 'POST', credentials: 'include', headers: authHeaders(), body: fd });
             if (res.ok) {
               const data = await res.json();
               const url: string | undefined = data.data?.url || data.url;

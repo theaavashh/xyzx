@@ -154,7 +154,7 @@ export default function TwoImageGrid() {
   if (!image && !items.length) return null;
 
   return (
-    <section className="bg-white">
+    <section className="bg-[#F7F6F3]">
       <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr]">
         <div className="relative aspect-[4/5] md:aspect-auto md:h-[64vh] overflow-hidden min-w-0">
           {image && (

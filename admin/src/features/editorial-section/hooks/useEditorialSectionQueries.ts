@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { clientLogger } from '@/lib/logger';
+import { authHeaders } from '@/utils/authHeaders';
 import type {
   EditorialSection,
   EditorialSectionFormData,
@@ -22,6 +23,10 @@ const INITIAL_FORM: EditorialSectionFormData = {
   isActive: true,
 };
 
+type FormErrors = Partial<Record<keyof EditorialSectionFormData, string>>;
+
+const INITIAL_ERRORS: FormErrors = {};
+
 export function useEditorialSectionQueries() {
   const [sections, setSections] = useState<EditorialSection[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,11 +38,12 @@ export function useEditorialSectionQueries() {
   const [fetchedProducts, setFetchedProducts] = useState<ProductItem[]>([]);
   const [selectedProductIds, setSelectedProductIds] = useState<Set<string>>(new Set());
   const [form, setForm] = useState<EditorialSectionFormData>(INITIAL_FORM);
+  const [formErrors, setFormErrors] = useState<FormErrors>(INITIAL_ERRORS);
 
   const fetchSections = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/api/v1/editorial-sections`, { credentials: 'include' });
+      const response = await fetch(`${API_BASE}/api/v1/editorial-sections`, { credentials: 'include', headers: authHeaders() });
       if (response.ok) {
         const data = await response.json();
         setSections(data.data || []);
@@ -57,6 +63,9 @@ export function useEditorialSectionQueries() {
 
   const handleFormChange = (field: string, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    if (formErrors[field as keyof EditorialSectionFormData]) {
+      setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
   };
 
   const fetchProductsByFeature = async (feature: string) => {
@@ -65,7 +74,7 @@ export function useEditorialSectionQueries() {
     setFetchedProducts([]);
     setSelectedProductIds(new Set());
     try {
-      const response = await fetch(`${API_BASE}/api/v1/products?${feature}=true&limit=50`, { credentials: 'include' });
+      const response = await fetch(`${API_BASE}/api/v1/products?${feature}=true&limit=50`, { credentials: 'include', headers: authHeaders() });
       if (response.ok) {
         const data = await response.json();
         const products: ProductItem[] = data.data || [];
@@ -100,6 +109,7 @@ export function useEditorialSectionQueries() {
 
   const openModal = () => {
     setForm(INITIAL_FORM);
+    setFormErrors(INITIAL_ERRORS);
     setFetchedProducts([]);
     setSelectedProductIds(new Set());
     setEditingSection(null);
@@ -116,6 +126,7 @@ export function useEditorialSectionQueries() {
       featureType: section.featureType || '',
       isActive: section.isActive,
     });
+    setFormErrors(INITIAL_ERRORS);
     setFetchedProducts([]);
     setSelectedProductIds(new Set(section.productIds || []));
     setEditingSection(section);
@@ -129,18 +140,23 @@ export function useEditorialSectionQueries() {
     setFetchedProducts([]);
     setSelectedProductIds(new Set());
     setForm(INITIAL_FORM);
+    setFormErrors(INITIAL_ERRORS);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.season || !form.title) {
-      toast.error('Season and title are required');
+
+    const errors: FormErrors = {};
+    if (!form.season.trim()) errors.season = 'Season is required';
+    if (!form.title.trim()) errors.title = 'Title is required';
+    if (!form.featureType) errors.featureType = 'Product feature is required';
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
-    if (!form.featureType) {
-      toast.error('Select a product feature');
-      return;
-    }
+
+    setFormErrors({});
 
     const payload = { ...form, productIds: Array.from(selectedProductIds) };
 
@@ -151,7 +167,7 @@ export function useEditorialSectionQueries() {
 
       const response = await fetch(url, {
         method: editingSection ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify(payload),
       });
@@ -174,6 +190,7 @@ export function useEditorialSectionQueries() {
       const response = await fetch(`${API_BASE}/api/v1/editorial-sections/${section.id}`, {
         method: 'DELETE',
         credentials: 'include',
+        headers: authHeaders(),
       });
       if (response.ok) {
         toast.success('Deleted');
@@ -193,6 +210,7 @@ export function useEditorialSectionQueries() {
       const response = await fetch(`${API_BASE}/api/v1/editorial-sections/${section.id}/toggle`, {
         method: 'PATCH',
         credentials: 'include',
+        headers: authHeaders(),
       });
       if (response.ok) {
         const data = await response.json();
@@ -215,7 +233,7 @@ export function useEditorialSectionQueries() {
       const orders = newOrder.map((s, i) => ({ id: s.id, order: i }));
       const response = await fetch(`${API_BASE}/api/v1/editorial-sections/reorder`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify({ orders }),
       });
@@ -245,6 +263,7 @@ export function useEditorialSectionQueries() {
     fetchedProducts,
     selectedProductIds,
     form,
+    formErrors,
     handleFormChange,
     fetchProductsByFeature,
     toggleProduct,

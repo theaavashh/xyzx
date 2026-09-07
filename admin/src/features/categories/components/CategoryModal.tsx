@@ -17,9 +17,7 @@ export function ImagePreviewModal({ show, imageUrl, onClose }: ImagePreviewModal
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) onClose();
-          }}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
           <motion.div
             className="bg-white rounded-xl max-w-4xl max-h-[90vh] overflow-hidden"
@@ -80,9 +78,7 @@ export function BulkDeleteModal({ show, count, onConfirm, onCancel }: BulkDelete
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) onCancel();
-          }}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel(); }}
         >
           <motion.div
             className="bg-white rounded-xl max-w-md w-full p-6"
@@ -138,9 +134,7 @@ export function DeleteModal({ show, itemName, itemType, onConfirm, onCancel }: D
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) onCancel();
-          }}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel(); }}
         >
           <motion.div
             className="bg-white rounded-xl max-w-md w-full p-6"

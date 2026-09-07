@@ -21,7 +21,7 @@ export interface PaginatedResult<T> {
 }
 
 type OrderWithRelations = Order & {
-  user: { id: string; name: string; email: string };
+  user: { id: string; name: string; email: string } | null;
   orderItems: (OrderItem & {
     product: { id: string; name: string; sku: string | null; images: string[] };
   })[];
@@ -144,7 +144,7 @@ export const findOrderByNumber = async (
 
 export const createOrder = async (data: {
   orderNumber: string;
-  userId: string;
+  userId?: string;
   subtotal: number;
   tax: number;
   shipping: number;
@@ -252,7 +252,10 @@ export const getOrderItems = async (
     where: { orderId },
     select: { productId: true, quantity: true },
   });
-  return items;
+  return items.map((item) => ({
+    productId: item.productId as string,
+    quantity: item.quantity,
+  }));
 };
 
 export const existsById = async (id: string): Promise<boolean> => {

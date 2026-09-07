@@ -168,7 +168,7 @@ export default function RewardsDashboardPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Trophy className="w-8 h-8 text-yellow-500" />
-              <h1 className="text-3xl font-bold text-gray-900">My Rewards</h1>
+              <h1 className="text-3xl font-bold text-zinc-600">My Rewards</h1>
             </div>
             <button
               type="button"
@@ -187,7 +187,7 @@ export default function RewardsDashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-zinc-600">
                 Current Balance
               </h3>
               <Trophy className="w-6 h-6 text-yellow-500" />
@@ -195,12 +195,12 @@ export default function RewardsDashboardPage() {
             <div className="text-3xl font-bold text-blue-600">
               {balance?.balance || 0}
             </div>
-            <p className="text-sm text-gray-600 mt-2">Available points</p>
+            <p className="text-sm text-zinc-600 mt-2">Available points</p>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-zinc-600">
                 Total Earned
               </h3>
               <Star className="w-6 h-6 text-green-500" />
@@ -208,12 +208,12 @@ export default function RewardsDashboardPage() {
             <div className="text-3xl font-bold text-green-600">
               +{balance?.totalEarned || 0}
             </div>
-            <p className="text-sm text-gray-600 mt-2">Points earned</p>
+            <p className="text-sm text-zinc-600 mt-2">Points earned</p>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-zinc-600">
                 Total Redeemed
               </h3>
               <ShoppingCart className="w-6 h-6 text-red-500" />
@@ -221,7 +221,7 @@ export default function RewardsDashboardPage() {
             <div className="text-3xl font-bold text-red-600">
               -{balance?.totalRedeemed || 0}
             </div>
-            <p className="text-sm text-gray-600 mt-2">Points used</p>
+            <p className="text-sm text-zinc-600 mt-2">Points used</p>
           </div>
         </div>
 
@@ -229,10 +229,10 @@ export default function RewardsDashboardPage() {
         {showHistory && (
           <div className="bg-white rounded-lg shadow">
             <div className="p-6 border-b">
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-zinc-600">
                 Reward History
               </h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-zinc-600 mt-1">
                 View your complete reward transaction history
               </p>
             </div>
@@ -240,7 +240,7 @@ export default function RewardsDashboardPage() {
             {historyLoading ? (
               <div className="p-8 text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-gray-600 mt-4">Loading history...</p>
+                <p className="text-zinc-600 mt-4">Loading history...</p>
               </div>
             ) : history.length > 0 ? (
               <div className="p-6">
@@ -257,15 +257,15 @@ export default function RewardsDashboardPage() {
                           {getStatusIcon(reward.type)}
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">
+                          <p className="font-medium text-zinc-600">
                             {reward.description || 'Reward transaction'}
                           </p>
                           {reward.order && (
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-zinc-600">
                               Order: {reward.order.orderNumber}
                             </p>
                           )}
-                          <div className="flex items-center space-x-2 text-sm text-gray-500">
+                          <div className="flex items-center space-x-2 text-sm text-zinc-600">
                             <Calendar className="w-4 h-4" />
                             <span>{formatDate(reward.createdAt)}</span>
                           </div>
@@ -282,7 +282,7 @@ export default function RewardsDashboardPage() {
                           {reward.type === 'EARNED' ? '+' : '-'}
                           {reward.points}
                         </p>
-                        <p className="text-sm text-gray-600">points</p>
+                        <p className="text-sm text-zinc-600">points</p>
                       </div>
                     </div>
                   ))}
@@ -317,11 +317,11 @@ export default function RewardsDashboardPage() {
               </div>
             ) : (
               <div className="p-8 text-center">
-                <Gift className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <Gift className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-zinc-600 mb-2">
                   No reward history yet
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-zinc-600">
                   Start earning points by making purchases to see your reward
                   history here.
                 </p>

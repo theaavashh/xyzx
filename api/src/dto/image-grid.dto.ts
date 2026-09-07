@@ -5,7 +5,6 @@ const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
 
 export const imageGridCreateSchema = z.object({
   src: z.string().min(1, 'Image URL is required').max(1000),
-  alt: z.string().min(1, 'Alt text is required').max(500),
   title: emptyToUndefined(z.string().max(200).optional()),
   subtitle: emptyToUndefined(z.string().max(500).optional()),
   link: emptyToUndefined(z.string().max(500).optional()),
@@ -15,7 +14,6 @@ export const imageGridCreateSchema = z.object({
 
 export const imageGridUpdateSchema = z.object({
   src: z.string().min(1).max(1000).optional(),
-  alt: z.string().min(1).max(500).optional(),
   title: emptyToUndefined(z.string().max(200).optional()),
   subtitle: emptyToUndefined(z.string().max(500).optional()),
   link: emptyToUndefined(z.string().max(500).optional()),

@@ -8,6 +8,7 @@ import { ROUTE_MAP } from '@/constants/navigation';
 
 interface SidebarItemProps {
   item: NavItem;
+  isCollapsed: boolean;
   expandedSections: string[];
   toggleSection: (id: string) => void;
   handleNavigation: (itemId: string, parentId?: string) => void;
@@ -16,6 +17,7 @@ interface SidebarItemProps {
 
 export function SidebarItem({
   item,
+  isCollapsed,
   expandedSections,
   toggleSection,
   handleNavigation,
@@ -30,33 +32,41 @@ export function SidebarItem({
   return (
     <div suppressHydrationWarning>
       <button
+        title={item.label}
         onClick={() => {
-          if (hasChildren) {
+          if (isCollapsed && hasChildren) {
+            const targetId = ROUTE_MAP[item.id]
+              ? item.id
+              : (item.children?.[0]?.id ?? item.id);
+            handleNavigation(targetId);
+          } else if (hasChildren) {
             toggleSection(item.id);
           } else {
             handleNavigation(item.id);
           }
         }}
         className={`w-full flex items-center px-3 py-2 text-lg font-medium rounded-md transition-all relative ${
+          isCollapsed ? 'lg:justify-center' : ''
+        } ${
           isActive
             ? 'text-gray-900 bg-gray-100'
             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
         }`}
       >
         {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-blue-500 rounded-full" />}
-        <Icon className="w-5 h-5 mr-3 flex-shrink-0" />
-        <span className={`flex-1 text-left text-xl tracking-normal truncate `}>{item.label}</span>
+        <Icon className={`w-5 h-5 flex-shrink-0 ${isCollapsed ? 'lg:mr-0' : 'mr-3'} mr-3`} />
+        <span className={`flex-1 text-left text-xl tracking-normal truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{item.label}</span>
         {hasChildren && (
           <ChevronRight
             className={`w-4 h-4 flex-shrink-0 transition-transform duration-150 ${
               isExpanded ? 'rotate-90' : ''
-            }`}
+            } ${isCollapsed ? 'lg:hidden' : ''}`}
           />
         )}
       </button>
 
       <AnimatePresence>
-        {hasChildren && isExpanded && (
+        {!isCollapsed && hasChildren && isExpanded && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}

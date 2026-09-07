@@ -28,6 +28,8 @@ export interface UseLoginReturn {
   handleSubmit: (data: LoginFormData) => Promise<void>;
   handleVerifyOtp: (otp: string) => Promise<void>;
   handleForgotPassword: (email: string) => Promise<void>;
+  handleResendOtp: () => Promise<void>;
+  resendCooldown: number;
   step: LoginStep;
   pendingEmail: string;
   backToLogin: () => void;

@@ -47,6 +47,7 @@ import {
 import toast from 'react-hot-toast';
 import DashboardLayout from '@/components/DashboardLayout';
 import { getApiBaseUrl } from '@/utils/api';
+import { authHeaders } from '@/utils/authHeaders';
 
 type AnalyticsView =
   | 'quick-insights'
@@ -183,7 +184,7 @@ export default function AnalyticsPage() {
         `${API_BASE_URL}/api/v1/analytics/sales-overview?period=${dateRange}`,
         {
           credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
         },
       );
 
@@ -227,7 +228,7 @@ export default function AnalyticsPage() {
         `${API_BASE_URL}/api/v1/analytics/revenue-metrics?period=${dateRange}`,
         {
           credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
         },
       );
 
@@ -256,7 +257,7 @@ export default function AnalyticsPage() {
         `${API_BASE_URL}/api/v1/analytics/orders-chart?period=${dateRange}`,
         {
           credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
         },
       );
 
@@ -284,7 +285,7 @@ export default function AnalyticsPage() {
         `${API_BASE_URL}/api/v1/analytics/traffic-overview`,
         {
           credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
         },
       );
 
@@ -954,7 +955,7 @@ export default function AnalyticsPage() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Analytics</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black">Analytics</h1>
             <p className="text-black text-lg mt-2">
               View and analyze your store performance
             </p>

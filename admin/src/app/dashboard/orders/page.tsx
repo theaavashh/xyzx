@@ -67,7 +67,7 @@ export default function OrdersPage() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">
+            <h1 className="text-2xl sm:text-3xl font-bold text-black">
               Order Management
             </h1>
             <p className="text-black text-lg mt-2">
@@ -142,7 +142,7 @@ export default function OrdersPage() {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
-                  <h2 className="text-2xl font-semibold text-black outer-sans">Filter Orders</h2>
+                  <h2 className="text-2xl font-semibold text-black">Filter Orders</h2>
                   <button
                     type="button"
                     onClick={() => setShowFilters(false)}

@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 import { clientLogger } from '@/lib/logger';
+import { authHeaders } from '@/utils/authHeaders';
 import type { ContentPage } from '../types';
 
 export function useContentPagesQueries() {
@@ -11,7 +12,7 @@ export function useContentPagesQueries() {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/content`,
-        { credentials: 'include' },
+        { credentials: 'include', headers: authHeaders() },
       );
       if (response.ok) {
         const data = await response.json();
@@ -34,7 +35,7 @@ export function useContentPagesQueries() {
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/content/slug/${slug}`,
         {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
           credentials: 'include',
           body: JSON.stringify(form),
         },
@@ -59,7 +60,7 @@ export function useContentPagesQueries() {
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/content`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
           credentials: 'include',
           body: JSON.stringify(createForm),
         },
@@ -82,7 +83,7 @@ export function useContentPagesQueries() {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/content/slug/${slug}`,
-        { method: 'DELETE', credentials: 'include' },
+        { method: 'DELETE', credentials: 'include', headers: authHeaders() },
       );
       if (response.ok) {
         toast.success('Content page deleted successfully');
@@ -101,7 +102,7 @@ export function useContentPagesQueries() {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/content/slug/${slug}/toggle`,
-        { method: 'PATCH', credentials: 'include' },
+        { method: 'PATCH', credentials: 'include', headers: authHeaders() },
       );
       if (response.ok) {
         const data = await response.json();

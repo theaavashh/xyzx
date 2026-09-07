@@ -74,6 +74,7 @@ export const createHeroBanner: RequestHandler = asyncHandler(
       buttonText,
       isActive,
       order,
+      position,
     } = req.body;
 
     const banner = await heroBannerRepository.createHeroBanner({
@@ -86,6 +87,7 @@ export const createHeroBanner: RequestHandler = asyncHandler(
       buttonText: buttonText || undefined,
       isActive: isActive !== undefined ? isActive : true,
       order: order !== undefined ? order : 0,
+      position: position || 'CENTER',
     });
 
     sendCreated(res, banner, 'Hero banner created successfully');
@@ -108,7 +110,7 @@ export const updateHeroBanner: RequestHandler = asyncHandler(
       return;
     }
 
-    const { title, subtitle, largeImage, smallImage, videoUrl, buttonUrl, buttonText, isActive, order } = req.body;
+    const { title, subtitle, largeImage, smallImage, videoUrl, buttonUrl, buttonText, isActive, order, position } = req.body;
     const banner = await heroBannerRepository.updateHeroBanner(id, {
       title,
       subtitle: subtitle || undefined,
@@ -119,6 +121,7 @@ export const updateHeroBanner: RequestHandler = asyncHandler(
       buttonText: buttonText || undefined,
       isActive: isActive !== undefined ? isActive : undefined,
       order: order !== undefined ? order : undefined,
+      position: position !== undefined ? position : undefined,
     });
 
     sendSuccess(res, banner, 'Hero banner updated successfully');

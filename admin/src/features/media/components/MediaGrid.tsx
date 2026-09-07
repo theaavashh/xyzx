@@ -42,13 +42,13 @@ export default function MediaGrid({ items, onToggleActive, onEdit, onDelete }: M
                 src={item.mediaUrl}
                 alt={item.linkTo.replace('-', ' ')}
                 fill
-                className="object-cover"
+                className="object-contain"
                 unoptimized
               />
             ) : (
               <video
                 src={item.mediaUrl}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
                 controls
               />
             )}

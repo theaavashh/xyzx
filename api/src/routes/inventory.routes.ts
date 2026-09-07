@@ -8,15 +8,19 @@ import {
   getInventoryLogs,
   deductStockForStoreSale,
   bulkUpdateStock,
+  getVariantInventory,
+  updateVariantStock,
 } from '../controllers/inventory.controller';
 
 const router: Router = Router();
 
 router.get('/stats', authenticateToken, getInventoryStats);
 router.get('/low-stock', authenticateToken, getLowStockProducts);
+router.get('/variants', authenticateToken, getVariantInventory);
 router.get('/logs', authenticateToken, getInventoryLogs);
 router.get('/:productId', authenticateToken, getStock);
 router.put('/:productId', authenticateToken, requireAdmin, updateStock);
+router.put('/variant/:variantId', authenticateToken, requireAdmin, updateVariantStock);
 router.post('/store-sale', authenticateToken, requireAdmin, deductStockForStoreSale);
 router.post('/bulk', authenticateToken, requireAdmin, bulkUpdateStock);
 

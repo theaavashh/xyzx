@@ -1,6 +1,7 @@
 'use client';
 
 import { clientLogger } from '@/lib/logger';
+import { authHeaders } from '@/utils/authHeaders';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import type { HeroSlide, HeroSlideForm } from '../types';
@@ -24,7 +25,7 @@ export function useHeroSlideQueries() {
       }
       const response = await fetch(
         `${baseUrl()}/api/v1/hero-slides`,
-        { credentials: 'include' },
+        { credentials: 'include', headers: authHeaders() },
       );
       if (response.ok) {
         const data = await response.json();
@@ -57,13 +58,12 @@ export function useHeroSlideQueries() {
           : `${baseUrl()}/api/v1/hero-slides`;
         const response = await fetch(url, {
           method: editingItem ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
           credentials: 'include',
           body: JSON.stringify({
             ...form,
             subtitle: form.subtitle || null,
             imageMobile: form.imageMobile || null,
-            alt: form.alt || null,
           }),
         });
         if (response.ok) {
@@ -97,7 +97,7 @@ export function useHeroSlideQueries() {
         }
         const response = await fetch(
           `${baseUrl()}/api/v1/hero-slides/${item.id}`,
-          { method: 'DELETE', credentials: 'include' },
+          { method: 'DELETE', credentials: 'include', headers: authHeaders() },
         );
         if (response.ok) {
           toast.success('Hero slide deleted successfully');
@@ -125,7 +125,7 @@ export function useHeroSlideQueries() {
         }
         const response = await fetch(
           `${baseUrl()}/api/v1/hero-slides/${item.id}/toggle`,
-          { method: 'PATCH', credentials: 'include' },
+          { method: 'PATCH', credentials: 'include', headers: authHeaders() },
         );
         if (response.ok) {
           const data = await response.json();
@@ -164,7 +164,7 @@ export function useHeroSlideQueries() {
         const orders = newOrder.map((item, index) => ({ id: item.id, order: index }));
         const response = await fetch(`${baseUrl()}/api/v1/hero-slides/reorder`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
           credentials: 'include',
           body: JSON.stringify({ orders }),
         });
@@ -195,7 +195,7 @@ export function useHeroSlideQueries() {
         const formData = new FormData();
         formData.append('file', file);
         const response = await fetch(`${baseUrl()}/api/v1/upload/hero-slide`, {
-          method: 'POST', credentials: 'include', body: formData,
+          method: 'POST', credentials: 'include', headers: authHeaders(), body: formData,
         });
         if (response.ok) {
           const data = await response.json();

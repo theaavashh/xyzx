@@ -22,6 +22,8 @@ RUN corepack enable pnpm && \
 
 COPY . .
 
+RUN rm -f .env.local
+
 RUN pnpm build
 
 FROM node:22-alpine AS production

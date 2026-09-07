@@ -1,39 +1,57 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Send, CheckCircle, MapPin, ArrowRight, Mail, Phone } from 'lucide-react';
-import Link from 'next/link';
-import { fetchVisitOurStore } from '@/components/VisitOurStore/utils/api';
-import type { VisitOurStoreData } from '@/components/VisitOurStore/types';
+import { Send, CheckCircle, Mail, Phone } from 'lucide-react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9999';
 
+interface ContactPageData {
+  pageTitle: string | null;
+  pageSubtitle: string | null;
+  email: string | null;
+  phone: string | null;
+  subjectOptions: string;
+  successTitle: string | null;
+  successMessage: string | null;
+}
+
+interface SubjectOption {
+  value: string;
+  label: string;
+}
+
+const SUBJECT_LABELS: Record<string, string> = {
+  order: 'Order Inquiry',
+  product: 'Product Question',
+  shipping: 'Shipping Information',
+  return: 'Return & Exchange',
+  technical: 'Technical Support',
+  other: 'Other',
+};
+
 export default function ContactPage() {
-  const [store, setStore] = useState<VisitOurStoreData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
+  const [pageData, setPageData] = useState<ContactPageData | null>(null);
 
   useEffect(() => {
-    let mounted = true;
-    async function load() {
-      try {
-        const result = await fetchVisitOurStore();
-        if (mounted) setStore(result);
-      } catch {
-        if (mounted) setStore(null);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-    load();
-    return () => {
-      mounted = false;
-    };
+    fetch(`${API_BASE}/api/v1/public/contact-page/public`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((json) => { if (json?.data) setPageData(json.data); })
+      .catch(() => {});
   }, []);
+
+  const contactEmail = pageData?.email || 'support@rapharch.com';
+  const contactPhone = pageData?.phone || '+1 (212) 555-0189';
+
+  const subjectOptions: SubjectOption[] = (pageData?.subjectOptions || 'order,product,shipping,return,technical,other')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((key) => ({ value: key, label: SUBJECT_LABELS[key] || key }));
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -70,16 +88,6 @@ export default function ContactPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-5 h-5 border-2 border-zinc-300 border-t-zinc-800 rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  const data = store?.isActive ? store : null;
-
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
@@ -91,17 +99,17 @@ export default function ContactPage() {
             className="bg-white rounded-xl border border-black/10 p-8 md:p-12 text-center max-w-lg mx-auto"
           >
             <div className="w-16 h-16 bg-black/5 rounded-full flex items-center justify-center mx-auto mb-5">
-              <CheckCircle className="w-8 h-8 text-black" />
+              <CheckCircle className="w-8 h-8 text-zinc-600" />
             </div>
-            <h3 className="lastik text-2xl text-black mb-2">
-              Message Sent!
+              <h3 className="bound-regular text-2xl text-zinc-600 mb-2">
+              {pageData?.successTitle || 'Message Sent!'}
             </h3>
-            <p className="text-sm text-black mb-6 max-w-sm mx-auto">
-              Thank you for reaching out. Our team will get back to you within 48 hours.
+            <p className="text-sm text-zinc-600 mb-6 max-w-sm mx-auto">
+              {pageData?.successMessage || 'Thank you for reaching out. Our team will get back to you within 48 hours.'}
             </p>
             <button
               onClick={() => setSubmitted(false)}
-              className="px-5 py-2.5 text-sm font-medium text-black bg-black/5 rounded-lg hover:bg-black/10 transition-colors"
+              className="px-5 py-2.5 text-sm font-medium text-zinc-600 bg-black/5 rounded-lg hover:bg-black/10 transition-colors"
             >
               Send Another Message
             </button>
@@ -112,27 +120,32 @@ export default function ContactPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <h1 className="lastik text-3xl sm:text-4xl md:text-5xl text-black mb-6 leading-tight">
-                GET IN TOUCH<br />WITH US
+              <h1 className="bound-regular text-3xl sm:text-4xl md:text-5xl text-zinc-600 mb-6 leading-tight">
+                {(pageData?.pageTitle || 'GET IN TOUCH').split('\n').map((line, i) => (
+                  <span key={i}>{line}{i === 0 && (pageData?.pageTitle || '').includes('\n') ? <br /> : ' '}</span>
+                ))}
               </h1>
+              {pageData?.pageSubtitle && (
+                <p className="text-zinc-500 text-sm mb-6">{pageData.pageSubtitle}</p>
+              )}
               <div className="flex flex-col gap-3 text-base mb-8">
                 <a
-                  href={`mailto:${data?.email || 'support@rapharch.com'}`}
-                  className="flex items-center gap-3 text-black transition-colors group"
+                  href={`mailto:${contactEmail}`}
+                  className="flex items-center gap-3 text-zinc-600 transition-colors group"
                 >
                   <span className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center group-hover:bg-black/10 group-hover:scale-110 transition-all duration-300">
-                    <Mail className="w-3.5 h-3.5 text-black transition-colors duration-300" />
+                    <Mail className="w-3.5 h-3.5 text-zinc-600 transition-colors duration-300" />
                   </span>
-                  {data?.email || 'support@rapharch.com'}
+                  {contactEmail}
                 </a>
                 <a
-                  href={`tel:${data?.phone || '+1 (212) 555-0189'}`}
-                  className="flex items-center gap-3 text-black transition-colors group"
+                  href={`tel:${contactPhone}`}
+                  className="flex items-center gap-3 text-zinc-600 transition-colors group"
                 >
                   <span className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center group-hover:bg-black/10 group-hover:scale-110 transition-all duration-300">
-                    <Phone className="w-3.5 h-3.5 text-black transition-colors duration-300" />
+                    <Phone className="w-3.5 h-3.5 text-zinc-600 transition-colors duration-300" />
                   </span>
-                  {data?.phone || '+1 (212) 555-0189'}
+                  {contactPhone}
                 </a>
               </div>
               <hr className="border-black/10" />
@@ -146,7 +159,7 @@ export default function ContactPage() {
                     id="name"
                     name="name"
                     placeholder="Name *"
-                    className="w-full px-4 py-3 text-sm text-black border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black bg-white/50 placeholder:text-black"
+                    className="w-full px-4 py-3 text-sm text-zinc-600 border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black bg-white/50 placeholder:text-zinc-600"
                     required
                   />
                 </div>
@@ -157,7 +170,7 @@ export default function ContactPage() {
                     id="email"
                     name="email"
                     placeholder="Email *"
-                    className="w-full px-4 py-3 text-sm text-black border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black bg-white/50 placeholder:text-black"
+                    className="w-full px-4 py-3 text-sm text-zinc-600 border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black bg-white/50 placeholder:text-zinc-600"
                     required
                   />
                 </div>
@@ -168,7 +181,7 @@ export default function ContactPage() {
                     id="phone"
                     name="phone"
                     placeholder="Phone Number *"
-                    className="w-full px-4 py-3 text-sm text-black border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black bg-white/50 placeholder:text-black"
+                    className="w-full px-4 py-3 text-sm text-zinc-600 border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black bg-white/50 placeholder:text-zinc-600"
                     required
                   />
                 </div>
@@ -177,15 +190,12 @@ export default function ContactPage() {
                   <select
                     id="subject"
                     name="subject"
-                    className="w-full px-4 py-3 text-sm text-black border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black bg-white/50"
+                    className="w-full px-4 py-3 text-sm text-zinc-600 border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black bg-white/50"
                   >
                     <option value="" disabled selected>Subject</option>
-                    <option value="order">Order Inquiry</option>
-                    <option value="product">Product Question</option>
-                    <option value="shipping">Shipping Information</option>
-                    <option value="return">Return & Exchange</option>
-                    <option value="technical">Technical Support</option>
-                    <option value="other">Other</option>
+                    {subjectOptions.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -195,7 +205,7 @@ export default function ContactPage() {
                     name="message"
                     rows={5}
                     placeholder="Message *"
-                    className="w-full px-4 py-3 text-sm text-black border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black bg-white/50 placeholder:text-black resize-none"
+                    className="w-full px-4 py-3 text-sm text-zinc-600 border border-black/10 rounded-md focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black bg-white/50 placeholder:text-zinc-600 resize-none"
                     required
                   />
                 </div>

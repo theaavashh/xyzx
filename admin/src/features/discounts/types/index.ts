@@ -4,7 +4,6 @@ export type { Coupon };
 export type { CouponFormData, CouponStats } from '@/types/coupon.types';
 
 export type DiscountType = 'percentage' | 'fixed';
-export type ApplicableTo = 'all' | 'products' | 'categories';
 export type StatusFilter = 'all' | 'active' | 'inactive';
 
 export const getStatusInfo = (coupon: Coupon) => {

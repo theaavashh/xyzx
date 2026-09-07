@@ -8,72 +8,67 @@ import { HeroContent } from './HeroContent';
 import { HeroProgress } from './HeroProgress';
 import { fetchHeroSlides } from './utils/api';
 import type { Slide } from './types';
-import type { HeroProps } from './types';
 
 const slideVariants = {
-  enter: (dir: number) => ({
-    y: dir > 0 ? '100%' : '-100%',
-    scale: 1.08,
-  }),
+  enter: {
+    opacity: 0,
+    scale: 1.05,
+  },
   center: {
-    y: '0%',
+    opacity: 1,
     scale: 1,
     transition: {
-      duration: 1.3,
-      ease: [0.76, 0, 0.24, 1] as [number, number, number, number],
+      duration: 1.5,
+      ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
     },
   },
-  exit: (dir: number) => ({
-    y: dir > 0 ? '-100%' : '100%',
+  exit: {
+    opacity: 0,
     scale: 1,
     transition: {
-      duration: 1.3,
-      ease: [0.76, 0, 0.24, 1] as [number, number, number, number],
+      duration: 1.5,
+      ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
     },
-  }),
+  },
 };
 
 export default function Hero({
-  slides: propSlides,
-  autoPlayInterval = 6000,
-}: HeroProps) {
-  const [loadedSlides, setLoadedSlides] = useState<Slide[] | null>(null);
+  autoPlayInterval = 2000,
+}: {
+  autoPlayInterval?: number;
+}) {
+  const [loadedSlides, setLoadedSlides] = useState<Slide[]>([]);
   const [current, setCurrent] = useState(0);
-  const slides = propSlides ?? loadedSlides ?? [];
-  const [direction, setDirection] = useState(1);
+  const slides = loadedSlides;
   const [isAnimating, setIsAnimating] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const autoPlayRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const touchStartRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (propSlides) { setLoadedSlides(propSlides); return; }
-    let cancelled = false;
     fetchHeroSlides().then((data) => {
-      if (!cancelled && data.length > 0) setLoadedSlides(data);
+      if (data.length > 0) setLoadedSlides(data);
     });
-    return () => { cancelled = true; };
-  }, [propSlides]);
+  }, []);
 
   const totalSlides = slides.length;
 
   const goTo = useCallback(
-    (index: number, dir?: number) => {
+    (index: number) => {
       if (isAnimating) return;
       setIsAnimating(true);
-      setDirection(dir ?? (index > current ? 1 : -1));
       setCurrent((index + totalSlides) % totalSlides);
-      setTimeout(() => setIsAnimating(false), 1400);
+      setTimeout(() => setIsAnimating(false), 1600);
     },
     [isAnimating, current, totalSlides],
   );
 
   const next = useCallback(() => {
-    goTo(current + 1, 1);
+    goTo(current + 1);
   }, [current, goTo]);
 
   const prev = useCallback(() => {
-    goTo(current - 1, -1);
+    goTo(current - 1);
   }, [current, goTo]);
 
   useEffect(() => {
@@ -114,7 +109,7 @@ export default function Hero({
 
   return (
     <section
-              className="relative w-full min-h-[75dvh] sm:min-h-[75vh] overflow-hidden bg-black"
+              className="relative w-full min-h-[60dvh] sm:min-h-[65vh] overflow-hidden bg-black"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
@@ -123,15 +118,14 @@ export default function Hero({
       aria-label="Hero carousel"
       aria-roledescription="carousel"
     >
-      <AnimatePresence initial={false} custom={direction}>
+      <AnimatePresence initial={false}>
         <motion.div
           key={current}
-          custom={direction}
           variants={slideVariants}
           initial="enter"
           animate="center"
           exit="exit"
-          className="absolute inset-0 will-change-transform"
+          className="absolute inset-0 will-change-[opacity]"
         >
           <HeroImage
             src={slides[current].image}
@@ -145,8 +139,8 @@ export default function Hero({
       <div className="absolute inset-0 bg-black/18 z-10" />
 
       <div
-        className="absolute z-20 flex flex-col items-center px-6 text-center"
-        style={{ top: '58%', left: '50%', transform: 'translate(-50%, -50%)' }}
+        className="absolute z-20 flex flex-col items-center px-6 sm:px-10 lg:px-16 max-w-7xl text-center"
+        style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
       >
         <AnimatePresence mode="wait">
           <HeroContent
@@ -155,61 +149,24 @@ export default function Hero({
             subtitle={slides[current].subtitle}
           />
         </AnimatePresence>
-        <div className="relative z-20 mt-10 flex items-center gap-4">
-          <Link
-            href="/products"
-            className="relative text-white text-base font-semibold tracking-widest uppercase cursor-pointer bg-transparent border-none p-0 pb-px group"
-          >
-            <span className="relative inline-block">
-              Shop Collection
-              <span className="absolute -bottom-px left-0 w-0 h-[1px] bg-white transition-all duration-300 ease-out origin-left group-hover:w-full" />
-            </span>
-          </Link>
-          <span className="text-white/40 select-none text-base leading-none">|</span>
-          <Link
-            href="/products"
-            className="relative text-white text-base font-semibold tracking-widest uppercase cursor-pointer bg-transparent border-none p-0 pb-px group"
-          >
-            <span className="relative inline-block">
-              Shop All Items
-              <span className="absolute -bottom-px left-0 w-0 h-[1px] bg-white transition-all duration-300 ease-out origin-left group-hover:w-full" />
-            </span>
-          </Link>
-        </div>
+
       </div>
 
       {totalSlides > 1 && (
-        <>
-          <div className="absolute bottom-10 left-6 md:left-10 z-20 flex items-center gap-4">
-            <button
-              type="button"
-              onClick={prev}
-              className="p-1.5 bg-transparent text-white/60 hover:text-white transition-colors duration-300"
-              aria-label="Previous slide"
-            >
-              <svg className="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <polyline points="15,4 7,12 15,20" />
-              </svg>
-            </button>
-<button
-              type="button"
-              onClick={next}
-              className="p-1.5 bg-transparent text-white/60 hover:text-white transition-colors duration-300"
-              aria-label="Next slide"
-            >
-              <svg className="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <polyline points="9,4 17,12 9,20" />
-              </svg>
-            </button>
-          </div>
-          <HeroProgress
-            total={totalSlides}
-            current={current}
-            isPaused={isPaused}
-            duration={autoPlayInterval}
-          />
-        </>
+        <HeroProgress
+          total={totalSlides}
+          current={current}
+          isPaused={isPaused}
+          duration={autoPlayInterval}
+        />
       )}
+
+      <Link
+        href="/products"
+        className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 text-white px-7 py-3 rounded-xs font-semibold text-sm sm:text-base uppercase tracking-wider bg-transparent hover:bg-white hover:text-zinc-600 transition-all duration-300"
+      >
+        Shop Collection
+      </Link>
     </section>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { authHeaders } from '@/utils/authHeaders';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import type { StoreSection, StoreHours } from '../types';
@@ -63,7 +64,7 @@ export function useStore() {
     let mounted = true;
     const loadData = async () => {
       try {
-        const response = await fetch(`${API_BASE}/api/v1/store-section`);
+        const response = await fetch(`${API_BASE}/api/v1/store-section`, { headers: authHeaders() });
         if (response.ok) {
           const result = await response.json();
           if (mounted) setStoreData(mapStoreData(result.data));
@@ -85,14 +86,41 @@ export function useStore() {
 }
 
 export function useSaveStore() {
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9999';
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const uploadImage = async (file: File): Promise<string | null> => {
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await fetch(`${API_BASE}/api/v1/upload/store`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: authHeaders(),
+        body: formData,
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.data?.url || data.url || null;
+      }
+      toast.error('Failed to upload image');
+      return null;
+    } catch {
+      toast.error('Error uploading image');
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const save = async (data: StoreSection): Promise<StoreSection> => {
     setIsSaving(true);
     try {
       const response = await fetch(`${API_BASE}/api/v1/store-section`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify({
           title: data.title,
@@ -135,7 +163,7 @@ export function useSaveStore() {
     }
   };
 
-  return { save, isSaving };
+  return { save, isSaving, uploadImage, isUploading };
 }
 
 export function useToggleStore() {
@@ -146,7 +174,7 @@ export function useToggleStore() {
     try {
       const response = await fetch(`${API_BASE}/api/v1/store-section/toggle`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
       });
 

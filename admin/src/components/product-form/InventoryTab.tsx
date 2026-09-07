@@ -61,13 +61,14 @@ const InventoryTab: React.FC<InventoryTabProps> = React.memo(({
               Stock Quantity *
             </label>
             <input
-              type="number"
-              min="0"
+              type="text"
+              inputMode="numeric"
               required
-              value={formData.quantity}
-              onChange={(e) =>
-                onInputChange('quantity', parseInt(e.target.value) || 0)
-              }
+              value={formData.quantity || ''}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^0-9]/g, '');
+                onInputChange('quantity', val === '' ? 0 : parseInt(val));
+              }}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none text-black ${
                 errors.quantity ? 'border-red-500' : 'border-gray-300'
               }`}
@@ -82,12 +83,13 @@ const InventoryTab: React.FC<InventoryTabProps> = React.memo(({
               Low Stock Threshold
             </label>
             <input
-              type="number"
-              min="0"
-              value={formData.lowStockThreshold}
-              onChange={(e) =>
-                onInputChange('lowStockThreshold', parseInt(e.target.value) || 0)
-              }
+              type="text"
+              inputMode="numeric"
+              value={formData.lowStockThreshold || ''}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^0-9]/g, '');
+                onInputChange('lowStockThreshold', val === '' ? 0 : parseInt(val));
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-black"
               placeholder="5"
             />
@@ -157,13 +159,13 @@ const InventoryTab: React.FC<InventoryTabProps> = React.memo(({
             </label>
             <div className="flex gap-2">
               <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData.weight}
-                onChange={(e) =>
-                  onInputChange('weight', parseFloat(e.target.value) || 0)
-                }
+                type="text"
+                inputMode="decimal"
+                value={formData.weight || ''}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9.]/g, '');
+                  onInputChange('weight', val === '' || val === '.' ? 0 : parseFloat(val) || 0);
+                }}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-black"
                 placeholder="0.00"
               />
@@ -185,35 +187,35 @@ const InventoryTab: React.FC<InventoryTabProps> = React.memo(({
             </label>
             <div className="grid grid-cols-3 gap-2">
               <input
-                type="number"
-                min="0"
-                step="0.1"
-                value={formData.dimensions.length}
-                onChange={(e) =>
-                  handleDimensionChange('length', parseFloat(e.target.value) || 0)
-                }
+                type="text"
+                inputMode="decimal"
+                value={formData.dimensions.length || ''}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9.]/g, '');
+                  handleDimensionChange('length', val === '' || val === '.' ? 0 : parseFloat(val) || 0);
+                }}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-black"
                 placeholder="L"
               />
               <input
-                type="number"
-                min="0"
-                step="0.1"
-                value={formData.dimensions.width}
-                onChange={(e) =>
-                  handleDimensionChange('width', parseFloat(e.target.value) || 0)
-                }
+                type="text"
+                inputMode="decimal"
+                value={formData.dimensions.width || ''}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9.]/g, '');
+                  handleDimensionChange('width', val === '' || val === '.' ? 0 : parseFloat(val) || 0);
+                }}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-black"
                 placeholder="W"
               />
               <input
-                type="number"
-                min="0"
-                step="0.1"
-                value={formData.dimensions.height}
-                onChange={(e) =>
-                  handleDimensionChange('height', parseFloat(e.target.value) || 0)
-                }
+                type="text"
+                inputMode="decimal"
+                value={formData.dimensions.height || ''}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9.]/g, '');
+                  handleDimensionChange('height', val === '' || val === '.' ? 0 : parseFloat(val) || 0);
+                }}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-black"
                 placeholder="H"
               />

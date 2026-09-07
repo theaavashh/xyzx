@@ -9,6 +9,7 @@ export interface HeroBanner {
   buttonText?: string;
   isActive: boolean;
   order: number;
+  position?: string;
 }
 
 export interface HeroBannerResponse {

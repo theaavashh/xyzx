@@ -26,14 +26,14 @@ export default function OrderTable({
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Order #</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Customer</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Items</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Total</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Status</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Payment</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Date</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-700 outer-sans">Actions</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700">Order #</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700">Customer</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700">Items</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700">Total</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700">Status</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700">Payment</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700">Date</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-700">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -56,26 +56,23 @@ export default function OrderTable({
                   <td className="py-3 px-4">
                     <div>
                       <div className="font-medium text-gray-900">
-                        {order.user.firstName} {order.user.lastName}
+                        {order.user?.name ?? order.shippingName}
                       </div>
-                      <div className="text-sm text-gray-500">{order.user.email}</div>
-                      <div className="text-sm text-gray-500">{order.user.phone}</div>
+                      <div className="text-sm text-gray-500">{order.user?.email ?? order.shippingEmail}</div>
+                      {order.shippingPhone && (
+                        <div className="text-sm text-gray-500">{order.shippingPhone}</div>
+                      )}
                     </div>
                   </td>
                   <td className="py-3 px-4">
                     <div className="text-sm text-gray-600">
-                      {order.items.length} item{order.items.length !== 1 ? 's' : ''}
+                      {order.orderItems.length} item{order.orderItems.length !== 1 ? 's' : ''}
                     </div>
                   </td>
                   <td className="py-3 px-4">
                     <div className="font-medium text-gray-900">
-                      {formatCurrency(order.totalAmount, order.currency, order.currencySymbol)}
+                      {formatCurrency(order.total, order.currency)}
                     </div>
-                    {order.nprTotalAmount && order.currency !== 'NPR' && (
-                      <div className="text-sm text-gray-500">
-                        NPR {order.nprTotalAmount.toLocaleString()}
-                      </div>
-                    )}
                   </td>
                   <td className="py-3 px-4">
                     <span
@@ -87,9 +84,9 @@ export default function OrderTable({
                   </td>
                   <td className="py-3 px-4">
                     <span
-                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(order.paymentStatus)}`}
+                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(order.paymentStatus ?? 'PENDING')}`}
                     >
-                      {order.paymentStatus.toLowerCase()}
+                      {(order.paymentStatus ?? 'PENDING').toLowerCase()}
                     </span>
                   </td>
                   <td className="py-3 px-4 text-gray-600">

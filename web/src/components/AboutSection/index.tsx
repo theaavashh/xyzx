@@ -31,10 +31,17 @@ function AboutSectionContent() {
     fetchAboutSection().then(setData);
   }, []);
 
-  if (!data || !data.isActive) return null;
+  const displayData = data || {
+    quote: 'Crafted with intention, designed for the modern wardrobe. Every piece tells a story of quality and timeless style.',
+    ctaText: 'Our Story',
+    ctaUrl: '/about',
+    isActive: true,
+  };
+
+  if (!displayData.isActive) return null;
 
   return (
-    <section className="py-20 md:py-32 px-6 bg-white">
+    <section className="py-20 md:py-32 px-6 bg-[#F7F6F3]">
       <div className="max-w-3xl mx-auto text-center">
         <motion.p
           initial={{ opacity: 0, y: 30 }}
@@ -43,7 +50,7 @@ function AboutSectionContent() {
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="text-lg md:text-2xl leading-relaxed text-neutral-800 font-light"
         >
-          &ldquo;{data.quote}&rdquo;
+          &ldquo;{displayData.quote}&rdquo;
         </motion.p>
 
         <motion.div
@@ -53,10 +60,10 @@ function AboutSectionContent() {
           transition={{ duration: 0.6, delay: 0.3, ease: 'easeOut' }}
         >
           <a
-            href={data.ctaUrl}
-            className="inline-block mt-10 px-8 py-3 border-2 border-black text-black text-sm uppercase tracking-widest hover:bg-black hover:text-white transition-colors duration-300"
+            href={displayData.ctaUrl}
+            className="inline-block mt-10 px-8 py-3 text-zinc-600 text-sm uppercase tracking-widest underline underline-offset-4 hover:text-black transition-colors duration-300"
           >
-            {data.ctaText}
+            {displayData.ctaText}
           </a>
         </motion.div>
       </div>

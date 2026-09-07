@@ -11,6 +11,7 @@ const passwordSchema = z
 export const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),
+  role: z.enum(['user', 'admin']).optional(),
 });
 
 export const otpSchema = z.object({
@@ -19,6 +20,10 @@ export const otpSchema = z.object({
 });
 
 export const forgotPasswordSchema = z.object({
+  email: z.string().email('Invalid email address'),
+});
+
+export const resendOtpSchema = z.object({
   email: z.string().email('Invalid email address'),
 });
 

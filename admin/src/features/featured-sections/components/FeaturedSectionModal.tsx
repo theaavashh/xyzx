@@ -64,7 +64,7 @@ export function FeaturedSectionModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={onClose}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
@@ -74,7 +74,7 @@ export function FeaturedSectionModal({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h2 className="text-2xl font-semibold text-black outer-sans">
+              <h2 className="text-2xl font-semibold text-black">
                 {editingSection ? 'Edit Section' : 'Add Section'}
               </h2>
               <button type="button" onClick={onClose} className="text-gray-400 hover:text-black focus:outline-none focus:ring-2 focus:ring-[#D4AF37] rounded-md" aria-label="Close modal">
@@ -88,7 +88,7 @@ export function FeaturedSectionModal({
                 <div className="space-y-2">
                   {form.image ? (
                     <div className="relative rounded-lg overflow-hidden border border-gray-200">
-                      <img src={form.image} alt="Preview" className="w-full h-48 object-cover" />
+                      <img src={form.image} alt="Preview" className="w-full h-48 object-contain" />
                       <button
                         type="button"
                         onClick={() => handleChange('image', '')}

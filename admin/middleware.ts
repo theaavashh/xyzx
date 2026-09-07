@@ -36,11 +36,11 @@ export function middleware(request: NextRequest) {
 
   const scriptSrc = process.env.NODE_ENV === 'development'
     ? "'self' 'unsafe-inline' 'unsafe-eval'"
-    : "'self' 'unsafe-inline'";
+    : "'self' 'unsafe-inline' https://static.cloudflareinsights.com";
 
   const connectSrc = process.env.NODE_ENV === 'development'
     ? `'self' ${apiUrl} https://api.rapharch.com.au`
-    : `'self' ${apiUrl} https://api.rapharch.com.au`;
+    : `'self' ${apiUrl} https://api.rapharch.com.au https://*.cloudflareinsights.com`;
 
   response.headers.set(
     'Content-Security-Policy',
@@ -48,7 +48,7 @@ export function middleware(request: NextRequest) {
       `default-src 'self'`,
       `script-src ${scriptSrc}`,
       `style-src 'self' 'unsafe-inline'`,
-      `img-src 'self' ${apiUrl} https://api.rapharch.com.au`,
+      `img-src 'self' blob: data: ${apiUrl} https://api.rapharch.com.au`,
       `font-src 'self' data:`,
       `connect-src ${connectSrc}`,
       `frame-ancestors 'none'`,

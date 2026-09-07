@@ -133,7 +133,6 @@ const getDefaultFormData = (): ProductFormData => ({
   canonicalUrl: '',
   robotsMeta: 'index,follow',
   seoFriendlyImageFilename: '',
-  imageAltText: '',
   productSchema: '',
   brandSchema: '',
   breadcrumbSchema: '',
@@ -431,7 +430,6 @@ export default function EnhancedProductForm({
         canonicalUrl: initialData?.canonicalUrl || '',
         robotsMeta: initialData?.robotsMeta || 'index,follow',
         seoFriendlyImageFilename: initialData?.seoFriendlyImageFilename || '',
-        imageAltText: initialData?.imageAltText || '',
         productSchema: initialData?.productSchema || '',
         brandSchema: initialData?.brandSchema || '',
         breadcrumbSchema: initialData?.breadcrumbSchema || '',
@@ -615,7 +613,6 @@ export default function EnhancedProductForm({
         canonicalUrl: '',
         robotsMeta: 'index,follow',
         seoFriendlyImageFilename: '',
-        imageAltText: '',
         productSchema: '',
         brandSchema: '',
         breadcrumbSchema: '',
@@ -743,6 +740,14 @@ export default function EnhancedProductForm({
     setCurrencyPrices((prev) => prev.filter((cp) => cp.id !== id));
   };
 
+  const updateCurrencyPrice = (id: string, field: 'price' | 'comparePrice', value: number) => {
+    setCurrencyPrices((prev) =>
+      prev.map((cp) =>
+        cp.id === id ? { ...cp, [field]: value } : cp
+      )
+    );
+  };
+
   const currencyOptions = [
     { country: 'Australia', currency: 'AUD', symbol: 'A$' },
     { country: 'New Zealand', currency: 'NZD', symbol: 'NZ$' },
@@ -773,9 +778,18 @@ export default function EnhancedProductForm({
     setAttributes((prev) => prev.filter((attr) => attr.id !== id));
   };
 
+  const validateIdentity = (formData: any): Record<string, string> => {
+    const errors: Record<string, string> = {};
+    if (!formData.name?.trim()) errors.name = 'Product name is required';
+    if (!formData.productCode?.trim()) errors.productCode = 'Product code is required';
+    if (!formData.categoryId) errors.categoryId = 'Please select a category';
+    return errors;
+  };
+
   const getTabErrors = (tabId: string): Record<string, string> => {
     switch (tabId) {
       case 'identity':
+        return validateIdentity(formData);
       case 'details':
         return validateBasicInfo(formData as any);
       case 'variants':
@@ -1217,7 +1231,7 @@ export default function EnhancedProductForm({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      onClick={onClose}
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <motion.div
         className="bg-white rounded-md w-full max-w-6xl max-h-[90vh] flex flex-col shadow-2xl"
@@ -1233,7 +1247,7 @@ export default function EnhancedProductForm({
             <div className="w-8 h-8 bg-[#D4AF37] flex items-center justify-center">
               <Package className="w-4 h-4 text-white" />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900 outer-sans tracking-tight">
+            <h2 className="text-lg font-semibold text-gray-900 tracking-tight">
               {initialData ? 'Edit Product' : 'New Product'}
             </h2>
           </div>
@@ -1255,7 +1269,7 @@ export default function EnhancedProductForm({
         )}
 
         {/* Tabs */}
-        <div className="flex items-center gap-1 px-6 py-0 overflow-x-auto flex-shrink-0">
+        <div className="flex items-center gap-1 px-6 py-1 overflow-x-auto flex-shrink-0 bg-gray-50 rounded-lg mx-6 mt-2">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -1263,13 +1277,13 @@ export default function EnhancedProductForm({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-2 text-sm outer-sans tracking-tight whitespace-nowrap transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm tracking-tight whitespace-nowrap rounded-lg transition-all ${
                   isActive
-                    ? 'text-[#D4AF37] bg-[#D4AF37]/5'
-                    : 'text-black hover:text-gray-600'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#D4AF37]' : 'text-gray-400'}`} />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-gray-700' : 'text-gray-400'}`} />
                 {tab.label}
               </button>
             );
@@ -1328,6 +1342,7 @@ export default function EnhancedProductForm({
                   setCurrencyPrices((prev) => [...prev, price as CurrencyPrice]);
                 }}
                 onRemoveCurrencyPrice={removeCurrencyPrice}
+                onUpdateCurrencyPrice={updateCurrencyPrice}
               />
             )}
 

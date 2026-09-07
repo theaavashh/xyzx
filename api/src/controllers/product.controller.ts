@@ -11,6 +11,55 @@ import {
 } from '../utils';
 import { logger } from '../utils/logger';
 
+const getNumericValue = (val: unknown): number => {
+  if (typeof val === 'number') return val;
+  if (val && typeof val === 'object') {
+    const first = Object.values(val as Record<string, unknown>).find(
+      (x) => typeof x === 'number',
+    );
+    return typeof first === 'number' ? first : 0;
+  }
+  return 0;
+};
+
+const toVariantMirror = (variants: unknown): any => {
+  if (!Array.isArray(variants)) return variants;
+  return (variants as any[]).map((v) => ({
+    ...v,
+    discountPrice:
+      typeof v?.discountPrice === 'number'
+        ? v.discountPrice
+        : getNumericValue(v?.comparePrice) || undefined,
+  }));
+};
+
+const toVariantCreateRows = (variants: unknown): any[] => {
+  if (!Array.isArray(variants)) return [];
+  return (variants as any[]).map((v) => {
+    const discountPrice = getNumericValue(v?.discountPrice ?? v?.comparePrice);
+    return {
+      variantKey: v?.id ?? null,
+      color: v?.color ?? null,
+      size: v?.size ?? null,
+      pattern: v?.pattern ?? null,
+      sku: v?.sku ?? null,
+      barcode: v?.barcode ?? null,
+      price: getNumericValue(v?.price),
+      discountPrice: discountPrice > 0 ? discountPrice : null,
+      quantity:
+        typeof v?.quantity === 'number'
+          ? v.quantity
+          : typeof v?.stock === 'number'
+            ? v.stock
+            : 0,
+      images: v?.images ?? [],
+      isActive: v?.isActive ?? true,
+      isDefault: v?.isDefault ?? false,
+      combination: v?.combination ?? null,
+    };
+  });
+};
+
 export const getProducts: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const { page, limit, filters, sortBy, sortOrder } = parseQuery(req);
@@ -117,7 +166,6 @@ export const createProduct: RequestHandler = asyncHandler(
       canonicalUrl: prismaData.canonicalUrl,
       robotsMeta: prismaData.robotsMeta,
       seoFriendlyImageFilename: prismaData.seoFriendlyImageFilename,
-      imageAltText: prismaData.imageAltText,
       productSchema: prismaData.productSchema,
       brandSchema: prismaData.brandSchema,
       breadcrumbSchema: prismaData.breadcrumbSchema,
@@ -151,7 +199,8 @@ export const createProduct: RequestHandler = asyncHandler(
       variantAttributes: prismaData.variantAttributes ?? [],
       selectedSizes: prismaData.selectedSizes ?? [],
       selectedColors: prismaData.selectedColors,
-      variants: prismaData.variants,
+      variants: toVariantMirror(prismaData.variants),
+      productVariants: { create: toVariantCreateRows(prismaData.variants) },
       tags: prismaData.tags ?? [],
     });
 
@@ -233,7 +282,6 @@ export const updateProduct: RequestHandler = asyncHandler(
       canonicalUrl: prismaData.canonicalUrl,
       robotsMeta: prismaData.robotsMeta,
       seoFriendlyImageFilename: prismaData.seoFriendlyImageFilename,
-      imageAltText: prismaData.imageAltText,
       productSchema: prismaData.productSchema,
       brandSchema: prismaData.brandSchema,
       breadcrumbSchema: prismaData.breadcrumbSchema,
@@ -267,9 +315,16 @@ export const updateProduct: RequestHandler = asyncHandler(
       variantAttributes: prismaData.variantAttributes,
       selectedSizes: prismaData.selectedSizes,
       selectedColors: prismaData.selectedColors,
-      variants: prismaData.variants,
+      variants: toVariantMirror(prismaData.variants),
       tags: prismaData.tags,
     };
+
+    if (Array.isArray(prismaData.variants)) {
+      updatePayload.productVariants = {
+        deleteMany: {},
+        create: toVariantCreateRows(prismaData.variants),
+      };
+    }
 
     if (prismaData.subCategoryId !== undefined) {
       updatePayload.subCategoryId = prismaData.subCategoryId;

@@ -225,16 +225,16 @@ export default function RobotsPage() {
         <div className="rounded-xl p-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Robots.txt Management</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-black">Robots.txt Management</h1>
               <p className="text-black text-lg mt-2">Manage your robots.txt file</p>
             </div>
             <div className="flex space-x-2">
               <button type="button" onClick={() => setActiveTab('visual')}
-                className={`px-4 py-2.5 rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all outer-sans ${activeTab === 'visual' ? 'bg-[#D4AF37] text-white' : 'bg-gray-100 text-black hover:bg-gray-200'}`}>
+                className={`px-4 py-2.5 rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all ${activeTab === 'visual' ? 'bg-[#D4AF37] text-white' : 'bg-gray-100 text-black hover:bg-gray-200'}`}>
                 Visual Editor
               </button>
               <button type="button" onClick={() => setActiveTab('editor')}
-                className={`px-4 py-2.5 rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all outer-sans ${activeTab === 'editor' ? 'bg-[#D4AF37] text-white' : 'bg-gray-100 text-black hover:bg-gray-200'}`}>
+                className={`px-4 py-2.5 rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all ${activeTab === 'editor' ? 'bg-[#D4AF37] text-white' : 'bg-gray-100 text-black hover:bg-gray-200'}`}>
                 Text Editor
               </button>
             </div>
@@ -287,7 +287,7 @@ export default function RobotsPage() {
           <>
             <div className="bg-white rounded-md border border-gray-200 p-4">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold text-black outer-sans">Sitemaps</h2>
+                <h2 className="text-lg font-bold text-black">Sitemaps</h2>
                 <button type="button" onClick={handleAddSitemap}
                   className="flex items-center px-3 py-2 text-sm bg-[#D4AF37] text-white rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all">
                   <Plus className="w-4 h-4 mr-1" /> Add Sitemap
@@ -309,7 +309,7 @@ export default function RobotsPage() {
             </div>
 
             <div className="bg-white rounded-md border border-gray-200 p-4">
-              <h2 className="text-lg font-bold text-black outer-sans mb-4">Add New Rule</h2>
+              <h2 className="text-lg font-bold text-black mb-4">Add New Rule</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="user-agent" className="block text-sm font-medium text-black mb-1">User Agent</label>
@@ -391,7 +391,7 @@ export default function RobotsPage() {
         ) : (
           <div className="bg-white rounded-md border border-gray-200 p-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text-black outer-sans">robots.txt Editor</h2>
+              <h2 className="text-lg font-bold text-black">robots.txt Editor</h2>
               <div className="flex space-x-2">
                 <button type="button" onClick={handleCopyToClipboard}
                   className="flex items-center px-3 py-2 bg-gray-100 text-black rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]">
@@ -411,7 +411,7 @@ export default function RobotsPage() {
         )}
 
         <div className="bg-[#D4AF37]/5 rounded-lg border border-[#D4AF37]/20 p-4">
-          <h2 className="text-lg font-bold text-black outer-sans mb-4">robots.txt Best Practices</h2>
+          <h2 className="text-lg font-bold text-black mb-4">robots.txt Best Practices</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-black">
             <div>
               <h3 className="font-semibold mb-2">Important Rules:</h3>

@@ -1,7 +1,7 @@
 import type { Banner, BannerResponse } from '../types';
 import { BANNER_REVALIDATE_INTERVAL } from './constants';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9999';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9999';
 
 export async function fetchBanners(): Promise<Banner[]> {
   try {

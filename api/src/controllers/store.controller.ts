@@ -28,6 +28,7 @@ export const updateStore: RequestHandler = asyncHandler(
     let store = await storeRepository.getStore();
 
     const fields = [
+      'pageTitle', 'pageDescription',
       'title', 'subtitle', 'description', 'address', 'city', 'state',
       'zip', 'country', 'phone', 'email', 'image', 'mapEmbedUrl',
       'ctaText', 'ctaUrl', 'hours', 'isActive',

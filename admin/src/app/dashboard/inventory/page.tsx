@@ -4,6 +4,7 @@ import { useInventoryQueries } from '@/features/inventory';
 import InventoryStats from '@/features/inventory/components/InventoryStats';
 import InventoryFilters from '@/features/inventory/components/InventoryFilters';
 import InventoryTable from '@/features/inventory/components/InventoryTable';
+import VariantInventoryTable from '@/features/inventory/components/VariantInventoryTable';
 import DashboardLayout from '@/components/DashboardLayout';
 
 export default function InventoryPage() {
@@ -14,14 +15,14 @@ export default function InventoryPage() {
     loading,
     selectedProduct,
     setSelectedProduct,
-    updateQty,
-    setUpdateQty,
     updateType,
     setUpdateType,
     updateReason,
     setUpdateReason,
     handleUpdateStock,
     handleStoreSale,
+    variantInventory,
+    handleUpdateVariantStock,
   } = useInventoryQueries();
 
   if (loading) {
@@ -36,7 +37,7 @@ export default function InventoryPage() {
     <DashboardLayout title="Inventory Management">
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Inventory</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-black">Inventory</h1>
           <p className="text-black text-lg mt-2">Manage stock levels and track inventory changes</p>
         </div>
 
@@ -45,8 +46,6 @@ export default function InventoryPage() {
         <InventoryFilters
           selectedProduct={selectedProduct}
           onSelectedProductChange={setSelectedProduct}
-          updateQty={updateQty}
-          onUpdateQtyChange={setUpdateQty}
           updateType={updateType}
           onUpdateTypeChange={setUpdateType}
           updateReason={updateReason}
@@ -56,6 +55,10 @@ export default function InventoryPage() {
         />
 
         <InventoryTable lowStock={lowStock} logs={logs} />
+      </div>
+
+      <div className="space-y-6">
+        <VariantInventoryTable variants={variantInventory} onUpdateStock={handleUpdateVariantStock} />
       </div>
     </DashboardLayout>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import { clientLogger } from '@/lib/logger';
+import { authHeaders } from '@/utils/authHeaders';
 import { Archive, CheckCircle, Clock, Mail, MailOpen } from 'lucide-react';
 import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
@@ -25,18 +26,11 @@ const RecentMessages: React.FC = () => {
 
   const fetchRecentMessages = useCallback(async () => {
     try {
-      const token = document.cookie
-        .split(';')
-        .find(c => c.trim().startsWith('accessToken='))
-        ?.split('=')[1];
-
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9999'}/api/v1/contacts/recent?limit=5`,
         {
           credentials: 'include',
-          headers: {
-            ...(token ? { Authorization: `Bearer ${decodeURIComponent(token)}` } : {}),
-          },
+          headers: authHeaders(),
         },
       );
 

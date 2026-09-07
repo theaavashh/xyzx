@@ -62,8 +62,12 @@ export const createOrder: handleUnaryCall<CreateOrderRequest, OrderResponse> = a
     });
     if (data.total) {
       rewardService.addOrderReward(order.id, data.userId || '', data.total || 0).catch(e => logger.error('Rewards failed', { orderId: order.id }, e));
-      inventoryRepository.deductStockForOrder((data.items || []).map(i => ({ productId: i.productId, quantity: i.quantity })), order.id, 'ONLINE')
-        .catch(e => logger.error('Stock deduct failed', { orderId: order.id }, e));
+      const stockResult = await inventoryRepository.deductStockForOrder((data.items || []).map(i => ({ productId: i.productId, quantity: i.quantity })), order.id, 'ONLINE');
+      if (!stockResult.success) {
+        await orderRepository.cancelOrder(order.id, 'Insufficient stock');
+        callback(null, { success: false, message: 'One or more items are out of stock', data: null, error: { message: 'Out of stock', code: 'FAILED_PRECONDITION', details: {} } });
+        return;
+      }
     }
     callback(null, { success: true, message: 'Order created', data: order as any, error: null });
   } catch (error) {

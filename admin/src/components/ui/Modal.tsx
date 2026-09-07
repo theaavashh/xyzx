@@ -54,7 +54,7 @@ export function Modal({ isOpen, onClose, title, children, footer, size = 'md', s
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={handleOverlayClick}
+          onMouseDown={handleOverlayClick}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}

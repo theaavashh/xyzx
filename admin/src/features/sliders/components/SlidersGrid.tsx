@@ -50,7 +50,7 @@ export function SlidersGrid({ sliders, onToggle, onEdit, onDelete, onReorder, on
                     : `${process.env.NEXT_PUBLIC_API_BASE_URL}${slider.imageUrl}`
                 }
                 alt={`Slider ${slider.order}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
                 onError={(e) => {
                   clientLogger.error('Image load error:', slider.imageUrl);
                   e.currentTarget.style.display = 'none';

@@ -18,6 +18,7 @@ import { Prisma } from '@prisma/client';
 import { setupSwagger } from './config/swagger';
 import { healthCheck } from './controllers/health.controller';
 import { blockBrowserNavigation } from './middlewares/blockBrowserNav';
+import { csrfProtection } from './middlewares/csrf';
 import { metricsMiddleware, metricsEndpoint } from './middlewares/metrics';
 import { requestIdMiddleware } from './middlewares/requestId';
 import { logger } from './utils/logger';
@@ -101,10 +102,11 @@ app.use(
           directives: {
             defaultSrc: ["'self'"],
             styleSrc: ["'self'", "'unsafe-inline'", 'fonts.googleapis.com'],
-            scriptSrc: ["'self'"],
-            imgSrc: ["'self'", 'data:', 'https:', 'http:'],
+            scriptSrc: ["'self'", 'https://static.cloudflareinsights.com'],
+            scriptSrcElem: ["'self'", 'https://static.cloudflareinsights.com'],
+            imgSrc: ["'self'", 'data:', 'https:', 'http:', 'blob:'],
             fontSrc: ["'self'", 'fonts.gstatic.com', 'data:'],
-            connectSrc: ["'self'", 'https://*.google-analytics.com'],
+            connectSrc: ["'self'", 'https://*.google-analytics.com', 'https://*.cloudflareinsights.com'],
             frameSrc: ["'self'"],
             objectSrc: ["'none'"],
             upgradeInsecureRequests: [],
@@ -257,6 +259,8 @@ app.get('/metrics', (req: Request, res: Response, next: NextFunction) => {
 }, metricsEndpoint);
 
 setupSwagger(app);
+
+app.use('/api/v1', csrfProtection);
 
 app.use('/api/v1', mainRoutes);
 

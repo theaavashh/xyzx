@@ -1,1 +1,0 @@
-export { ShopByCategorySkeleton } from "./ShopByCategorySkeleton";

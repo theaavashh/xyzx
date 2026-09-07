@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 
 interface HeroButtonsProps {
   onShopCollection: () => void;
-  onShopAll: () => void;
 }
 
 const buttonVariants = {
@@ -22,7 +21,7 @@ const buttonVariants = {
   },
 };
 
-function HeroButtonsComponent({ onShopCollection, onShopAll }: HeroButtonsProps) {
+function HeroButtonsComponent({ onShopCollection }: HeroButtonsProps) {
   return (
     <motion.div
       variants={buttonVariants}
@@ -32,8 +31,6 @@ function HeroButtonsComponent({ onShopCollection, onShopAll }: HeroButtonsProps)
       className="relative z-20 mt-10 flex items-center gap-4"
     >
       <HeroButton onClick={onShopCollection}>Shop Collection</HeroButton>
-      <span className="text-white/40 select-none text-base leading-none">|</span>
-      <HeroButton onClick={onShopAll}>Shop All Items</HeroButton>
     </motion.div>
   );
 }

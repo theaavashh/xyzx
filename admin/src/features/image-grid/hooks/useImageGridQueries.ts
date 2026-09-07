@@ -1,6 +1,7 @@
 'use client';
 
 import { clientLogger } from '@/lib/logger';
+import { authHeaders } from '@/utils/authHeaders';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import type { ImageGridItem, ImageGridForm } from '../types';
@@ -24,7 +25,7 @@ export function useImageGridQueries() {
       }
       const response = await fetch(
         `${baseUrl()}/api/v1/image-grid`,
-        { credentials: 'include' },
+        { credentials: 'include', headers: authHeaders() },
       );
       if (response.ok) {
         const data = await response.json();
@@ -57,7 +58,7 @@ export function useImageGridQueries() {
           : `${baseUrl()}/api/v1/image-grid`;
         const response = await fetch(url, {
           method: editingItem ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
           credentials: 'include',
           body: JSON.stringify({
             ...form,
@@ -100,6 +101,7 @@ export function useImageGridQueries() {
           {
             method: 'DELETE',
             credentials: 'include',
+            headers: authHeaders(),
           },
         );
         if (response.ok) {
@@ -131,6 +133,7 @@ export function useImageGridQueries() {
           {
             method: 'PATCH',
             credentials: 'include',
+            headers: authHeaders(),
           },
         );
         if (response.ok) {
@@ -181,7 +184,7 @@ export function useImageGridQueries() {
           `${baseUrl()}/api/v1/image-grid/reorder`,
           {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
             credentials: 'include',
             body: JSON.stringify({ orders }),
           },
@@ -227,6 +230,7 @@ export function useImageGridQueries() {
           {
             method: 'POST',
             credentials: 'include',
+            headers: authHeaders(),
             body: formData,
           },
         );

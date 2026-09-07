@@ -71,7 +71,7 @@ function HeroContentComponent({ title, subtitle }: HeroContentProps) {
       initial="initial"
       animate="animate"
       exit="exit"
-      className="relative z-20"
+      className="relative z-20 w-full"
     >
       <motion.p
         variants={subtitleVariants}
@@ -82,7 +82,7 @@ function HeroContentComponent({ title, subtitle }: HeroContentProps) {
       </motion.p>
       <motion.h1
         variants={titleVariants}
-        className="mt-4 text-5xl sm:text-6xl md:text-7xl lg:text-[60px] text-white leading-[1.05] tracking-[-0.03em] font-normal lastik"
+        className="mt-4 text-5xl sm:text-6xl md:text-7xl lg:text-[60px] text-white leading-[1.05] tracking-[-0.03em] font-normal"
        
       >
         {title}

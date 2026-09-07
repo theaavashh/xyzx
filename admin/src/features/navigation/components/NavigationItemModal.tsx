@@ -22,6 +22,20 @@ interface NavigationItemModalProps {
   onSubmit: (formData: NavigationFormData) => void;
 }
 
+interface ColumnError {
+  title?: string;
+  href?: string;
+  links?: Array<{ label?: string; href?: string } | undefined>;
+}
+
+interface FormErrors {
+  name?: string;
+  href?: string;
+  columns?: Array<ColumnError | undefined>;
+}
+
+const URL_PATTERN = /^\//;
+
 export function NavigationItemModal({
   isOpen,
   onClose,
@@ -37,6 +51,7 @@ export function NavigationItemModal({
     isActive: true,
     columns: [],
   });
+  const [errors, setErrors] = useState<FormErrors>({});
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,11 +67,17 @@ export function NavigationItemModal({
           columns: [],
         });
       }
+      setErrors({});
     }
   }, [isOpen, editingItem, defaultOrder]);
 
+  const updateForm = (updater: (prev: NavigationFormData) => NavigationFormData) => {
+    setForm(updater);
+    setErrors({});
+  };
+
   const addColumn = () => {
-    setForm((prev) => ({
+    updateForm((prev) => ({
       ...prev,
       columns: [
         ...prev.columns,
@@ -66,14 +87,14 @@ export function NavigationItemModal({
   };
 
   const removeColumn = (columnIndex: number) => {
-    setForm((prev) => ({
+    updateForm((prev) => ({
       ...prev,
       columns: prev.columns.filter((_, i) => i !== columnIndex),
     }));
   };
 
   const updateColumn = (columnIndex: number, field: string, value: string) => {
-    setForm((prev) => ({
+    updateForm((prev) => ({
       ...prev,
       columns: prev.columns.map((col, i) =>
         i === columnIndex ? { ...col, [field]: value } : col,
@@ -82,7 +103,7 @@ export function NavigationItemModal({
   };
 
   const addLink = (columnIndex: number) => {
-    setForm((prev) => ({
+    updateForm((prev) => ({
       ...prev,
       columns: prev.columns.map((col, i) =>
         i === columnIndex
@@ -93,7 +114,7 @@ export function NavigationItemModal({
   };
 
   const removeLink = (columnIndex: number, linkIndex: number) => {
-    setForm((prev) => ({
+    updateForm((prev) => ({
       ...prev,
       columns: prev.columns.map((col, i) =>
         i === columnIndex
@@ -104,7 +125,7 @@ export function NavigationItemModal({
   };
 
   const updateLink = (columnIndex: number, linkIndex: number, field: string, value: string) => {
-    setForm((prev) => ({
+    updateForm((prev) => ({
       ...prev,
       columns: prev.columns.map((col, i) =>
         i === columnIndex
@@ -119,10 +140,78 @@ export function NavigationItemModal({
     }));
   };
 
+  const validate = (data: NavigationFormData): FormErrors => {
+    const next: FormErrors = {};
+
+    if (!data.name.trim()) {
+      next.name = 'Name is required';
+    }
+
+    if (!data.href.trim()) {
+      next.href = 'URL is required';
+    } else if (!URL_PATTERN.test(data.href.trim())) {
+      next.href = 'URL must be an internal path starting with "/"';
+    }
+
+    if (data.columns.length > 0) {
+      const columnErrors: Array<ColumnError | undefined> = data.columns.map((col) => {
+        const colError: ColumnError = {};
+        if (!col.title.trim()) {
+          colError.title = 'Column label is required';
+        }
+        if (col.href && !URL_PATTERN.test(col.href.trim())) {
+          colError.href = 'URL must be an internal path starting with "/"';
+        }
+        const linkErrors: Array<{ label?: string; href?: string } | undefined> =
+          col.links.map((link) => {
+            const linkError: { label?: string; href?: string } = {};
+            if (!link.label.trim()) {
+              linkError.label = 'Label is required';
+            }
+            if (!link.href.trim()) {
+              linkError.href = 'URL is required';
+            } else if (!URL_PATTERN.test(link.href.trim())) {
+              linkError.href = 'URL must be an internal path starting with "/"';
+            }
+            return Object.keys(linkError).length > 0 ? linkError : undefined;
+          });
+        if (Object.keys(colError).length > 0 || linkErrors.some(Boolean)) {
+          colError.links = linkErrors;
+          return colError;
+        }
+        return undefined;
+      });
+      if (columnErrors.some(Boolean)) {
+        next.columns = columnErrors;
+      }
+    }
+
+    return next;
+  };
+
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
-    onSubmit(form);
+    const nextErrors = validate(form);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length === 0) {
+      onSubmit(form);
+    }
   };
+
+  const inputClass = (hasError?: boolean) =>
+    `w-full px-3 py-2 border rounded-lg text-sm text-black focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-none ${
+      hasError ? 'border-red-500' : 'border-gray-300'
+    }`;
+
+  const columnTitleClass = (hasError?: boolean) =>
+    `flex-1 bg-white px-2 py-1.5 border rounded text-sm text-black outline-none placeholder:text-gray-400 ${
+      hasError ? 'border-red-500' : 'border-gray-200'
+    }`;
+
+  const linkInputClass = (hasError?: boolean) =>
+    `flex-1 px-2.5 py-1.5 border rounded-lg text-sm text-black focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-none min-w-0 ${
+      hasError ? 'border-red-500' : 'border-gray-200'
+    }`;
 
   return (
     <AnimatePresence>
@@ -132,7 +221,7 @@ export function NavigationItemModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4"
-          onClick={onClose}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
           <motion.div
             ref={modalRef}
@@ -145,9 +234,8 @@ export function NavigationItemModal({
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 shrink-0">
               <div className="flex items-center gap-3">
-                
                 <div>
-                  <h2 className="text-2xl font-semibold text-black outer-sans">
+                  <h2 className="text-2xl font-semibold text-black">
                     {editingItem ? 'Edit Navigation Item' : 'New Navigation Item'}
                   </h2>
                   <p className="text-xs text-gray-500">
@@ -164,32 +252,32 @@ export function NavigationItemModal({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-5">
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-5" noValidate>
               <div className="space-y-4">
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Basic Info</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                   <div>
-                     <label className="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
-                     <input
-                       type="text"
-                       value={form.name}
-                       onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
-                       placeholder="e.g. Men, Women, Kids"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-black focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-none"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">URL</label>
-                      <input
-                        type="text"
-                        value={form.href}
-                        onChange={(e) => setForm((prev) => ({ ...prev, href: e.target.value }))}
-                        placeholder="e.g. /men, /women"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-black focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-none"
-                       required
-                     />
-                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
+                    <input
+                      type="text"
+                      value={form.name}
+                      onChange={(e) => updateForm((prev) => ({ ...prev, name: e.target.value }))}
+                      placeholder="e.g. Men, Women, Kids"
+                      className={inputClass(!!errors.name)}
+                    />
+                    {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">URL</label>
+                    <input
+                      type="text"
+                      value={form.href}
+                      onChange={(e) => updateForm((prev) => ({ ...prev, href: e.target.value }))}
+                      placeholder="e.g. /men, /women"
+                      className={inputClass(!!errors.href)}
+                    />
+                    {errors.href && <p className="text-xs text-red-500 mt-1">{errors.href}</p>}
+                  </div>
                 </div>
                 <label className="flex items-center gap-2.5 cursor-pointer">
                   <div className={`relative w-10 h-5 rounded-full transition-colors ${form.isActive ? 'bg-[#D4AF37]' : 'bg-gray-300'}`}>
@@ -197,7 +285,7 @@ export function NavigationItemModal({
                     <input
                       type="checkbox"
                       checked={form.isActive}
-                      onChange={(e) => setForm((prev) => ({ ...prev, isActive: e.target.checked }))}
+                      onChange={(e) => updateForm((prev) => ({ ...prev, isActive: e.target.checked }))}
                       className="sr-only"
                     />
                   </div>
@@ -219,80 +307,93 @@ export function NavigationItemModal({
                 </div>
 
                 <div className="space-y-3">
-                  {form.columns.map((column, columnIndex) => (
-                    <div key={columnIndex} className="border border-gray-200 rounded-xl overflow-hidden">
-                      <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-xs font-medium text-gray-500">Column Label</label>
-                          <button
-                            type="button"
-                            onClick={() => removeColumn(columnIndex)}
-                            className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <FolderTree className="w-4 h-4 text-gray-400 shrink-0" />
-                          <input
-                            type="text"
-                            value={column.title}
-                            onChange={(e) => updateColumn(columnIndex, 'title', e.target.value)}
-                            placeholder="e.g. New Arrivals"
-                            className="flex-1 bg-white px-2 py-1.5 border border-gray-200 rounded text-sm text-black outline-none placeholder:text-gray-400"
-                            required
-                          />
-                        </div>
-                      </div>
-                      <div className="p-4 space-y-3">
-                        <input
-                          type="text"
-                          value={column.href}
-                          onChange={(e) => updateColumn(columnIndex, 'href', e.target.value)}
-                          placeholder="Column URL (e.g. /men/all)"
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-black focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-none"
-                        />
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-medium text-gray-500">Links</span>
+                  {form.columns.map((column, columnIndex) => {
+                    const colError = errors.columns?.[columnIndex];
+                    return (
+                      <div key={columnIndex} className="border border-gray-200 rounded-xl overflow-hidden">
+                        <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-xs font-medium text-gray-500">Column Label</label>
                             <button
                               type="button"
-                              onClick={() => addLink(columnIndex)}
-                              className="text-xs font-medium text-gray-900 hover:text-gray-600 transition-colors"
+                              onClick={() => removeColumn(columnIndex)}
+                              className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                             >
-                              + Add Link
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
-                          {column.links.map((link, linkIndex) => (
-                            <div key={linkIndex} className="flex items-center gap-2">
-                              <LinkIcon className="w-3.5 h-3.5 text-gray-300 shrink-0" />
-                              <input
-                                type="text"
-                                value={link.label}
-                                onChange={(e) => updateLink(columnIndex, linkIndex, 'label', e.target.value)}
-                                placeholder="Label"
-                                className="flex-1 px-2.5 py-1.5 border border-gray-200 rounded-lg text-sm text-black focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-none min-w-0"
-                              />
-                              <input
-                                type="text"
-                                value={link.href}
-                                onChange={(e) => updateLink(columnIndex, linkIndex, 'href', e.target.value)}
-                                placeholder="URL"
-                                className="flex-1 px-2.5 py-1.5 border border-gray-200 rounded-lg text-sm text-black focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-none min-w-0"
-                              />
+                          <div className="flex items-center gap-2">
+                            <FolderTree className="w-4 h-4 text-gray-400 shrink-0" />
+                            <input
+                              type="text"
+                              value={column.title}
+                              onChange={(e) => updateColumn(columnIndex, 'title', e.target.value)}
+                              placeholder="e.g. New Arrivals"
+                              className={columnTitleClass(!!colError?.title)}
+                            />
+                          </div>
+                          {colError?.title && (
+                            <p className="text-xs text-red-500 mt-1">{colError.title}</p>
+                          )}
+                        </div>
+                        <div className="p-4 space-y-3">
+                          <div>
+                            <input
+                              type="text"
+                              value={column.href}
+                              onChange={(e) => updateColumn(columnIndex, 'href', e.target.value)}
+                              placeholder="Column URL (e.g. /men/all)"
+                              className={inputClass(!!colError?.href)}
+                            />
+                            {colError?.href && (
+                              <p className="text-xs text-red-500 mt-1">{colError.href}</p>
+                            )}
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-medium text-gray-500">Links</span>
                               <button
                                 type="button"
-                                onClick={() => removeLink(columnIndex, linkIndex)}
-                                className="p-1 text-gray-300 hover:text-red-500 transition-colors shrink-0"
+                                onClick={() => addLink(columnIndex)}
+                                className="text-xs font-medium text-gray-900 hover:text-gray-600 transition-colors"
                               >
-                                <X className="w-4 h-4" />
+                                + Add Link
                               </button>
                             </div>
-                          ))}
+                            {column.links.map((link, linkIndex) => {
+                              const linkError = colError?.links?.[linkIndex];
+                              return (
+                                <div key={linkIndex} className="flex items-center gap-2">
+                                  <LinkIcon className="w-3.5 h-3.5 text-gray-300 shrink-0" />
+                                  <input
+                                    type="text"
+                                    value={link.label}
+                                    onChange={(e) => updateLink(columnIndex, linkIndex, 'label', e.target.value)}
+                                    placeholder="Label"
+                                    className={linkInputClass(!!linkError?.label)}
+                                  />
+                                  <input
+                                    type="text"
+                                    value={link.href}
+                                    onChange={(e) => updateLink(columnIndex, linkIndex, 'href', e.target.value)}
+                                    placeholder="URL"
+                                    className={linkInputClass(!!linkError?.href)}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => removeLink(columnIndex, linkIndex)}
+                                    className="p-1 text-gray-300 hover:text-red-500 transition-colors shrink-0"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {form.columns.length === 0 && (

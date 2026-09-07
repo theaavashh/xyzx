@@ -1,13 +1,13 @@
 import type { Slide } from '../types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9999';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9999';
 
 export async function fetchHeroSlides(): Promise<Slide[]> {
   try {
     const response = await fetch(
       `${API_BASE_URL}/api/v1/public/hero-slides/active`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 60, tags: ['hero-slides'] },
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',

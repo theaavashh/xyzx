@@ -167,7 +167,6 @@ export interface Product {
   canonicalUrl?: string;
   robotsMeta?: string;
   seoFriendlyImageFilename?: string;
-  imageAltText?: string;
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: string;

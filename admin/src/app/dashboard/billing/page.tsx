@@ -50,7 +50,7 @@ export default function BillingPage() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Billing Management</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black">Billing Management</h1>
             <p className="text-black text-lg mt-2">View and manage all orders and billing information</p>
           </div>
           <div className="flex items-center gap-3">
@@ -90,7 +90,7 @@ export default function BillingPage() {
                 className="bg-white rounded-t-xl sm:rounded-xl shadow-xl w-full sm:max-w-md"
                 onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
-                  <h2 className="text-2xl font-semibold text-black outer-sans">Filter Orders</h2>
+                  <h2 className="text-2xl font-semibold text-black">Filter Orders</h2>
                   <button type="button" onClick={() => setShowFilters(false)}
                     className="text-gray-400 hover:text-black focus:outline-none focus:ring-2 focus:ring-[#D4AF37] rounded-md"><X className="w-6 h-6" /></button>
                 </div>

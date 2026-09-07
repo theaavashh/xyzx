@@ -4,7 +4,6 @@ export interface HeroSlide {
   subtitle: string | null;
   image: string;
   imageMobile: string | null;
-  alt: string | null;
   isActive: boolean;
   order: number;
   createdAt: string;
@@ -16,7 +15,6 @@ export interface HeroSlideForm {
   subtitle: string;
   image: string;
   imageMobile: string;
-  alt: string;
   isActive: boolean;
   order: number;
 }

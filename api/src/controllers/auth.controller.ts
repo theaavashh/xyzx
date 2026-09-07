@@ -1,4 +1,5 @@
 import type { Request, RequestHandler, Response } from 'express';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { getJwtConfig } from '../config/env-config';
 import { cacheService } from '../services/cache.service';
@@ -22,13 +23,29 @@ import {
   sendUnauthorized,
 } from '../utils';
 
+const cookieSameSite = process.env.NODE_ENV === 'production' ? ('none' as const) : ('lax' as const);
+
 const refreshCookieOptions = (maxAgeMs: number) => ({
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict' as const,
+  sameSite: cookieSameSite,
   maxAge: maxAgeMs,
   path: '/api/v1/auth/refresh',
 });
+
+const accessCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: cookieSameSite,
+  path: '/',
+};
+
+const csrfCookieOptions = {
+  httpOnly: false,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: cookieSameSite,
+  path: '/',
+};
 
 const setRefreshCookie = (res: Response, refreshToken: string): void => {
   const jwtConfig = getJwtConfig();
@@ -36,6 +53,21 @@ const setRefreshCookie = (res: Response, refreshToken: string): void => {
     ? parseDurationToMs(jwtConfig.refreshExpiresIn)
     : 7 * 24 * 60 * 60 * 1000;
   res.cookie('refreshToken', refreshToken, refreshCookieOptions(refreshMaxAge));
+};
+
+const setAccessCookie = (res: Response, accessToken: string): void => {
+  res.cookie('accessToken', accessToken, accessCookieOptions);
+};
+
+const setCsrfCookie = (res: Response): void => {
+  const csrfToken = crypto.randomBytes(32).toString('hex');
+  res.cookie('csrf-token', csrfToken, csrfCookieOptions);
+};
+
+export const clearAuthCookies = (res: Response): void => {
+  res.clearCookie('refreshToken', { path: '/api/v1/auth/refresh' });
+  res.clearCookie('accessToken', { path: '/' });
+  res.clearCookie('csrf-token', { path: '/' });
 };
 
 const parseDurationToMs = (duration: string): number => {
@@ -80,7 +112,7 @@ export const verifyCredentials: RequestHandler = asyncHandler(
 );
 
 export const login: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
 
   const user = await userService.findUserByEmail(email);
   if (!user) {
@@ -93,18 +125,75 @@ export const login: RequestHandler = asyncHandler(async (req: Request, res: Resp
     return;
   }
 
+  if (role && user.role !== role) {
+    sendUnauthorized(res, 'Invalid email or password');
+    return;
+  }
+
   const isPasswordValid = await userService.validatePassword(password, user.password);
   if (!isPasswordValid) {
     sendUnauthorized(res, 'Invalid email or password');
     return;
   }
 
+  if (user.role === 'admin') {
+    const otp = userService.generateOTP();
+    await userService.storeOTP(email, otp);
+    try {
+      await emailService.sendLoginOtp(email, otp);
+    } catch (err) {
+      if (process.env.NODE_ENV === 'production') {
+        throw err;
+      }
+      logger.warn(
+        `[DEV] OTP for ${email}: ${otp} (email send failed: ${(err as Error).message})`,
+      );
+    }
+
+    sendSuccess(res, { email: user.email, requiresOtp: true }, 'OTP sent to your email');
+    return;
+  }
+
+  const accessToken = userService.generateAccessToken(user.id, user.email, user.role);
+  const refreshToken = userService.generateRefreshToken(user.id, user.email);
+  const jwtConfig = getJwtConfig();
+  const ttl = typeof jwtConfig.refreshExpiresIn === 'string'
+    ? parseDurationToMs(jwtConfig.refreshExpiresIn) / 1000
+    : 7 * 24 * 60 * 60;
+
+  await storeRefreshToken(user.id, refreshToken, ttl);
+  setRefreshCookie(res, refreshToken);
+  setAccessCookie(res, accessToken);
+  setCsrfCookie(res);
+
+  sendSuccess(res, { user: sanitizeUser(user), accessToken, requiresOtp: false }, 'Login successful');
+});
+
+export const resendOtp: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+  const { email } = req.body as { email: string };
+
+  const user = await userService.findUserByEmail(email);
+  if (!user || !user.isActive) {
+    sendUnauthorized(res, 'Invalid email');
+    return;
+  }
+
   const otp = userService.generateOTP();
   await userService.storeOTP(email, otp);
-  await emailService.sendLoginOtp(email, otp);
+  try {
+    await emailService.sendLoginOtp(email, otp);
+  } catch (err) {
+    if (process.env.NODE_ENV === 'production') {
+      throw err;
+    }
+    logger.warn(
+      `[DEV] OTP for ${email}: ${otp} (email send failed: ${(err as Error).message})`,
+    );
+  }
 
   sendSuccess(res, { email: user.email }, 'OTP sent to your email');
 });
+
 export const verifyOtp: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
   const { email, otp } = req.body;
 
@@ -134,6 +223,8 @@ export const verifyOtp: RequestHandler = asyncHandler(async (req: Request, res: 
 
   await storeRefreshToken(user.id, refreshToken, ttl);
   setRefreshCookie(res, refreshToken);
+  setAccessCookie(res, accessToken);
+  setCsrfCookie(res);
 
   sendSuccess(res, { user: sanitizeUser(user), accessToken }, 'Login successful');
 });
@@ -296,6 +387,8 @@ export const loginWithTotp: RequestHandler = asyncHandler(
 
       await storeRefreshToken(user.id, refreshToken, ttl);
       setRefreshCookie(res, refreshToken);
+      setAccessCookie(res, accessToken);
+      setCsrfCookie(res);
 
       sendSuccess(
         res,
@@ -409,7 +502,7 @@ export const refreshAccessToken: RequestHandler = asyncHandler(async (req: Reque
 
     const validInDb = await validateRefreshToken(decoded.userId, token);
     if (!validInDb) {
-      res.clearCookie('refreshToken', { path: '/api/v1/auth/refresh' });
+      clearAuthCookies(res);
       sendUnauthorized(res, 'Refresh token has been revoked');
       return;
     }
@@ -417,7 +510,7 @@ export const refreshAccessToken: RequestHandler = asyncHandler(async (req: Reque
     const user = await userService.findUserById(decoded.userId);
     if (!user || !user.isActive) {
       await revokeAllUserTokens(decoded.userId);
-      res.clearCookie('refreshToken', { path: '/api/v1/auth/refresh' });
+      clearAuthCookies(res);
       sendUnauthorized(res, 'User not found or deactivated');
       return;
     }
@@ -427,10 +520,12 @@ export const refreshAccessToken: RequestHandler = asyncHandler(async (req: Reque
 
     await rotateRefreshToken(token, newRefreshToken, user.id, refreshTtl);
     setRefreshCookie(res, newRefreshToken);
+    setAccessCookie(res, newAccessToken);
+    setCsrfCookie(res);
 
     sendSuccess(res, { user: sanitizeUser(user), accessToken: newAccessToken }, 'Token refreshed successfully');
   } catch (error) {
-    res.clearCookie('refreshToken', { path: '/api/v1/auth/refresh' });
+    clearAuthCookies(res);
     sendUnauthorized(res, 'Invalid or expired refresh token');
   }
 });
@@ -495,7 +590,7 @@ export const logout: RequestHandler = asyncHandler(async (req: Request, res: Res
     await cacheService.set(blacklistKey, invalidatedAt, ttl);
   }
 
-  res.clearCookie('refreshToken', { path: '/api/v1/auth/refresh' });
+  clearAuthCookies(res);
 
   sendSuccess(res, null, 'Logout successful');
 });

@@ -33,7 +33,7 @@ export function SalesBannerModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={onClose}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
@@ -57,7 +57,7 @@ export function SalesBannerModal({
                 <div className="space-y-2">
                   {form.image ? (
                     <div className="relative rounded-lg overflow-hidden border border-gray-200">
-                      <img src={form.image} alt="Preview" className="w-full h-48 object-cover" />
+                      <img src={form.image} alt="Preview" className="w-full h-48 object-contain" />
                       <button
                         type="button"
                         onClick={() => onFormChange('image', '')}

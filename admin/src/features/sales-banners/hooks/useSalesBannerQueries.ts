@@ -1,6 +1,7 @@
 'use client';
 
 import { clientLogger } from '@/lib/logger';
+import { authHeaders } from '@/utils/authHeaders';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import type { SalesBanner, SalesBannerFormData } from '../types';
@@ -20,7 +21,7 @@ export function useSalesBanners() {
   return useQuery({
     queryKey: SALES_BANNERS_KEY,
     queryFn: async () => {
-      const res = await fetch(`${BASE_URL}/api/v1/sales-banners`, { credentials: 'include' });
+      const res = await fetch(`${BASE_URL}/api/v1/sales-banners`, { credentials: 'include', headers: authHeaders() });
       if (!res.ok) throw new Error('Failed to fetch sales banners');
       const data = await res.json();
       return (data.data || []) as SalesBanner[];
@@ -34,7 +35,7 @@ export function useCreateSalesBanner() {
     mutationFn: async (form: SalesBannerFormData) => {
       const res = await fetch(`${BASE_URL}/api/v1/sales-banners`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify(form),
       });
@@ -57,7 +58,7 @@ export function useUpdateSalesBanner() {
     mutationFn: async ({ id, form }: { id: string; form: SalesBannerFormData }) => {
       const res = await fetch(`${BASE_URL}/api/v1/sales-banners/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify(form),
       });
@@ -81,6 +82,7 @@ export function useDeleteSalesBanner() {
       const res = await fetch(`${BASE_URL}/api/v1/sales-banners/${id}`, {
         method: 'DELETE',
         credentials: 'include',
+        headers: authHeaders(),
       });
       return handleResponse(res);
     },
@@ -102,6 +104,7 @@ export function useToggleSalesBannerStatus() {
       const res = await fetch(`${BASE_URL}/api/v1/sales-banners/${banner.id}/toggle`, {
         method: 'PATCH',
         credentials: 'include',
+        headers: authHeaders(),
       });
       const data = await handleResponse(res);
       return data.data as { isActive: boolean };
@@ -123,7 +126,7 @@ export function useReorderSalesBanners() {
     mutationFn: async (orders: { id: string; order: number }[]) => {
       const res = await fetch(`${BASE_URL}/api/v1/sales-banners/reorder`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify({ orders }),
       });
@@ -148,6 +151,7 @@ export function useUploadSalesBannerImage() {
       const res = await fetch(`${BASE_URL}/api/v1/upload/sales-banner`, {
         method: 'POST',
         credentials: 'include',
+        headers: authHeaders(),
         body: formData,
       });
       const data = await handleResponse(res);

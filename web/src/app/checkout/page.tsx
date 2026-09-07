@@ -8,12 +8,13 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Truck, Lock, ChevronLeft, Store } from "lucide-react";
+import { Truck, Lock, ChevronLeft, Store, Tag, X } from "lucide-react";
+import { toast } from "react-hot-toast";
 import StripeCheckoutForm from "@/components/StripeCheckoutForm";
 import type { CheckoutFormRef } from "@/components/StripeCheckoutForm";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContextTanStack";
-import { getApiBaseUrl } from "@/utils/api";
+import { api } from "@/lib/api";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9999";
 
@@ -56,20 +57,33 @@ function resolveImage(url: string | null): string {
 }
 
 const inputClass = (error?: string) =>
-  `w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-neutral-900 text-neutral-900 text-sm ${error ? "border-red-400" : "border-neutral-200"}`;
+  `w-full px-4 py-3.5 border rounded-xl bg-white text-sm text-zinc-600 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-colors ${error ? "border-red-400" : "border-neutral-200"}`;
 
-const labelClass = "block text-sm font-medium text-neutral-700 mb-1.5";
+const labelClass = "block text-xs font-medium text-zinc-600 mb-1.5 uppercase tracking-wide";
 const errorClass = "mt-1 text-xs text-red-500";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, subtotal } = useCart();
+  const { items, subtotal, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
   const stripeRef = useRef<CheckoutFormRef>(null);
 
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [paymentError, setPaymentError] = useState("");
+
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    id: string;
+    code: string;
+    name: string;
+    type: string;
+    value: number;
+    discountAmount: number;
+    description?: string;
+  } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState("");
 
   const {
     register,
@@ -101,7 +115,8 @@ export default function CheckoutPage() {
   const email = watch("email");
   const shipping = subtotal > 100 ? 0 : deliveryMethod === "pickup" ? 0 : shippingMethod === "express" ? 12.99 : 10;
   const tax = subtotal * 0.08;
-  const total = subtotal + shipping + tax;
+  const discount = appliedCoupon?.discountAmount || 0;
+  const total = Math.max(0, subtotal + shipping + tax - discount);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -122,19 +137,14 @@ export default function CheckoutPage() {
       try {
         setIsLoading(true);
         setPaymentError("");
-        const response = await fetch(`${getApiBaseUrl()}/api/v1/payments/create-payment-intent`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        const data = await api.post<{ success: boolean; data: { clientSecret: string } }>(
+          "/api/v1/payments/create-payment-intent",
+          {
             amount: total,
             currency: "usd",
             metadata: { email: email || "guest@example.com", items: items.length },
-          }),
-        });
-
-        if (!response.ok) throw new Error("Failed to create payment intent");
-
-        const data = await response.json();
+          },
+        );
         if (data.success) {
           setClientSecret(data.data.clientSecret);
         }
@@ -152,64 +162,138 @@ export default function CheckoutPage() {
     await stripeRef.current?.submitPayment();
   };
 
-  const handlePaymentSuccess = () => router.push("/checkout/success");
+  const handlePaymentSuccess = async () => {
+    try {
+      const formData = watch();
+      const orderData = {
+        subtotal,
+        tax,
+        shipping,
+        discount: discount,
+        total,
+        currency: "USD",
+        shippingName: `${formData.firstName} ${formData.lastName}`.trim(),
+        shippingEmail: formData.email,
+        shippingPhone: formData.phone || undefined,
+        shippingAddress: [formData.address, formData.apartment].filter(Boolean).join(", "),
+        shippingCity: formData.city || "",
+        shippingState: "",
+        shippingCountry: formData.country || "Nepal",
+        shippingZip: formData.postalCode || "",
+        paymentMethod: "stripe",
+        couponCode: appliedCoupon?.code || undefined,
+        couponId: appliedCoupon?.id || undefined,
+        notes: appliedCoupon ? `Coupon applied: ${appliedCoupon.code} (-$${discount.toFixed(2)})` : undefined,
+        items: items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+      };
+
+      const response = await api.post<{ success: boolean; data: { id: string; orderNumber: string } }>(
+        "/api/v1/orders",
+        orderData,
+      );
+
+      if (response.success) {
+        await clearCart();
+        router.push(`/checkout/success?orderNumber=${response.data.orderNumber}`);
+      }
+    } catch {
+      setPaymentError("Payment succeeded but failed to create order. Please contact support.");
+      toast.error("Failed to create order");
+    }
+  };
+
   const handlePaymentError = (error: string) => setPaymentError(error);
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true);
+    setCouponError("");
+    try {
+      const response = await api.post<{ success: boolean; data: { id: string; code: string; name: string; type: string; value: number; discountAmount: number; description?: string } }>(
+        "/api/v1/public/coupons/validate",
+        { code: couponCode.trim(), subtotal },
+      );
+      if (response.success) {
+        setAppliedCoupon(response.data);
+        setClientSecret("");
+        toast.success(`Coupon "${response.data.code}" applied! You save $${response.data.discountAmount.toFixed(2)}`);
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Invalid coupon code";
+      setCouponError(message);
+      toast.error(message);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode("");
+    setCouponError("");
+    setClientSecret("");
+    toast.success("Coupon removed");
+  };
 
   if (items.length === 0) return null;
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <div className="bg-white border-b border-neutral-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors">
-            <ChevronLeft className="w-4 h-4" /> Back to Shop
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="border-b border-neutral-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-1.5 text-sm text-neutral-500 hover:text-zinc-900 transition-colors">
+            <ChevronLeft className="w-4 h-4" /> Return to shop
           </Link>
           <div className="flex items-center gap-2 text-xs text-neutral-400">
-            <Lock className="w-3 h-3" /> Secure Checkout
+            <Lock className="w-3 h-3" /> Secure checkout
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        <h1 className="lastik text-4xl text-neutral-900 tracking-tight mb-8">Checkout</h1>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <h1 className="swansea text-3xl sm:text-4xl font-bold text-zinc-900 tracking-wide mb-10">Checkout</h1>
 
         <form onSubmit={handleSubmit(onValidSubmit)}>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            <div className="lg:col-span-3 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
+            {/* Left — Form */}
+            <div className="lg:col-span-7 space-y-8">
               {!isAuthenticated ? (
-                <div className="bg-white rounded-xl border border-neutral-100 p-6">
-                  <h2 className="text-base font-medium text-neutral-900 mb-1">Guest Checkout</h2>
-                  <p className="text-sm text-neutral-400 mb-4">
-                    You can checkout as a guest. Already have an account?{" "}
-                    <Link href="/login" className="text-neutral-900 underline underline-offset-2 hover:no-underline font-medium">Sign in</Link>
+                <div>
+                  <h2 className="text-sm font-medium text-zinc-600 mb-1">Guest checkout</h2>
+                  <p className="text-sm text-neutral-500 mb-5">
+                    Already have an account?{" "}
+                    <Link href="/login" className="text-zinc-600 underline underline-offset-2 hover:no-underline font-medium">Log in</Link>
                   </p>
 
-                  <div className="border-t border-neutral-100 pt-4 mt-2">
-                    <label className="flex items-start gap-3 cursor-pointer">
-                      <input type="checkbox" {...register("createAccount")}
-                        className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900" />
-                      <div>
-                        <span className="text-sm font-medium text-neutral-900">Create an account for faster checkout</span>
-                        <p className="text-xs text-neutral-400 mt-0.5">Save your details and track your orders</p>
-                      </div>
-                    </label>
-                    {watch("createAccount") && (
-                      <div className="mt-4 ml-7">
-                        <label className={labelClass}>Create Password *</label>
-                        <input type="password" {...register("password")} placeholder="At least 6 characters"
-                          className={inputClass(errors.password?.message)} />
-                        {errors.password && <p className={errorClass}>{errors.password.message}</p>}
-                      </div>
-                    )}
-                  </div>
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" {...register("createAccount")}
+                      className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-zinc-600 focus:ring-black" />
+                    <div>
+                      <span className="text-sm font-medium text-zinc-600">Create an account for faster checkout</span>
+                      <p className="text-xs text-neutral-400 mt-0.5">Save your details and track your orders</p>
+                    </div>
+                  </label>
+                  {watch("createAccount") && (
+                    <div className="mt-4 ml-7">
+                      <label className={labelClass}>Password *</label>
+                      <input type="password" {...register("password")} placeholder="At least 6 characters"
+                        className={inputClass(errors.password?.message)} />
+                      {errors.password && <p className={errorClass}>{errors.password.message}</p>}
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div className="bg-neutral-50 border border-neutral-100 rounded-xl p-4 flex items-center gap-3">
-                  <div className="w-8 h-8 bg-neutral-900 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                <div className="bg-neutral-50 rounded-2xl p-4 flex items-center gap-3">
+                  <div className="w-9 h-9 bg-black rounded-full flex items-center justify-center text-white text-sm font-medium">
                     {user?.firstName?.[0] || user?.email[0].toUpperCase()}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-neutral-900">
+                    <p className="text-sm font-medium text-zinc-600">
                       Welcome back, {user?.firstName || user?.email}
                     </p>
                     <p className="text-xs text-neutral-400">Your details have been pre-filled</p>
@@ -217,62 +301,99 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              <div className="bg-white rounded-xl border border-neutral-100 p-6">
-                <h2 className="text-base font-medium text-neutral-900 mb-4">Contact Information</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelClass}>First Name *</label>
-                    <input {...register("firstName")} placeholder="John" className={inputClass(errors.firstName?.message)} />
-                    {errors.firstName && <p className={errorClass}>{errors.firstName.message}</p>}
-                  </div>
-                  <div>
-                    <label className={labelClass}>Last Name *</label>
-                    <input {...register("lastName")} placeholder="Doe" className={inputClass(errors.lastName?.message)} />
-                    {errors.lastName && <p className={errorClass}>{errors.lastName.message}</p>}
-                  </div>
-                  <div>
-                    <label className={labelClass}>Email *</label>
-                    <input {...register("email")} placeholder="john@example.com" className={inputClass(errors.email?.message)} />
-                    {errors.email && <p className={errorClass}>{errors.email.message}</p>}
-                  </div>
-                  <div>
-                    <label className={labelClass}>Phone</label>
-                    <input {...register("phone")} placeholder="+1 (555) 000-0000" className={inputClass()} />
-                  </div>
+              {/* Delivery */}
+              <div>
+                <h2 className="text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-4 pb-2 border-b border-neutral-100">Delivery Method</h2>
+                <div className="grid grid-cols-2 bg-neutral-100 rounded-2xl p-1">
+                  <button
+                    type="button"
+                    onClick={() => setValue("deliveryMethod", "delivery")}
+                    className={`flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium transition-all ${
+                      deliveryMethod === "delivery"
+                        ? "bg-white text-zinc-900 shadow-sm"
+                        : "text-neutral-500 hover:text-zinc-900"
+                    }`}
+                  >
+                    <Truck className="w-4 h-4" />
+                    Delivery
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setValue("deliveryMethod", "pickup")}
+                    className={`flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium transition-all ${
+                      deliveryMethod === "pickup"
+                        ? "bg-white text-zinc-900 shadow-sm"
+                        : "text-neutral-500 hover:text-zinc-900"
+                    }`}
+                  >
+                    <Store className="w-4 h-4" />
+                    Pick Up
+                  </button>
                 </div>
+                <p className="text-xs text-neutral-400 mt-2 text-center">
+                  {deliveryMethod === "delivery" ? "Ship to your address" : "Free — available in 2-4 hours"}
+                </p>
               </div>
 
-              {/* Delivery Method */}
-              <div className="bg-white rounded-xl border border-neutral-100 p-6">
-                <h2 className="text-base font-medium text-neutral-900 mb-4">Delivery Method</h2>
-                <div className="space-y-3">
-                  <label className={`flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-colors ${deliveryMethod === "delivery" ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-300"}`}>
-                    <input type="radio" value="delivery" {...register("deliveryMethod")} className="text-neutral-900 focus:ring-neutral-900" />
-                    <Truck className="w-5 h-5 text-neutral-500" />
-                    <div>
-                      <div className="text-sm font-medium text-neutral-900">Delivery</div>
-                      <div className="text-xs text-neutral-400 mt-0.5">Ship to your address</div>
-                    </div>
-                  </label>
-                  <label className={`flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-colors ${deliveryMethod === "pickup" ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-300"}`}>
-                    <input type="radio" value="pickup" {...register("deliveryMethod")} className="text-neutral-900 focus:ring-neutral-900" />
-                    <Store className="w-5 h-5 text-neutral-500" />
-                    <div>
-                      <div className="text-sm font-medium text-neutral-900">Pick Up</div>
-                      <div className="text-xs text-neutral-400 mt-0.5">Free — available in 2-4 hours</div>
-                    </div>
-                  </label>
+              {/* Contact */}
+              <div className="bg-gray-50 rounded-2xl p-5">
+                <h2 className="text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-4 pb-2 border-b border-neutral-100">Contact Information</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="relative">
+                    <input
+                      {...register("firstName")}
+                      placeholder=" "
+                      className={`peer w-full px-4 pt-5 pb-2 border rounded-xl bg-white text-sm text-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-colors ${errors.firstName?.message ? "border-red-400" : "border-neutral-200"}`}
+                    />
+                    <label className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-neutral-400 pointer-events-none transition-all duration-200 peer-focus:top-2.5 peer-focus:translate-y-0 peer-focus:text-[10px] peer-focus:text-zinc-600 peer-[:not(:placeholder-shown)]:top-2.5 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-zinc-600">
+                      First Name *
+                    </label>
+                    {errors.firstName && <p className={errorClass}>{errors.firstName.message}</p>}
+                  </div>
+                  <div className="relative">
+                    <input
+                      {...register("lastName")}
+                      placeholder=" "
+                      className={`peer w-full px-4 pt-5 pb-2 border rounded-xl bg-white text-sm text-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-colors ${errors.lastName?.message ? "border-red-400" : "border-neutral-200"}`}
+                    />
+                    <label className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-neutral-400 pointer-events-none transition-all duration-200 peer-focus:top-2.5 peer-focus:translate-y-0 peer-focus:text-[10px] peer-focus:text-zinc-600 peer-[:not(:placeholder-shown)]:top-2.5 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-zinc-600">
+                      Last Name *
+                    </label>
+                    {errors.lastName && <p className={errorClass}>{errors.lastName.message}</p>}
+                  </div>
+                  <div className="relative">
+                    <input
+                      {...register("email")}
+                      placeholder=" "
+                      className={`peer w-full px-4 pt-5 pb-2 border rounded-xl bg-white text-sm text-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-colors ${errors.email?.message ? "border-red-400" : "border-neutral-200"}`}
+                    />
+                    <label className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-neutral-400 pointer-events-none transition-all duration-200 peer-focus:top-2.5 peer-focus:translate-y-0 peer-focus:text-[10px] peer-focus:text-zinc-600 peer-[:not(:placeholder-shown)]:top-2.5 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-zinc-600">
+                      Email *
+                    </label>
+                    {errors.email && <p className={errorClass}>{errors.email.message}</p>}
+                  </div>
+                  <div className="relative">
+                    <input
+                      {...register("phone")}
+                      placeholder=" "
+                      className="peer w-full px-4 pt-5 pb-2 border rounded-xl bg-white text-sm text-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-colors border-neutral-200"
+                    />
+                    <label className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-neutral-400 pointer-events-none transition-all duration-200 peer-focus:top-2.5 peer-focus:translate-y-0 peer-focus:text-[10px] peer-focus:text-zinc-600 peer-[:not(:placeholder-shown)]:top-2.5 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-zinc-600">
+                      Phone
+                    </label>
+                  </div>
                 </div>
               </div>
 
               {deliveryMethod === "delivery" && (
                 <>
-                  <div className="bg-white rounded-xl border border-neutral-100 p-6">
-                    <h2 className="text-base font-medium text-neutral-900 mb-4">Shipping Address</h2>
+                  {/* Address */}
+                  <div className="bg-gray-50 rounded-2xl p-5">
+                    <h2 className="text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-4 pb-2 border-b border-neutral-100">Shipping Address</h2>
                     <div className="space-y-4">
                       <div>
-                        <label className={labelClass}>Country/Region</label>
-                        <select {...register("country")} className={inputClass(errors.country?.message) + " bg-white"}>
+                        <label className={labelClass}>Country / Region</label>
+                        <select {...register("country")} className={`w-full px-4 py-3.5 border rounded-xl bg-white text-sm text-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-colors ${errors.country?.message ? "border-red-400" : "border-neutral-200"}`}>
                           <option value="Nepal">Nepal</option>
                           <option value="US">United States</option>
                           <option value="UK">United Kingdom</option>
@@ -282,68 +403,94 @@ export default function CheckoutPage() {
                         </select>
                         {errors.country && <p className={errorClass}>{errors.country.message}</p>}
                       </div>
-                      <div>
-                        <label className={labelClass}>Address *</label>
-                        <input {...register("address")} placeholder="123 Main Street" className={inputClass(errors.address?.message)} />
+                      <div className="relative">
+                        <input
+                          {...register("address")}
+                          placeholder=" "
+                          className={`peer w-full px-4 pt-5 pb-2 border rounded-xl bg-white text-sm text-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-colors ${errors.address?.message ? "border-red-400" : "border-neutral-200"}`}
+                        />
+                        <label className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-neutral-400 pointer-events-none transition-all duration-200 peer-focus:top-2.5 peer-focus:translate-y-0 peer-focus:text-[10px] peer-focus:text-zinc-600 peer-[:not(:placeholder-shown)]:top-2.5 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-zinc-600">
+                          Address *
+                        </label>
                         {errors.address && <p className={errorClass}>{errors.address.message}</p>}
                       </div>
-                      <div>
-                        <label className={labelClass}>Apartment, suite, etc.</label>
-                        <input {...register("apartment")} placeholder="Apt 4B" className={inputClass()} />
+                      <div className="relative">
+                        <input
+                          {...register("apartment")}
+                          placeholder=" "
+                          className="peer w-full px-4 pt-5 pb-2 border rounded-xl bg-white text-sm text-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-colors border-neutral-200"
+                        />
+                        <label className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-neutral-400 pointer-events-none transition-all duration-200 peer-focus:top-2.5 peer-focus:translate-y-0 peer-focus:text-[10px] peer-focus:text-zinc-600 peer-[:not(:placeholder-shown)]:top-2.5 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-zinc-600">
+                          Apartment, suite, etc.
+                        </label>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className={labelClass}>City *</label>
-                          <input {...register("city")} placeholder="New York" className={inputClass(errors.city?.message)} />
+                        <div className="relative">
+                          <input
+                            {...register("city")}
+                            placeholder=" "
+                            className={`peer w-full px-4 pt-5 pb-2 border rounded-xl bg-white text-sm text-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-colors ${errors.city?.message ? "border-red-400" : "border-neutral-200"}`}
+                          />
+                          <label className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-neutral-400 pointer-events-none transition-all duration-200 peer-focus:top-2.5 peer-focus:translate-y-0 peer-focus:text-[10px] peer-focus:text-zinc-600 peer-[:not(:placeholder-shown)]:top-2.5 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-zinc-600">
+                            City *
+                          </label>
                           {errors.city && <p className={errorClass}>{errors.city.message}</p>}
                         </div>
-                        <div>
-                          <label className={labelClass}>Postal Code</label>
-                          <input {...register("postalCode")} placeholder="10001" className={inputClass()} />
+                        <div className="relative">
+                          <input
+                            {...register("postalCode")}
+                            placeholder=" "
+                            className="peer w-full px-4 pt-5 pb-2 border rounded-xl bg-white text-sm text-zinc-600 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-colors border-neutral-200"
+                          />
+                          <label className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-neutral-400 pointer-events-none transition-all duration-200 peer-focus:top-2.5 peer-focus:translate-y-0 peer-focus:text-[10px] peer-focus:text-zinc-600 peer-[:not(:placeholder-shown)]:top-2.5 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-zinc-600">
+                            Postal Code
+                          </label>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-xl border border-neutral-100 p-6">
-                    <h2 className="text-base font-medium text-neutral-900 mb-4">Shipping Method</h2>
+                  {/* Shipping Method */}
+                  <div className="bg-gray-50 rounded-2xl p-5">
+                    <h2 className="text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-4 pb-2 border-b border-neutral-100">Shipping Method</h2>
                     <div className="space-y-3">
-                      <label className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-colors ${shippingMethod === "standard" ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-300"}`}>
+                      <label className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${shippingMethod === "standard" ? "border-black bg-neutral-50 shadow-sm" : "border-neutral-200 hover:border-neutral-300"}`}>
                         <div className="flex items-center gap-3">
-                          <input type="radio" value="standard" {...register("shippingMethod")} className="text-neutral-900 focus:ring-neutral-900" />
+                          <input type="radio" value="standard" {...register("shippingMethod")} className="text-zinc-600 focus:ring-black" />
                           <div>
-                            <div className="text-sm font-medium text-neutral-900">Standard Shipping</div>
+                            <div className="text-sm font-medium text-zinc-600">Standard Shipping</div>
                             <div className="text-xs text-neutral-400 mt-0.5 flex items-center gap-1">
                               <Truck className="w-3 h-3" /> 5-7 business days
                             </div>
                           </div>
                         </div>
-                        <span className="text-sm font-medium text-neutral-900">{subtotal > 100 ? "Free" : "$10.00"}</span>
+                        <span className="text-sm font-medium text-zinc-600">{subtotal > 100 ? "Free" : "$10.00"}</span>
                       </label>
-                      <label className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-colors ${shippingMethod === "express" ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-300"}`}>
+                      <label className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${shippingMethod === "express" ? "border-black bg-neutral-50 shadow-sm" : "border-neutral-200 hover:border-neutral-300"}`}>
                         <div className="flex items-center gap-3">
-                          <input type="radio" value="express" {...register("shippingMethod")} className="text-neutral-900 focus:ring-neutral-900" />
+                          <input type="radio" value="express" {...register("shippingMethod")} className="text-zinc-600 focus:ring-black" />
                           <div>
-                            <div className="text-sm font-medium text-neutral-900">Express Shipping</div>
+                            <div className="text-sm font-medium text-zinc-600">Express Shipping</div>
                             <div className="text-xs text-neutral-400 mt-0.5">2-3 business days</div>
                           </div>
                         </div>
-                        <span className="text-sm font-medium text-neutral-900">$12.99</span>
+                        <span className="text-sm font-medium text-zinc-600">$12.99</span>
                       </label>
                     </div>
                   </div>
                 </>
               )}
 
-              <div className="bg-white rounded-xl border border-neutral-100 p-6">
-                <h2 className="text-base font-medium text-neutral-900 mb-4">Payment</h2>
+              {/* Payment */}
+              <div>
+                <h2 className="text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-4 pb-2 border-b border-neutral-100">Payment</h2>
 
                 {isLoading && !clientSecret ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-neutral-200 border-t-neutral-900" />
+                  <div className="flex items-center justify-center py-10">
+                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-neutral-200 border-t-black" />
                   </div>
                 ) : paymentError ? (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
+                  <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-sm text-red-700">
                     {paymentError}
                   </div>
                 ) : clientSecret && stripePromise ? (
@@ -351,7 +498,7 @@ export default function CheckoutPage() {
                     <StripeCheckoutForm ref={stripeRef} total={total} onPaymentSuccess={handlePaymentSuccess} onPaymentError={handlePaymentError} />
                   </Elements>
                 ) : (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4">
                     <p className="text-sm text-yellow-800 font-medium">Stripe is not configured</p>
                     <p className="text-xs text-yellow-600 mt-1">
                       Set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY to enable payments.
@@ -361,51 +508,99 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-xl border border-neutral-100 p-6 sticky top-24">
-                <h2 className="text-base font-medium text-neutral-900 mb-4">Order Summary</h2>
+            {/* Right — Order Summary */}
+            <div className="lg:col-span-5">
+              <div className="bg-neutral-50 rounded-3xl p-6 lg:p-8 sticky top-24">
+                <h2 className="text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-6">Order Summary</h2>
 
-                <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
+                <div className="space-y-4 mb-6 max-h-72 overflow-y-auto">
                   {items.map((item) => (
-                    <div key={item.id} className="flex gap-3">
-                      <div className="w-14 h-14 bg-neutral-50 rounded-lg overflow-hidden flex-shrink-0">
+                    <div key={item.id} className="flex gap-4">
+                      <div className="relative w-20 h-24 bg-white rounded-xl overflow-hidden flex-shrink-0 border border-neutral-100">
                         <img src={resolveImage(item.image)} alt={item.name} className="w-full h-full object-cover" />
+                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-black text-white text-[10px] font-medium rounded-full flex items-center justify-center">
+                          {item.quantity}
+                        </span>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-medium text-neutral-900 truncate">{item.name}</h3>
-                        {(item.size || item.color) && (
-                          <p className="text-xs text-neutral-400 mt-0.5">{[item.size, item.color].filter(Boolean).join(" / ")}</p>
-                        )}
-                        <div className="flex items-center justify-between mt-1">
-                          <span className="text-xs text-neutral-400">x{item.quantity}</span>
-                          <span className="text-sm font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                      <div className="flex-1 min-w-0 flex flex-col justify-between">
+                        <div>
+                          <h3 className="text-sm font-medium text-zinc-600 truncate">{item.name}</h3>
+                          {(item.size || item.color) && (
+                            <p className="text-xs text-neutral-400 mt-0.5">{[item.size, item.color].filter(Boolean).join(" / ")}</p>
+                          )}
                         </div>
+                        <span className="text-sm font-medium text-zinc-600">${(item.price * item.quantity).toFixed(2)}</span>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="border-t border-neutral-100 pt-4 space-y-2.5">
+                <div className="border-t border-neutral-200 pt-5 space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-neutral-400">Subtotal ({items.length} items)</span>
-                    <span className="text-neutral-900">${subtotal.toFixed(2)}</span>
+                    <span className="text-neutral-500">Subtotal ({items.length} items)</span>
+                    <span className="text-zinc-600 font-medium">${subtotal.toFixed(2)}</span>
+                  </div>
+
+                  {/* Coupon Input */}
+                  {appliedCoupon ? (
+                    <div className="flex items-center justify-between bg-emerald-50 rounded-xl px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <Tag className="w-3.5 h-3.5 text-emerald-600" />
+                        <span className="text-sm font-medium text-emerald-700 tracking-tight">{appliedCoupon.code}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-emerald-700">-${appliedCoupon.discountAmount.toFixed(2)}</span>
+                        <button type="button" onClick={removeCoupon} className="text-emerald-600 hover:text-emerald-800">
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Discount code"
+                        value={couponCode}
+                        onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(""); }}
+                        onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), applyCoupon())}
+                        className="flex-1 px-3 py-2.5 border border-neutral-200 rounded-xl bg-white text-sm text-zinc-600 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-colors"
+                      />
+                      <button
+                        type="button"
+                        onClick={applyCoupon}
+                        disabled={couponLoading || !couponCode.trim()}
+                        className="px-4 py-2.5 bg-black text-white text-sm font-medium rounded-xl hover:bg-neutral-800 disabled:bg-neutral-300 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {couponLoading ? "..." : "Apply"}
+                      </button>
+                    </div>
+                  )}
+                  {couponError && <p className="text-xs text-red-500">{couponError}</p>}
+
+                  <div className="flex justify-between text-sm">
+                    <span className="text-neutral-500">
+                      {shipping === 0 ? "Shipping" : deliveryMethod === "pickup" ? "Shipping" : shippingMethod === "express" ? "Express Delivery" : "Standard Shipping"}
+                    </span>
+                    <span className="text-zinc-600 font-medium">{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-neutral-400">Shipping</span>
-                    <span className="text-neutral-900">{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
+                    <span className="text-neutral-500">Tax (8%)</span>
+                    <span className="text-zinc-600 font-medium">${tax.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-neutral-400">Tax (8%)</span>
-                    <span className="text-neutral-900">${tax.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-base font-semibold pt-3 border-t border-neutral-100">
-                    <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
+                  {discount > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-emerald-600">Discount</span>
+                      <span className="text-emerald-600 font-medium">-${discount.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-base font-semibold pt-4 border-t border-neutral-200">
+                    <span className="text-zinc-600">Total</span>
+                    <span className="text-zinc-600">${total.toFixed(2)}</span>
                   </div>
                 </div>
 
                 {subtotal < 100 && shipping !== 0 && (
-                  <div className="mt-4 bg-emerald-50 border border-emerald-200 rounded-lg p-3 flex items-center gap-2">
+                  <div className="mt-5 bg-emerald-50 rounded-2xl p-3 flex items-center gap-2">
                     <Truck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                     <p className="text-xs text-emerald-800">
                       Add <span className="font-semibold">${(100 - subtotal).toFixed(2)}</span> more for free shipping

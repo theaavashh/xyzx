@@ -10,7 +10,7 @@ export default function OfflinePage() {
           </svg>
         </div>
 
-        <h1 className="mb-3 text-2xl font-medium tracking-tight text-neutral-900 animate-fade-in-up">
+        <h1 className="mb-3 text-2xl font-medium tracking-wide text-neutral-900 animate-fade-in-up">
           No connection
         </h1>
 

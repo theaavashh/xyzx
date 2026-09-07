@@ -56,7 +56,7 @@ export default function CategoryGridPage() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">
+            <h1 className="text-2xl sm:text-3xl font-bold text-black">
               Category Grid
             </h1>
             <p className="text-black text-lg mt-2">
@@ -66,7 +66,7 @@ export default function CategoryGridPage() {
           <button
             type="button"
             onClick={openCreate}
-            className="bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold"
+            className="bg-[#D4AF37] text-white px-4 py-2.5 text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold"
           >
             <Plus className="w-4 h-4" />
             Add Item

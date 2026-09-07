@@ -17,10 +17,10 @@ export const ErrorState = memo(function ErrorState({
       <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6">
         <AlertTriangle className="h-10 w-10 text-red-500" strokeWidth={1.5} />
       </div>
-      <h3 className={`lastik text-2xl text-gray-900 mb-3 uppercase tracking-tight`}>
+      <h3 className={`swansea text-2xl text-zinc-600 mb-3 uppercase tracking-wide`}>
         Unable to load data
       </h3>
-      <p className="text-gray-500 text-lg mb-8 text-center max-w-md leading-relaxed">
+      <p className="text-zinc-600 text-lg mb-8 text-center max-w-md leading-relaxed">
         {message}
       </p>
       {onRetry && (

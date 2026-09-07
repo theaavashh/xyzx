@@ -3,8 +3,6 @@
 interface InventoryFiltersProps {
   selectedProduct: string;
   onSelectedProductChange: (value: string) => void;
-  updateQty: string;
-  onUpdateQtyChange: (value: string) => void;
   updateType: string;
   onUpdateTypeChange: (value: string) => void;
   updateReason: string;
@@ -16,8 +14,6 @@ interface InventoryFiltersProps {
 export default function InventoryFilters({
   selectedProduct,
   onSelectedProductChange,
-  updateQty,
-  onUpdateQtyChange,
   updateType,
   onUpdateTypeChange,
   updateReason,
@@ -27,8 +23,8 @@ export default function InventoryFilters({
 }: InventoryFiltersProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <h2 className="text-xl font-bold text-black outer-sans mb-6">Update Stock</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <h2 className="text-xl font-bold text-black mb-6">Update Stock</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-black mb-2">Product ID</label>
           <input
@@ -36,16 +32,6 @@ export default function InventoryFilters({
             placeholder="Enter product ID"
             value={selectedProduct}
             onChange={(e) => onSelectedProductChange(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#D4AF37] focus:border-[#D4AF37]"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-black mb-2">Quantity</label>
-          <input
-            type="number"
-            placeholder="Enter quantity"
-            value={updateQty}
-            onChange={(e) => onUpdateQtyChange(e.target.value)}
             className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#D4AF37] focus:border-[#D4AF37]"
           />
         </div>

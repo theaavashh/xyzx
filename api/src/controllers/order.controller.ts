@@ -3,7 +3,9 @@ import type { Request, RequestHandler, Response } from 'express';
 import { orderRepository } from '../repositories/order.repository';
 import { rewardService } from '../services/reward.service';
 import { inventoryRepository } from '../repositories/inventory.repository';
+import { couponRepository } from '../repositories/coupon.repository';
 import { logger } from '../utils/logger';
+import { notifyNewOrder } from '../services/order-notification.service';
 import {
   asyncHandler,
   parseQuery,
@@ -11,6 +13,7 @@ import {
   sendCreated,
   sendNotFound,
   sendSuccess,
+  sendUnauthorized,
 } from '../utils';
 
 const VALID_ORDER_STATUSES: OrderStatus[] = [
@@ -46,6 +49,27 @@ export const getOrders: RequestHandler = asyncHandler(
   },
 );
 
+export const getMyOrders: RequestHandler = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      sendUnauthorized(res, 'Authentication required');
+      return;
+    }
+
+    const { page, limit, sortBy, sortOrder } = parseQuery(req);
+
+    const result = await orderRepository.findOrders(
+      page,
+      limit,
+      { userId },
+      { sortBy, sortOrder },
+    );
+
+    sendSuccess(res, result.data, undefined, 200, result.pagination);
+  },
+);
+
 export const getOrderById: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const id = req.params.id as string;
@@ -62,7 +86,7 @@ export const getOrderById: RequestHandler = asyncHandler(
       return;
     }
 
-    if (req.user?.role !== 'admin' && order.userId !== req.user?.userId) {
+    if (req.user?.role !== 'admin' && order.userId && order.userId !== req.user?.userId) {
       sendNotFound(res, 'Order not found');
       return;
     }
@@ -74,11 +98,6 @@ export const getOrderById: RequestHandler = asyncHandler(
 export const createOrder: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user?.userId;
-
-    if (!userId) {
-      sendBadRequest(res, 'Not authenticated');
-      return;
-    }
 
     const {
       subtotal,
@@ -104,6 +123,7 @@ export const createOrder: RequestHandler = asyncHandler(
       billingZip,
       notes,
       paymentMethod,
+      couponId,
       items,
     } = req.body;
 
@@ -138,20 +158,37 @@ export const createOrder: RequestHandler = asyncHandler(
       items,
     });
 
-    rewardService.addOrderReward(order.id, userId, total).catch((error) => {
-      logger.error('Failed to add rewards for order', { orderId: order.id }, error);
+    notifyNewOrder(order).catch((error) => {
+      logger.error('Failed to notify admins of new order', { orderId: order.id }, error);
     });
 
-    inventoryRepository.deductStockForOrder(
+    if (userId) {
+      rewardService.addOrderReward(order.id, userId, total).catch((error) => {
+        logger.error('Failed to add rewards for order', { orderId: order.id }, error);
+      });
+    }
+
+    // Stock deduction is now synchronous — if it fails, cancel the order
+    const stockResult = await inventoryRepository.deductStockForOrder(
       items.map((item: { productId: string; quantity: number }) => ({
         productId: item.productId,
         quantity: item.quantity,
       })),
       order.id,
       'ONLINE',
-    ).catch((error) => {
-      logger.error('Failed to deduct stock for order', { orderId: order.id }, error);
-    });
+    );
+
+    if (!stockResult.success) {
+      await orderRepository.cancelOrder(order.id, 'Insufficient stock');
+      sendBadRequest(res, 'One or more items are out of stock');
+      return;
+    }
+
+    if (couponId) {
+      couponRepository.incrementUsedCount(couponId).catch((error) => {
+        logger.error('Failed to increment coupon usage', { couponId, orderId: order.id }, error);
+      });
+    }
 
     sendCreated(res, order, 'Order created successfully');
   },
@@ -204,27 +241,24 @@ export const cancelOrder: RequestHandler = asyncHandler(
       return;
     }
 
-    if (req.user?.role !== 'admin' && order.userId !== req.user?.userId) {
+    if (req.user?.role !== 'admin' && order.userId && order.userId !== req.user?.userId) {
       sendNotFound(res, 'Order not found');
       return;
     }
 
     const cancelledOrder = await orderRepository.cancelOrder(id, reason);
 
-    orderRepository.getOrderItems(id).then((items) => {
-      if (items && Array.isArray(items)) {
-        inventoryRepository.restoreStockForOrder(
-          items.map((item: { productId: string; quantity: number }) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-          })),
-          id,
-          reason || 'Order cancelled',
-        ).catch((error) => {
-          logger.error('Failed to restore stock for cancelled order', { orderId: id }, error);
-        });
-      }
-    });
+    const items = await orderRepository.getOrderItems(id);
+    if (items && Array.isArray(items) && items.length > 0) {
+      await inventoryRepository.restoreStockForOrder(
+        items.map((item: { productId: string; quantity: number }) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+        })),
+        id,
+        reason || 'Order cancelled',
+      );
+    }
 
     sendSuccess(res, cancelledOrder, 'Order cancelled successfully');
   },

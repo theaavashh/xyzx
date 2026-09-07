@@ -39,7 +39,8 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
             className="fixed right-0 top-0 h-full w-full max-w-md bg-[#fcfbf9] z-50 shadow-2xl flex flex-col"
           >
             <div className="flex items-center justify-between px-6 py-5 border-b border-[rgb(209,205,196)]">
-              <h3 className="lastik text-2xl text-[#212121]">
+              <h3 className="swansea text-2xl text-[#212121] flex items-center gap-2">
+                <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
                 Cart {itemCount > 0 && <span className="inline-flex items-center justify-center ml-1.5 text-sm font-medium">{itemCount}</span>}
               </h3>
               <button
@@ -52,6 +53,24 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
               </button>
             </div>
 
+            {items.length > 0 && (
+              <div className="px-6 pt-5 pb-2">
+                <p className="text-xs text-zinc-600 mb-2">
+                  {subtotal >= 100 ? (
+                    <>You've got <span className="font-semibold">free shipping!</span></>
+                  ) : (
+                    <>Only <span className="font-semibold">${(100 - subtotal).toFixed(2)}</span> away from free shipping</>
+                  )}
+                </p>
+                <div className="w-full bg-gray-200 h-1.5">
+                  <div
+                    className="bg-green-600 h-1.5 transition-all duration-500"
+                    style={{ width: `${Math.min((subtotal / 100) * 100, 100)}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="flex-1 overflow-y-auto px-6 py-5">
               {isLoading ? (
                 <div className="flex items-center justify-center h-full">
@@ -62,23 +81,23 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                   <div className="w-16 h-16 flex items-center justify-center mb-6">
                     <ShoppingBag className="h-7 w-7 text-[#212121]" strokeWidth={1} />
                   </div>
-                  <p className="text-lg font-semibold text-gray-800 uppercase tracking-wide mb-1">
+                  <p className="text-lg font-semibold text-zinc-600 uppercase tracking-wide mb-1">
                     Your Cart is Empty
                   </p>
-                  <p className="text-md text-[#212121]/60 mb-8 max-w-[350px]">
+                  <p className="text-base text-[#212121]/60 mb-8 max-w-[350px]">
                     Discover our collection and find your perfect piece.
                   </p>
                   <button
                     type="button"
                     onClick={onClose}
-                    className="w-full py-3.5 border border-[#212121] text-[#212121] text-base font-medium uppercase tracking-widest bg-[#D4AF37] hover:bg-[#212121] hover:text-white transition-colors"
+                    className="w-full py-3.5 bg-[#212121] text-white text-base font-medium uppercase tracking-widest hover:bg-[#212121]/90 transition-colors"
                   >
                     Shop
                   </button>
                 </div>
               ) : (
                 <div className="space-y-5">
-                  {items.map((item) => (
+                  {items.filter(Boolean).map((item) => (
                     <motion.div
                       key={item.id}
                       layout

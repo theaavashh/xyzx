@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { X, XCircle } from 'lucide-react';
 
 interface NavigationDeleteAlertProps {
   isOpen: boolean;
@@ -24,38 +25,65 @@ export function NavigationDeleteAlert({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={onClose}
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
         >
           <motion.div
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0.95 }}
-            className="bg-white rounded-xl shadow-xl max-w-xs w-full p-5"
-            onClick={(e) => e.stopPropagation()}
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="bg-white rounded-lg shadow-xl max-w-md w-full"
           >
-            <h3 className="text-base font-semibold text-gray-900 mb-1">
-              Delete &ldquo;{itemName}&rdquo;?
-            </h3>
-            <p className="text-sm text-gray-500 mb-4">
-              This cannot be undone.
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={onConfirm}
-                disabled={isPending}
-                className="flex-1 px-3 py-1.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
-              >
-                {isPending ? 'Deleting...' : 'Delete'}
-              </button>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-black">
+                  Delete Item
+                </h2>
+                <button
+                  onClick={onClose}
+                  className="text-gray-400 hover:text-black focus:outline-none focus:ring-2 focus:ring-[#D4AF37] rounded-md"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-black opacity-75 mb-4">
+                  Are you sure you want to delete this item? This action cannot
+                  be undone.
+                </p>
+                {itemName && (
+                  <div className="p-3 bg-gray-50 rounded-md">
+                    <p className="text-sm text-black">{itemName}</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={onClose}
+                  disabled={isPending}
+                  className="px-4 py-2.5 text-black bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={onConfirm}
+                  disabled={isPending}
+                  className="px-4 py-2.5 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  {isPending ? (
+                    <>
+                      <span className="animate-spin">⏳</span>
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="w-4 h-4" />
+                      Delete Item
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </motion.div>
         </motion.div>

@@ -36,10 +36,9 @@ export const getImageGridItemById: RequestHandler = asyncHandler(
 
 export const createImageGridItem: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
-    const { src, alt, title, subtitle, link, order, isActive } = req.body;
+    const { src, title, subtitle, link, order, isActive } = req.body;
     const item = await imageGridRepository.createImageGridItem({
       src,
-      alt,
       title,
       subtitle,
       link,
@@ -53,7 +52,7 @@ export const createImageGridItem: RequestHandler = asyncHandler(
 export const updateImageGridItem: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const { src, alt, title, subtitle, link, order, isActive } = req.body;
+    const { src, title, subtitle, link, order, isActive } = req.body;
 
     const exists = await imageGridRepository.existsById(id);
     if (!exists) {
@@ -63,7 +62,6 @@ export const updateImageGridItem: RequestHandler = asyncHandler(
 
     const updateData: Record<string, unknown> = {};
     if (src !== undefined) updateData.src = src;
-    if (alt !== undefined) updateData.alt = alt;
     if (title !== undefined) updateData.title = title;
     if (subtitle !== undefined) updateData.subtitle = subtitle;
     if (link !== undefined) updateData.link = link;

@@ -68,12 +68,12 @@ export default async function CookiePolicyPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-        <span className="inline-block text-black/30 text-xs font-semibold tracking-[0.25em] uppercase mb-6 border-l-2 border-black/30 pl-4">
+        <span className="inline-block text-zinc-600/30 text-xs font-semibold tracking-[0.25em] uppercase mb-6 border-l-2 border-black/30 pl-4">
           Cookies
         </span>
-        <h1 className="lastik text-3xl sm:text-4xl md:text-5xl text-black mb-8">{page.title}</h1>
+        <h1 className="swansea text-3xl sm:text-4xl md:text-5xl text-zinc-600 mb-8">{page.title}</h1>
         <div
-          className="prose prose-lg max-w-none prose-headings:text-black prose-h1:text-black prose-p:text-black/60 prose-li:text-black/60 prose-strong:text-black prose-a:text-black prose-a:no-underline hover:prose-a:underline whitespace-pre-wrap"
+          className="prose prose-lg max-w-none prose-headings:text-zinc-600 prose-h1:text-zinc-600 prose-p:text-zinc-600/60 prose-li:text-zinc-600/60 prose-strong:text-zinc-600 prose-a:text-zinc-600 prose-a:no-underline hover:prose-a:underline"
           dangerouslySetInnerHTML={{ __html: safeContent }}
         />
       </div>

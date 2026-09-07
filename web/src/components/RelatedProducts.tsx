@@ -8,7 +8,7 @@ interface RelatedProductsProps {
 export default function RelatedProducts({ products }: RelatedProductsProps) {
   return (
     <div className="py-12 border-t border-gray-200">
-      <h2 className="text-2xl font-bold text-gray-900 mb-8">
+      <h2 className="text-2xl font-medium text-zinc-600 mb-8 tracking-wide">
         You Might Also Like
       </h2>
 
@@ -86,18 +86,18 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
 
             {/* Product Info */}
             <div className="space-y-1">
-              <h3 className="text-sm font-medium text-gray-900 group-hover:underline">
+              <h3 className="text-sm font-medium text-zinc-600 group-hover:underline">
                 {product.name}
               </h3>
-              <p className="text-xs text-gray-600">{product.category}</p>
+              <p className="text-xs text-zinc-600">{product.category}</p>
 
               {/* Price */}
               <div className="flex items-center space-x-2 mb-2">
-                <span className="text-sm font-bold text-gray-900">
+                <span className="text-sm font-bold text-zinc-600">
                   ${product.price}
                 </span>
                 {product.originalPrice > product.price && (
-                  <span className="text-xs text-gray-500 line-through">
+                  <span className="text-xs text-zinc-600 line-through">
                     ${product.originalPrice}
                   </span>
                 )}
@@ -113,7 +113,7 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
 
               {/* Colors */}
               <div className="flex items-center space-x-1">
-                <span className="text-xs text-gray-600">
+                <span className="text-xs text-zinc-600">
                   {product.colors} Colors
                 </span>
               </div>
@@ -124,7 +124,7 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
                   {[...Array(5)].map((_, starIndex) => (
                     <svg
                       key={`star-${product.id}-${starIndex}`}
-                      className={`w-3 h-3 ${starIndex < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'}`}
+                      className={`w-3 h-3 ${starIndex < Math.floor(product.rating) ? 'text-yellow-400' : 'text-zinc-600'}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -132,7 +132,7 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
                     </svg>
                   ))}
                 </div>
-                <span className="text-xs text-gray-600">
+                <span className="text-xs text-zinc-600">
                   ({product.reviews})
                 </span>
               </div>
@@ -145,7 +145,7 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
       <div className="mt-8 text-center">
         <Link
           href="/products"
-          className="inline-block border border-gray-300 text-gray-700 py-2 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+          className="inline-block border border-gray-300 text-zinc-600 py-2 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors"
         >
           View All Products
         </Link>

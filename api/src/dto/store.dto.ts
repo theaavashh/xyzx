@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
 export const storeUpdateSchema = z.object({
+  pageTitle: z.string().max(200).optional().nullable(),
+  pageDescription: z.string().optional().nullable(),
   title: z.string().min(1).max(200).optional(),
   subtitle: z.string().max(300).optional().nullable(),
   description: z.string().optional(),

@@ -15,6 +15,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import type { ActivityItem, ApiResponse } from '@/types';
+import { authHeaders } from '@/utils/authHeaders';
 
 interface RecentActivityProps {
   limit?: number;
@@ -27,18 +28,11 @@ interface RecentActivityApiResponse {
 }
 
 const fetchRecentActivity = async (limit: number): Promise<ActivityItem[]> => {
-  const token = document.cookie
-    .split(';')
-    .find(c => c.trim().startsWith('accessToken='))
-    ?.split('=')[1];
-
   const response = await fetch(
     `/api/v1/analytics/recent-activity?limit=${limit}`,
     {
       credentials: 'include',
-      headers: {
-        ...(token ? { Authorization: `Bearer ${decodeURIComponent(token)}` } : {}),
-      },
+      headers: authHeaders(),
     },
   );
   if (!response.ok) throw new Error('Failed to fetch activities');
@@ -158,7 +152,7 @@ const RecentActivity: React.FC<RecentActivityProps> = ({
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 outer-sans uppercase tracking-wide">
+          <h2 className="text-lg font-semibold text-gray-900 uppercase tracking-wide">
             Recent Activity
           </h2>
         </div>
@@ -174,7 +168,7 @@ const RecentActivity: React.FC<RecentActivityProps> = ({
     <div className="bg-white rounded-xl shadow-sm border border-gray-200">
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 outer-sans uppercase tracking-wide">
+          <h2 className="text-lg font-semibold text-gray-900 uppercase tracking-wide">
             Recent Activity
           </h2>
           {showRefresh && (

@@ -1,9 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import type { FAQItem } from '../types';
+
+const faqSchema = z.object({
+  question: z.string().min(1, 'Question is required'),
+  answer: z.string().min(1, 'Answer is required'),
+  category: z.string().min(1, 'Category is required'),
+  order: z
+    .number({ message: 'Order must be a number' })
+    .min(0, 'Order must be 0 or greater'),
+  isActive: z.boolean(),
+});
+
+type FAQFormValues = z.infer<typeof faqSchema>;
 
 interface FAQFormModalProps {
   isOpen: boolean;
@@ -14,32 +29,50 @@ interface FAQFormModalProps {
 }
 
 export function FAQFormModal({ isOpen, onClose, faq, onSubmit, isSubmitting }: FAQFormModalProps) {
-  const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState('');
-  const [category, setCategory] = useState('');
-  const [order, setOrder] = useState(0);
-  const [isActive, setIsActive] = useState(true);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<FAQFormValues>({
+    resolver: zodResolver(faqSchema),
+    defaultValues: {
+      question: '',
+      answer: '',
+      category: '',
+      order: 0,
+      isActive: true,
+    },
+  });
 
   useEffect(() => {
+    if (!isOpen) return;
     if (faq) {
-      setQuestion(faq.question);
-      setAnswer(faq.answer);
-      setCategory(faq.category);
-      setOrder(faq.order);
-      setIsActive(faq.isActive);
+      reset({
+        question: faq.question,
+        answer: faq.answer,
+        category: faq.category,
+        order: faq.order,
+        isActive: faq.isActive,
+      });
     } else {
-      setQuestion('');
-      setAnswer('');
-      setCategory('');
-      setOrder(0);
-      setIsActive(true);
+      reset({
+        question: '',
+        answer: '',
+        category: '',
+        order: 0,
+        isActive: true,
+      });
     }
-  }, [faq, isOpen]);
+  }, [faq, isOpen, reset]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await onSubmit({ question, answer, category, order, isActive });
+  const onValid = async (data: FAQFormValues) => {
+    await onSubmit(data);
   };
+
+  const inputBase =
+    'w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-none text-black placeholder:text-gray-400';
 
   return (
     <AnimatePresence>
@@ -49,7 +82,7 @@ export function FAQFormModal({ isOpen, onClose, faq, onSubmit, isSubmitting }: F
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={onClose}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
@@ -71,71 +104,72 @@ export function FAQFormModal({ isOpen, onClose, faq, onSubmit, isSubmitting }: F
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-5 space-y-4">
+            <form onSubmit={handleSubmit(onValid)} className="p-5 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Question</label>
                 <textarea
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
+                  {...register('question')}
                   placeholder="Enter the FAQ question"
                   rows={2}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-none text-black placeholder:text-gray-400 resize-none"
+                  className={`${inputBase} resize-none ${errors.question ? 'border-red-500' : 'border-gray-300'}`}
                 />
+                {errors.question && (
+                  <p className="mt-1 text-xs text-red-500">{errors.question.message}</p>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Answer</label>
                 <textarea
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
+                  {...register('answer')}
                   placeholder="Enter the FAQ answer"
                   rows={4}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-none text-black placeholder:text-gray-400 resize-none"
+                  className={`${inputBase} resize-none ${errors.answer ? 'border-red-500' : 'border-gray-300'}`}
                 />
+                {errors.answer && (
+                  <p className="mt-1 text-xs text-red-500">{errors.answer.message}</p>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                 <input
                   type="text"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  {...register('category')}
                   placeholder="e.g. Shipping, Orders, Returns"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-none text-black placeholder:text-gray-400"
+                  className={`${inputBase} ${errors.category ? 'border-red-500' : 'border-gray-300'}`}
                 />
+                {errors.category && (
+                  <p className="mt-1 text-xs text-red-500">{errors.category.message}</p>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Order</label>
                 <input
                   type="number"
-                  value={order}
-                  onChange={(e) => setOrder(Number(e.target.value))}
+                  {...register('order', { valueAsNumber: true })}
                   min={0}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-none text-black placeholder:text-gray-400"
+                  className={`${inputBase} ${errors.order ? 'border-red-500' : 'border-gray-300'}`}
                 />
+                {errors.order && (
+                  <p className="mt-1 text-xs text-red-500">{errors.order.message}</p>
+                )}
               </div>
 
               <label className="flex items-center gap-3 cursor-pointer">
                 <div
                   className={`relative w-10 h-5 rounded-full transition-colors ${
-                    isActive ? 'bg-[#D4AF37]' : 'bg-gray-300'
+                    watch('isActive') ? 'bg-[#D4AF37]' : 'bg-gray-300'
                   }`}
                 >
                   <div
                     className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${
-                      isActive ? 'translate-x-5' : ''
+                      watch('isActive') ? 'translate-x-5' : ''
                     }`}
                   />
-                  <input
-                    type="checkbox"
-                    checked={isActive}
-                    onChange={(e) => setIsActive(e.target.checked)}
-                    className="sr-only"
-                  />
                 </div>
+                <input type="checkbox" {...register('isActive')} className="sr-only" />
                 <span className="text-sm text-gray-700">Active</span>
               </label>
 

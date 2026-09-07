@@ -2,17 +2,25 @@ import type { Metadata } from 'next';
 import DualCardSection from '@/components/DualCardSection';
 import EditorialSection from '@/components/EditorialSection';
 import Feature from '@/components/Feature';
+import PromotionalBanner from '@/components/PromotionalBanner';
 import OfflineCouponBanner from '@/components/OfflineCouponBanner';
 import Hero from '@/components/Hero';
 import HeroSection from '@/components/HeroSection';
+import ShortDescription from '@/components/ShortDescription';
 import { CategoryGrid } from '@/components/CategoryGrid';
 import Navbar from '@/components/Navbar';
 import NewIn from '@/components/NewIn';
 import TwoImageGrid from '@/components/TwoImageGrid';
+import ThreeImageGrid from '@/components/ThreeImageGrid';
+import WomenItems from '@/components/WomenItems';
+import NewsletterSignup from '@/components/NewsletterSignup';
 import AboutSection from '@/components/AboutSection';
 import { generateSEOMetadata } from '@/components/SEO';
 import ShopByCategory from '@/components/ShopByCategory';
+import CategoryTileGrid from '@/components/CategoryTileGrid';
 import VisitOurStore from '@/components/VisitOurStore';
+import { FooterSocial } from '@/components/Footer/components';
+import PageLoadBlur from '@/components/PageLoadBlur';
 import {
   OrganizationStructuredData,
   WebsiteStructuredData,
@@ -40,29 +48,34 @@ export const metadata: Metadata = generateSEOMetadata({
 export default function Home() {
   return (
     <>
+      <PageLoadBlur />
       <OfflineCouponBanner />
       <OrganizationStructuredData />
       <WebsiteStructuredData />
       <div className="min-h-screen bg-white">
         <div className="relative">
-          <div className="absolute inset-x-0 top-0 z-[60]">
-            <Navbar />
-          </div>
+          <Navbar />
           <HeroSection />
-         
+          <ShortDescription />         
         </div>
         <CategoryGrid />
         <NewIn />
          <EditorialSection />
           <ShopByCategory />
+          <CategoryTileGrid />
         <Hero />
-        <AboutSection />
+        <WomenItems />
+        <NewsletterSignup />
+
         <TwoImageGrid />
+        <ThreeImageGrid />
        
         <DualCardSection />
-        <VisitOurStore />
-
-        <Feature />
+         <AboutSection />
+        {/* <VisitOurStore /> */}
+         <PromotionalBanner />
+          <Feature />
+          <FooterSocial />
 
       </div>
     </>

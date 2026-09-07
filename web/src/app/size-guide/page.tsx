@@ -24,7 +24,7 @@ export default function SizeGuidePage() {
       <div className="bg-black text-white py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Size Guide</h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-zinc-600 max-w-2xl mx-auto">
             Find your perfect fit with our comprehensive sizing charts
           </p>
         </div>
@@ -35,9 +35,9 @@ export default function SizeGuidePage() {
           {/* Introduction */}
           <section className="mb-16 text-center">
             <div className="max-w-3xl mx-auto">
-              <Ruler className="w-16 h-16 mx-auto mb-6 text-black" />
+              <Ruler className="w-16 h-16 mx-auto mb-6 text-zinc-600" />
               <h2 className="text-2xl font-bold mb-4">How to Measure</h2>
-              <p className="text-gray-600">
+              <p className="text-zinc-600">
                 For the best fit, measure yourself carefully or use a piece of
                 clothing that fits you well. If you&apos;re between sizes, we
                 recommend sizing up for a more comfortable fit or down for a
@@ -372,10 +372,10 @@ export default function SizeGuidePage() {
           <section className="mb-16">
             <div className="bg-gray-50 p-8 rounded-xl">
               <div className="flex items-start gap-4">
-                <Info className="w-8 h-8 text-black flex-shrink-0" />
+                <Info className="w-8 h-8 text-zinc-600 flex-shrink-0" />
                 <div>
                   <h3 className="text-xl font-bold mb-4">Sizing Tips</h3>
-                  <ul className="space-y-2 text-gray-600">
+                  <ul className="space-y-2 text-zinc-600">
                     <li>
                       • Measure your feet at the end of the day when
                       they&apos;re largest
@@ -411,7 +411,7 @@ export default function SizeGuidePage() {
             <h2 className="text-2xl font-bold mb-4">
               Still Unsure About Your Size?
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-zinc-600 mb-6">
               Contact our customer service team for personalized sizing
               assistance
             </p>

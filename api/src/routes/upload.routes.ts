@@ -3,7 +3,7 @@ import multer from 'multer';
 import { authenticateToken, requireAdmin } from '../middlewares/auth';
 import {
   heroBannerUpload,
-  shopByCategoryUpload,
+  storeUpload,
   categoryUpload,
   categoryGridUpload,
   heroSlideUpload,
@@ -16,8 +16,8 @@ import {
   productUpload,
   genericUpload,
   uploadHeroBannerImage,
-  uploadShopByCategoryImage,
   uploadCategoryImage,
+  uploadStoreImage,
   uploadCategoryGridImage,
   uploadHeroSlideImage,
   uploadImageGridImage,
@@ -28,6 +28,12 @@ import {
   uploadFollowSectionImage,
   uploadProductImage,
   uploadGenericFile,
+  threeImageGridUpload,
+  uploadThreeImageGridImage,
+  categoryTileGridUpload,
+  uploadCategoryTileGridImage,
+  womenItemsUpload,
+  uploadWomenItemsImage,
 } from '../controllers/upload.controller';
 
 const router: Router = Router();
@@ -72,8 +78,8 @@ const wrapMulter = (mw: any) => (req: Request, res: Response, next: NextFunction
 router.post('/hero-slide', authenticateToken, requireAdmin, wrapMulter(heroSlideUpload.single('file')), uploadHeroSlideImage);
 router.post('/category-grid', authenticateToken, requireAdmin, wrapMulter(categoryGridUpload.single('file')), uploadCategoryGridImage);
 router.post('/image-grid', authenticateToken, requireAdmin, wrapMulter(imageGridUpload.single('file')), uploadImageGridImage);
-router.post('/shop-by-category', authenticateToken, requireAdmin, wrapMulter(shopByCategoryUpload.single('file')), uploadShopByCategoryImage);
 router.post('/category', authenticateToken, requireAdmin, wrapMulter(categoryUpload.single('file')), uploadCategoryImage);
+router.post('/store', authenticateToken, requireAdmin, wrapMulter(storeUpload.single('file')), uploadStoreImage);
 router.post('/featured-section', authenticateToken, requireAdmin, wrapMulter(featuredSectionUpload.single('file')), uploadFeaturedSectionImage);
 router.post('/sales-banner', authenticateToken, requireAdmin, wrapMulter(salesBannerUpload.single('file')), uploadSalesBannerImage);
 router.post('/editorial', authenticateToken, requireAdmin, wrapMulter(editorialUpload.single('file')), uploadEditorialImage);
@@ -81,5 +87,8 @@ router.post('/dual-card', authenticateToken, requireAdmin, wrapMulter(dualCardUp
 router.post('/follow-section', authenticateToken, requireAdmin, wrapMulter(followSectionUpload.single('file')), uploadFollowSectionImage);
 router.post('/file', authenticateToken, requireAdmin, wrapMulter(genericUpload.single('file')), uploadGenericFile);
 router.post('/product', authenticateToken, requireAdmin, wrapMulter(productUpload.single('file')), uploadProductImage);
+router.post('/three-image-grid', authenticateToken, requireAdmin, wrapMulter(threeImageGridUpload.single('file')), uploadThreeImageGridImage);
+router.post('/category-tile-grid', authenticateToken, requireAdmin, wrapMulter(categoryTileGridUpload.single('file')), uploadCategoryTileGridImage);
+router.post('/women-items', authenticateToken, requireAdmin, wrapMulter(womenItemsUpload.single('file')), uploadWomenItemsImage);
 
 export default router;

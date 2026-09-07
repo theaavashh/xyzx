@@ -127,7 +127,7 @@ export default function ClientDetailsForm() {
     >
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">
+          <h1 className="text-2xl sm:text-3xl font-bold text-black">
             Client Details
           </h1>
           <p className="text-black text-lg mt-2">
@@ -218,19 +218,19 @@ export default function ClientDetailsForm() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100">
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Client
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Email
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Account Created
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">
+                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>

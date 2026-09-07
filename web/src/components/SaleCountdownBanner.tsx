@@ -43,7 +43,7 @@ export default function SaleCountdownBanner({
   if (!timeLeft) {
     return (
       <div className="w-full bg-white border-b border-gray-100 py-3">
-        <p className="text-center text-sm font-medium text-gray-500">
+        <p className="text-center text-sm font-medium text-zinc-600">
           Sale Ended
         </p>
       </div>
@@ -63,21 +63,21 @@ export default function SaleCountdownBanner({
         <div className="flex items-center gap-2">
           {units.map((unit, i) => (
             <div key={unit.label} className="flex items-center">
-              <span className="font-bold tabular-nums text-lg md:text-xl text-gray-900 min-w-[2ch] text-center">
+              <span className="font-bold tabular-nums text-lg md:text-xl text-zinc-600 min-w-[2ch] text-center">
                 {String(unit.value).padStart(2, '0')}
               </span>
-              <span className="text-xs md:text-sm text-gray-500 ml-1">
+              <span className="text-xs md:text-sm text-zinc-600 ml-1">
                 {unit.label}
               </span>
               {i < units.length - 1 && (
-                <span className="mx-1.5 text-gray-300 text-sm md:text-base">
+                <span className="mx-1.5 text-zinc-600 text-sm md:text-base">
                   :
                 </span>
               )}
             </div>
           ))}
         </div>
-        <p className="text-sm md:text-base text-gray-700">
+        <p className="text-sm md:text-base text-zinc-600">
           <span className="font-bold">Up to 50% Off</span>
           <span className="font-medium">: Unbeatable Sale</span>
         </p>

@@ -62,7 +62,7 @@ export function SalesBannerGrid({ banners, isLoading, onEdit, onToggle, onDelete
             >
               <div className="aspect-[16/9] bg-gray-100 relative">
                 {banner.image ? (
-                  <img src={banner.image} alt={banner.title} className="w-full h-full object-cover" />
+                  <img src={banner.image} alt={banner.title} className="w-full h-full object-contain" />
                 ) : (
                   <div className="flex items-center justify-center h-full">
                     <ImageIcon className="w-8 h-8 text-gray-300" />

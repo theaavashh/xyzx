@@ -11,9 +11,14 @@ import {
   deleteCoupon,
   toggleCouponStatus,
   getCouponStats,
+  getActivePublicCoupons,
+  validateCoupon,
 } from '../controllers/coupon.controller';
 
 const router: Router = Router();
+
+router.get('/active', getActivePublicCoupons);
+router.post('/validate', validateCoupon);
 
 router.get('/stats', authenticateToken, requireAdmin, getCouponStats);
 router.get('/code/:code', authenticateToken, requireAdmin, getCouponByCode);

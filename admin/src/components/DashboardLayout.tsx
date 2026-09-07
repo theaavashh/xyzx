@@ -25,6 +25,7 @@ export default function DashboardLayout({
   showBackButton = false,
 }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [sidebarProfileDropdownOpen, setSidebarProfileDropdownOpen] =
     useState(false);
@@ -37,6 +38,14 @@ export default function DashboardLayout({
   const { userInitials, fullName } = useUserProfile(user);
   const { expandedSections, animatingItems, toggleSection, handleNavigation } =
     useNavigation(isMobile, setSidebarOpen);
+
+  const handleToggleSidebar = () => {
+    if (window.innerWidth >= 1024) {
+      setIsCollapsed((collapsed) => !collapsed);
+    } else {
+      setSidebarOpen((open) => !open);
+    }
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -75,6 +84,7 @@ export default function DashboardLayout({
         <Sidebar
           isOpen={sidebarOpen}
           setIsOpen={setSidebarOpen}
+          isCollapsed={isCollapsed}
           expandedSections={expandedSections}
           toggleSection={toggleSection}
           handleNavigation={handleNavigation}
@@ -96,6 +106,8 @@ export default function DashboardLayout({
             onBack={() => router.back()}
             isSidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
+            collapsed={isCollapsed}
+            onToggleSidebar={handleToggleSidebar}
             user={user}
             userInitials={userInitials}
             fullName={fullName}

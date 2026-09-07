@@ -158,7 +158,7 @@ export default function CategoryPage() {
               <FolderOpen className="w-5 h-5 text-gray-600" />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Categories</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-black">Categories</h1>
               <p className="text-black text-lg mt-2">{categories.length} categories total</p>
             </div>
           </div>
@@ -191,7 +191,7 @@ export default function CategoryPage() {
                 Grid
               </button>
             </div>
-            <button onClick={() => { reset({ name: '', image: '', internalLink: '', status: 'active', metaTitle: '', metaDescription: '', keywords: '' }); setShowAddModal(true); }} className="bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold whitespace-nowrap">
+            <button onClick={() => { reset({ name: '', image: '', internalLink: '', status: 'active', metaTitle: '', metaDescription: '', keywords: '' }); setShowAddModal(true); }} className="bg-[#D4AF37] text-white px-4 py-2.5 text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold whitespace-nowrap">
               <Plus className="w-4 h-4" /><span>Add</span>
             </button>
           </div>
@@ -250,7 +250,7 @@ export default function CategoryPage() {
       </div>
 
       {(showAddModal || editingCategory) && (
-        <CategoryForm form={form} editingCategory={editingCategory ? { id: editingCategory.id, name: editingCategory.name } : null} isSubmitting={isSubmitting} isLoading={createCategory.isPending || updateCategory.isPending} isUploadingImage={isUploadingImage} onSubmit={onSubmit} onCancel={editingCategory ? handleEditCancel : handleAddCancel} handleImageUpload={handleImageUpload} />
+        <CategoryForm form={form} editingCategory={editingCategory ? { id: editingCategory.id, name: editingCategory.name } : null} isSubmitting={isSubmitting} isLoading={createCategory.isPending || updateCategory.isPending} isUploadingImage={isUploadingImage} onSubmit={onSubmit} onCancel={editingCategory ? handleEditCancel : handleAddCancel} handleImageUpload={handleImageUpload} getFullImageUrl={getFullImageUrl} />
       )}
 
       <ImagePreviewModal show={showImagePreview} imageUrl={previewImage} onClose={() => setShowImagePreview(false)} />

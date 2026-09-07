@@ -21,6 +21,7 @@ export default function EditorialSectionPage() {
     fetchedProducts,
     selectedProductIds,
     form,
+    formErrors,
     handleFormChange,
     fetchProductsByFeature,
     toggleProduct,
@@ -41,12 +42,12 @@ export default function EditorialSectionPage() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Editorial Sections</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black">Editorial Sections</h1>
             <p className="text-black text-lg mt-2">Showcase products by feature type</p>
           </div>
           {sections.length === 0 && (
             <button type="button" onClick={openModal}
-              className="bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold">
+              className="bg-[#D4AF37] text-white px-4 py-2.5 text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold">
               <Plus className="w-4 h-4" /> Add Section
             </button>
           )}
@@ -69,6 +70,7 @@ export default function EditorialSectionPage() {
           isOpen={isModalOpen}
           editingSection={editingSection}
           form={form}
+          formErrors={formErrors}
           isFetchingProducts={isFetchingProducts}
           fetchedProducts={fetchedProducts}
           selectedProductIds={selectedProductIds}

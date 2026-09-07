@@ -49,13 +49,13 @@ export default function AddToCartModal({
             <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
               <Check className="w-4 h-4 text-white" />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-zinc-600">
               ADDED TO CART
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
+            className="text-zinc-600 hover:text-zinc-600 transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
@@ -64,7 +64,7 @@ export default function AddToCartModal({
         {/* Product Info */}
         <div className="mb-6">
           {product.brand && (
-            <p className="text-sm font-medium text-gray-600 mb-2">
+            <p className="text-sm font-medium text-zinc-600 mb-2">
               {product.brand}
             </p>
           )}
@@ -79,14 +79,14 @@ export default function AddToCartModal({
             </div>
 
             <div className="flex-1">
-              <h3 className="text-base font-medium text-gray-900 mb-2">
+              <h3 className="text-base font-medium text-zinc-600 mb-2">
                 {product.name}
               </h3>
-              <p className="text-lg font-semibold text-gray-900 mb-2">
+              <p className="text-lg font-semibold text-zinc-600 mb-2">
                 Rs{product.price.toLocaleString('en-IN')}
               </p>
               {product.variant && (
-                <p className="text-sm text-gray-600">{product.variant}</p>
+                <p className="text-sm text-zinc-600">{product.variant}</p>
               )}
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function AddToCartModal({
           <button
             type="button"
             onClick={onClose}
-            className="block w-full py-3 px-4 border-2 border-black text-black text-center font-semibold rounded hover:bg-gray-50 transition-colors"
+            className="block w-full py-3 px-4 border-2 border-black text-zinc-600 text-center font-semibold rounded hover:bg-gray-50 transition-colors"
           >
             CONTINUE SHOPPING
           </button>

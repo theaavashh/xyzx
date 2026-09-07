@@ -20,6 +20,7 @@ interface PricingTabProps {
   errors: Record<string, string>;
   onAddCurrencyPrice: (price: CurrencyPrice) => void;
   onRemoveCurrencyPrice: (id: string) => void;
+  onUpdateCurrencyPrice: (id: string, field: 'price' | 'comparePrice', value: number) => void;
 }
 
 interface NewCurrencyPriceForm {
@@ -56,6 +57,7 @@ const PricingTab: React.FC<PricingTabProps> = React.memo(({
   errors,
   onAddCurrencyPrice,
   onRemoveCurrencyPrice,
+  onUpdateCurrencyPrice,
 }) => {
   const [newCurrencyPrice, setNewCurrencyPrice] = useState<NewCurrencyPriceForm>({
     country: '',
@@ -171,15 +173,16 @@ const PricingTab: React.FC<PricingTabProps> = React.memo(({
                 Price *
               </label>
               <input
-                type="number"
-                step="0.01"
-                value={newCurrencyPrice.price}
-                onChange={(e) =>
+                type="text"
+                inputMode="decimal"
+                value={newCurrencyPrice.price || ''}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9.]/g, '');
                   setNewCurrencyPrice((prev) => ({
                     ...prev,
-                    price: parseFloat(e.target.value) || 0,
-                  }))
-                }
+                    price: val === '' || val === '.' ? 0 : parseFloat(val) || 0,
+                  }));
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-black"
                 placeholder="0.00"
               />
@@ -189,15 +192,16 @@ const PricingTab: React.FC<PricingTabProps> = React.memo(({
                 Compare Price
               </label>
               <input
-                type="number"
-                step="0.01"
-                value={newCurrencyPrice.comparePrice}
-                onChange={(e) =>
+                type="text"
+                inputMode="decimal"
+                value={newCurrencyPrice.comparePrice || ''}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9.]/g, '');
                   setNewCurrencyPrice((prev) => ({
                     ...prev,
-                    comparePrice: parseFloat(e.target.value) || 0,
-                  }))
-                }
+                    comparePrice: val === '' || val === '.' ? 0 : parseFloat(val) || 0,
+                  }));
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-black"
                 placeholder="0.00"
               />
@@ -243,20 +247,41 @@ const PricingTab: React.FC<PricingTabProps> = React.memo(({
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Price
                 </label>
-                <p className="text-sm font-semibold text-gray-900">
-                  {currencyPrice.symbol}
-                  {currencyPrice.price.toFixed(2)}
-                </p>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={currencyPrice.price || ''}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9.]/g, '');
+                    onUpdateCurrencyPrice(
+                      currencyPrice.id || index.toString(),
+                      'price',
+                      val === '' || val === '.' ? 0 : parseFloat(val) || 0,
+                    );
+                  }}
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none text-sm text-black"
+                  placeholder="0.00"
+                />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Compare Price
                 </label>
-                <p className="text-sm text-gray-600 line-through">
-                  {currencyPrice.comparePrice
-                    ? `${currencyPrice.symbol}${currencyPrice.comparePrice.toFixed(2)}`
-                    : '-'}
-                </p>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={currencyPrice.comparePrice || ''}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9.]/g, '');
+                    onUpdateCurrencyPrice(
+                      currencyPrice.id || index.toString(),
+                      'comparePrice',
+                      val === '' || val === '.' ? 0 : parseFloat(val) || 0,
+                    );
+                  }}
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none text-sm text-black"
+                  placeholder="0.00"
+                />
               </div>
               <div className="flex items-end">
                 <button

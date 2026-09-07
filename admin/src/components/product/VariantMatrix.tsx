@@ -23,6 +23,7 @@ import {
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
+import { uploadFile } from '@/services/apiClient';
 
 interface VariantOption {
   id: string;
@@ -319,17 +320,10 @@ const VariantMatrix: React.FC<VariantMatrixProps> = ({
     if (!file) return;
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      const data = await uploadFile<{ data?: { url: string } }>('/api/v1/upload/file', file);
+      const imageUrl = data.data?.url;
 
-      const response = await fetch('/api/upload/file', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const imageUrl = data.data?.url || data.url;
+      if (imageUrl) {
 
         if (optionId) {
           const updatedAttributes = attributes.map((attr) => ({
@@ -360,17 +354,10 @@ const VariantMatrix: React.FC<VariantMatrixProps> = ({
     if (!file) return;
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      const data = await uploadFile<{ data?: { url: string } }>('/api/v1/upload/file', file);
+      const imageUrl = data.data?.url;
 
-      const response = await fetch('/api/upload/file', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const imageUrl = data.data?.url || data.url;
+      if (imageUrl) {
 
         const updatedAttributes = attributes.map((attr) => ({
           ...attr,
@@ -487,6 +474,12 @@ const VariantMatrix: React.FC<VariantMatrixProps> = ({
     if (field === 'price' && typeof value === 'number') {
       if (value < 0) {
         toast.error('Price cannot be negative');
+        return;
+      }
+    }
+    if (field === 'comparePrice' && typeof value === 'number') {
+      if (value < 0) {
+        toast.error('Discount price cannot be negative');
         return;
       }
     }
@@ -624,10 +617,41 @@ const VariantMatrix: React.FC<VariantMatrixProps> = ({
                         }`}
                       >
                         <div className="relative">
-                          <div
-                            className="w-12 h-12 rounded-lg border border-gray-200"
-                            style={{ backgroundColor: opt.color || '#ccc' }}
-                          />
+                          {opt.image ? (
+                            <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-gray-200">
+                              <Image
+                                src={opt.image}
+                                alt={opt.name}
+                                fill
+                                className="object-contain"
+                              />
+                              <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => handleImageUpload(e, opt.id)}
+                                />
+                                <Upload className="w-5 h-5 text-white" />
+                              </label>
+                            </div>
+                          ) : (
+                            <label className="relative w-12 h-12 rounded-lg border border-gray-200 cursor-pointer overflow-hidden">
+                              <div
+                                className="w-full h-full"
+                                style={{ backgroundColor: opt.color || '#ccc' }}
+                              />
+                              <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <Upload className="w-5 h-5 text-white" />
+                              </span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => handleImageUpload(e, opt.id)}
+                              />
+                            </label>
+                          )}
                           {!opt.isActive && (
                             <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-lg">
                               <EyeOff className="w-4 h-4 text-black" />
@@ -661,7 +685,7 @@ const VariantMatrix: React.FC<VariantMatrixProps> = ({
                                   src={opt.patternImage}
                                   alt={opt.name}
                                   fill
-                                  className="object-cover"
+                                  className="object-contain"
                                 />
                                 <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                                   <input
@@ -839,7 +863,7 @@ const VariantMatrix: React.FC<VariantMatrixProps> = ({
                                             src={option.patternImage}
                                             alt=""
                                             fill
-                                            className="object-cover"
+                                            className="object-contain"
                                           />
                                         ) : (
                                           <Layers className="w-3 h-3 text-gray-400" />
@@ -877,8 +901,21 @@ const VariantMatrix: React.FC<VariantMatrixProps> = ({
                           </button>
                         </div>
 
+                        {/* Variant Combination Label */}
+                        <div className="mb-3">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-sm font-semibold text-amber-800">
+                            {Object.entries(variant.combination)
+                              .map(([attrId, optionId]) => {
+                                const attr = attributes.find((a) => a.id === attrId);
+                                const option = attr?.options.find((o) => o.id === optionId);
+                                return option?.name || optionId;
+                              })
+                              .join(' / ')}
+                          </span>
+                        </div>
+
                         {/* Price & Stock */}
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-3 gap-3">
                           <div>
                             <label className="block text-xs font-medium text-black mb-1">
                               Price
@@ -901,17 +938,56 @@ const VariantMatrix: React.FC<VariantMatrixProps> = ({
                                   setEditingCell({ variantId: variant.id, field: 'price' });
                                   setEditingValue(raw);
                                 }}
-                                onBlur={() => {
-                                  if (editingCell?.variantId === variant.id && editingCell?.field === 'price') {
-                                    const val = parseFloat(editingValue);
-                                    if (!isNaN(val) && val >= 0) {
-                                      handleVariantChange(variant.id, 'price', val);
-                                    } else {
-                                      handleVariantChange(variant.id, 'price', 0);
-                                    }
+                                onBlur={(e) => {
+                                  const raw = (e.target as HTMLInputElement).value;
+                                  const val = raw === '' ? 0 : parseFloat(raw);
+                                  handleVariantChange(variant.id, 'price', isNaN(val) ? 0 : val);
+                                  setEditingCell(null);
+                                  setEditingValue('');
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.currentTarget.blur();
+                                  }
+                                  if (e.key === 'Escape') {
                                     setEditingCell(null);
                                     setEditingValue('');
+                                    e.currentTarget.blur();
                                   }
+                                }}
+                                className="w-full pl-6 pr-2 py-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-amber-500 focus:border-amber-500 text-black"
+                                placeholder="0.00"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-black mb-1">
+                              Discount Price
+                            </label>
+                            <div className="relative">
+                              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-black text-sm">
+                                $
+                              </span>
+                              <input
+                                type="text"
+                                inputMode="decimal"
+                                value={
+                                  editingCell?.variantId === variant.id && editingCell?.field === 'comparePrice'
+                                    ? editingValue
+                                    : (variant.comparePrice != null ? String(variant.comparePrice) : '')
+                                }
+                                onChange={(e) => {
+                                  const raw = e.target.value;
+                                  if (!/^[0-9]*\.?[0-9]*$/.test(raw)) return;
+                                  setEditingCell({ variantId: variant.id, field: 'comparePrice' });
+                                  setEditingValue(raw);
+                                }}
+                                onBlur={(e) => {
+                                  const raw = (e.target as HTMLInputElement).value;
+                                  const val = raw === '' ? 0 : parseFloat(raw);
+                                  handleVariantChange(variant.id, 'comparePrice', isNaN(val) ? 0 : val);
+                                  setEditingCell(null);
+                                  setEditingValue('');
                                 }}
                                 onKeyDown={(e) => {
                                   if (e.key === 'Enter') {
@@ -946,17 +1022,12 @@ const VariantMatrix: React.FC<VariantMatrixProps> = ({
                                 setEditingCell({ variantId: variant.id, field: 'stock' });
                                 setEditingValue(raw);
                               }}
-                              onBlur={() => {
-                                if (editingCell?.variantId === variant.id && editingCell?.field === 'stock') {
-                                  const val = parseInt(editingValue);
-                                  if (!isNaN(val) && val >= 0) {
-                                    handleVariantChange(variant.id, 'stock', val);
-                                  } else {
-                                    handleVariantChange(variant.id, 'stock', 0);
-                                  }
-                                  setEditingCell(null);
-                                  setEditingValue('');
-                                }
+                              onBlur={(e) => {
+                                const raw = (e.target as HTMLInputElement).value;
+                                const val = raw === '' ? 0 : parseInt(raw);
+                                handleVariantChange(variant.id, 'stock', isNaN(val) ? 0 : val);
+                                setEditingCell(null);
+                                setEditingValue('');
                               }}
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
@@ -1000,87 +1071,6 @@ const VariantMatrix: React.FC<VariantMatrixProps> = ({
                         </div>
                       </div>
 
-                      {/* Variant Images */}
-                      <div className="flex-1 p-4">
-                        <label className="block text-xs font-medium text-black mb-2">
-                          Product Images ({variant.images?.length || 0})
-                        </label>
-                        <div className="flex flex-wrap gap-2">
-                          {variant.images?.map((img, idx) => (
-                            <div
-                              key={idx}
-                              className="relative group w-20 h-20 rounded-lg overflow-hidden border border-gray-200"
-                            >
-                              <Image
-                                src={img}
-                                alt={`Image ${idx + 1}`}
-                                fill
-                                className="object-cover"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const newImages = variant.images.filter(
-                                    (_, i) => i !== idx,
-                                  );
-                                  handleVariantChange(
-                                    variant.id,
-                                    'images',
-                                    newImages,
-                                  );
-                                }}
-                                className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            </div>
-                          ))}
-                          <label className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-amber-500 transition-colors">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={async (e) => {
-                                const file = e.target.files?.[0];
-                                if (!file) return;
-                                try {
-                                  const formData = new FormData();
-                                  formData.append('file', file);
-                                  const response = await fetch(
-                                    '/api/v1/upload/product',
-                                    {
-                                      method: 'POST',
-                                      credentials: 'include',
-                                      body: formData,
-                                    },
-                                  );
-                                  if (response.ok) {
-                                    const data = await response.json();
-                                    const imageUrl =
-                                      data.data?.url || data.url;
-                                    const newImages = [
-                                      ...(variant.images || []),
-                                      imageUrl,
-                                    ];
-                                    handleVariantChange(
-                                      variant.id,
-                                      'images',
-                                      newImages,
-                                    );
-                                    toast.success('Image uploaded');
-                                  } else {
-                                    toast.error('Failed to upload image');
-                                  }
-                                } catch {
-                                  toast.error('Failed to upload image');
-                                }
-                                e.target.value = '';
-                              }}
-                            />
-                            <Plus className="w-5 h-5 text-gray-400" />
-                          </label>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 ))}
@@ -1255,6 +1245,50 @@ const VariantMatrix: React.FC<VariantMatrixProps> = ({
                         placeholder="#000000"
                       />
                     </div>
+                    <label className="block text-sm font-medium text-black mb-2 mt-4">
+                      Color Image
+                    </label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                      {newOptionImage ? (
+                        <div className="relative inline-block">
+                          <div className="relative w-32 h-32 rounded-lg overflow-hidden">
+                            <Image
+                              src={newOptionImage}
+                              alt="Color"
+                              fill
+                              className="object-contain"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setNewOptionImage(null)}
+                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageUpload(e)}
+                            className="hidden"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="flex flex-col items-center gap-2 mx-auto"
+                          >
+                            <Upload className="w-10 h-10 text-gray-400" />
+                            <span className="text-sm text-black">
+                              Upload Color Image
+                            </span>
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -1290,7 +1324,7 @@ const VariantMatrix: React.FC<VariantMatrixProps> = ({
                               src={newOptionPattern}
                               alt="Pattern"
                               fill
-                              className="object-cover"
+                              className="object-contain"
                             />
                           </div>
                           <button

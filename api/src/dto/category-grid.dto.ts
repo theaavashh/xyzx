@@ -8,7 +8,6 @@ export const categoryGridCreateSchema = z.object({
   subtitle: emptyToUndefined(z.string().max(500).optional()),
   image: z.string().min(1, 'Image is required').max(1000),
   link: z.string().min(1, 'Link is required').max(500),
-  alt: emptyToUndefined(z.string().max(500).optional()),
   order: z.number().int().min(0).default(0),
   isActive: z.boolean().default(true),
 });
@@ -18,7 +17,6 @@ export const categoryGridUpdateSchema = z.object({
   subtitle: emptyToUndefined(z.string().max(500).optional()),
   image: z.string().min(1).max(1000).optional(),
   link: z.string().min(1).max(500).optional(),
-  alt: emptyToUndefined(z.string().max(500).optional()),
   order: z.number().int().min(0).optional(),
   isActive: z.boolean().optional(),
 });

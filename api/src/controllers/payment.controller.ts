@@ -35,7 +35,7 @@ export const createPaymentIntent: RequestHandler = asyncHandler(
           currency: currency.toLowerCase(),
           metadata: metadata as Record<string, string> | undefined,
           customer: customerId,
-          automatic_payment_methods: { enabled: true },
+          payment_method_types: ['card'],
         })
       );
 
@@ -97,7 +97,7 @@ export const createSetupIntent: RequestHandler = asyncHandler(
       const setupIntent = await stripeCircuitBreaker.execute(() =>
         stripe.setupIntents.create({
           customer: customerId,
-          automatic_payment_methods: { enabled: true },
+          payment_method_types: ['card'],
         })
       );
 

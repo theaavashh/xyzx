@@ -36,13 +36,12 @@ export const getHeroSlideById: RequestHandler = asyncHandler(
 
 export const createHeroSlide: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
-    const { title, subtitle, image, imageMobile, alt, order, isActive } = req.body;
+    const { title, subtitle, image, imageMobile, order, isActive } = req.body;
     const item = await heroSlideRepository.createHeroSlide({
       title,
       subtitle,
       image,
       imageMobile,
-      alt,
       order: order ?? 0,
       isActive: isActive ?? true,
     });
@@ -53,7 +52,7 @@ export const createHeroSlide: RequestHandler = asyncHandler(
 export const updateHeroSlide: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const { title, subtitle, image, imageMobile, alt, order, isActive } = req.body;
+    const { title, subtitle, image, imageMobile, order, isActive } = req.body;
 
     const exists = await heroSlideRepository.existsById(id);
     if (!exists) {
@@ -66,7 +65,6 @@ export const updateHeroSlide: RequestHandler = asyncHandler(
     if (subtitle !== undefined) updateData.subtitle = subtitle;
     if (image !== undefined) updateData.image = image;
     if (imageMobile !== undefined) updateData.imageMobile = imageMobile;
-    if (alt !== undefined) updateData.alt = alt;
     if (order !== undefined) updateData.order = order;
     if (isActive !== undefined) updateData.isActive = isActive;
 

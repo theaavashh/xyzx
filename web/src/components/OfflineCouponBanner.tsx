@@ -46,25 +46,25 @@ export default function OfflineCouponBanner() {
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-50 bg-gray-50 px-5 py-10 transition-all duration-300 md:hidden ${
+      className={`fixed bottom-0 left-0 right-0 z-50 bg-gray-50 px-5 py-6 transition-all duration-300 md:hidden ${
         hidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
       }`}
     >
       <button
         type="button"
         onClick={() => setDismissed(true)}
-        className="absolute top-2 right-2 text-black/40 hover:text-black transition-colors"
+        className="absolute top-2 right-2 text-zinc-600/40 hover:text-zinc-600 transition-colors"
         aria-label="Close"
       >
         <HiXMark className="w-4 h-4" />
       </button>
       <div className="mx-auto flex max-w-9xl items-center gap-4">
         <div className="flex-1 min-w-0">
-          <p className="lastik text-sm text-black uppercase tracking-tight">
+          <p className="text-sm text-zinc-600 uppercase tracking-wide">
             Offer at checkout
           </p>
-          <p className="text-sm text-black mt-0.5 font-medium">
-            Use code <span className="px-2 py-0.5 rounded text-black font-semibold text-md tracking-widest">{coupon.code}</span> for an exclusive discount
+          <p className="text-sm text-zinc-600 mt-0.5 font-medium">
+            Use code <span className="px-2 py-0.5 rounded text-zinc-600 font-semibold text-sm tracking-widest">{coupon.code}</span> for an exclusive discount
           </p>
         </div>
         <button

@@ -12,6 +12,8 @@ interface NavbarProps {
   onBack: () => void;
   isSidebarOpen: boolean;
   setSidebarOpen: (isOpen: boolean) => void;
+  collapsed: boolean;
+  onToggleSidebar: () => void;
   user: User | null;
   userInitials: string;
   fullName: string;
@@ -29,6 +31,8 @@ export function Navbar({
   onBack,
   isSidebarOpen,
   setSidebarOpen,
+  collapsed,
+  onToggleSidebar,
   user,
   userInitials,
   fullName,
@@ -48,8 +52,8 @@ export function Navbar({
           <div className="flex items-center space-x-2 sm:space-x-4">
             <button
               type="button"
-              onClick={() => setSidebarOpen(!isSidebarOpen)}
-              className="lg:hidden p-2 rounded-md transition-colors text-black hover:text-black hover:bg-gray-100"
+              onClick={onToggleSidebar}
+              className="p-2 rounded-md transition-colors text-black hover:text-black hover:bg-gray-100"
               aria-label="Toggle sidebar"
             >
               <Menu className="w-5 h-5" />
@@ -64,7 +68,7 @@ export function Navbar({
                 <X className="w-5 h-5" />
               </button>
             )}
-            <h1 className="text-lg sm:text-2xl font-bold text-black truncate outer-sans tracking-wide">
+            <h1 className="text-lg sm:text-2xl font-bold text-black truncate tracking-wide">
               {title}
             </h1>
           </div>

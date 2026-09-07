@@ -51,14 +51,20 @@ export const authenticateToken = async (
 ): Promise<void | Response> => {
   try {
     const authHeader = req.headers['authorization'];
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    let token: string | undefined;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.slice(7);
+    } else {
+      token = req.cookies?.accessToken;
+    }
+
+    if (!token) {
       return res.status(401).json({
         success: false,
         message: 'Access token is required. Use: Authorization: Bearer <token>',
       });
     }
-
-    const token = authHeader!.slice(7);
 
     const jwtConfig = getJwtConfig();
     const payload = jwt.verify(token, jwtConfig.secret) as unknown as {
@@ -114,5 +120,55 @@ export const authenticateToken = async (
       success: false,
       message: 'Authentication error',
     });
+  }
+};
+
+export const optionalAuth = async (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const authHeader = req.headers['authorization'];
+    let token: string | undefined;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.slice(7);
+    } else {
+      token = req.cookies?.accessToken;
+    }
+
+    if (!token) {
+      return next();
+    }
+
+    const jwtConfig = getJwtConfig();
+    const payload = jwt.verify(token, jwtConfig.secret) as unknown as {
+      userId: string;
+      email: string;
+      role?: string;
+      iat: number;
+      exp: number;
+    };
+
+    const blacklistKey = `blacklist:user:${payload.userId}`;
+    const invalidatedAt = await cacheService.get<number>(blacklistKey);
+
+    if (invalidatedAt && payload.iat < invalidatedAt) {
+      return next();
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: { id: true, email: true, role: true, isActive: true },
+    });
+
+    if (user && user.isActive) {
+      req.user = { ...payload, isActive: user.isActive };
+    }
+
+    next();
+  } catch {
+    next();
   }
 };

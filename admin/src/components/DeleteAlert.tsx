@@ -65,7 +65,7 @@ export default function DeleteAlert({
                       <AlertTriangle className="w-5 h-5 text-red-500" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-gray-900 outer-sans">
+                      <h2 className="text-lg font-semibold text-gray-900">
                         {title}
                       </h2>
                       <p className="text-sm text-red-500 font-medium">
@@ -90,7 +90,7 @@ export default function DeleteAlert({
                         <img
                           src={productImage}
                           alt={productName}
-                          className="w-10 h-10 rounded-lg object-cover ring-1 ring-gray-200"
+                          className="w-10 h-10 rounded-lg object-contain ring-1 ring-gray-200"
                         />
                       ) : (
                         <div className="w-10 h-10 bg-white rounded-lg border border-gray-200 flex items-center justify-center">

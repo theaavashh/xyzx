@@ -2,6 +2,7 @@
 
 
 import { clientLogger } from '@/lib/logger';
+import { uploadFile } from '@/services/apiClient';
 
 import React, { useState } from 'react';
 import { Camera, X } from 'lucide-react';
@@ -50,33 +51,26 @@ const MediaTab: React.FC<MediaTabProps> = React.memo(({
 
     for (const file of filesToAdd) {
       try {
-        const formDataUpload = new FormData();
-        formDataUpload.append('file', file);
+        const result = await uploadFile<{
+          success: boolean;
+          data?: { url: string };
+        }>('/api/v1/upload/product', file);
 
-        const response = await fetch('/api/upload/product', {
-          method: 'POST',
-          body: formDataUpload,
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          clientLogger.error(`Upload failed: ${response.status}`, errorData);
-          toast.error(`Upload failed: ${errorData.message || response.statusText}`);
-          continue;
-        }
-
-        const result = await response.json();
         if (result.success && result.data?.url) {
           uploadedPaths.push(result.data.url);
         }
-      } catch (error) {
-        clientLogger.error('Error uploading image:', error);
+      } catch (error: any) {
+        const msg = error?.message || `Upload of "${file.name}" failed`;
+        clientLogger.error(msg, error);
+        toast.error(msg);
       }
     }
 
     if (uploadedPaths.length > 0) {
       onImagesChange([...formData.images, ...uploadedPaths]);
       toast.success(`${uploadedPaths.length} image(s) uploaded`);
+    } else if (filesToAdd.length > 0) {
+      toast.error('No images were uploaded. Please try again.');
     }
 
     setUploading(false);
@@ -152,7 +146,7 @@ const MediaTab: React.FC<MediaTabProps> = React.memo(({
                   <img
                     src={getImageUrl(image)}
                     alt={`Product ${index + 1}`}
-                    className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                    className="w-full h-32 object-contain rounded-lg border border-gray-200"
                   />
                   <button
                     type="button"

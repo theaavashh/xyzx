@@ -20,7 +20,7 @@ export const ServiceCard = memo(function ServiceCard({ service }: ServiceCardPro
         />
       </div>
       <div className="text-left ml-2">
-        <h3 className="text-lg md:text-xl font-semibold text-gray-800">
+        <h3 className="text-lg md:text-xl font-semibold text-zinc-600">
           {service.title}
         </h3>
       </div>

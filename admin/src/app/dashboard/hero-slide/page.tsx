@@ -33,11 +33,11 @@ export default function HeroSlidePage() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Hero Slides</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black">Hero Slides</h1>
             <p className="text-black text-lg mt-2">Manage hero carousel slides displayed on the homepage</p>
           </div>
           <button type="button" onClick={() => { setEditingItem(null); setIsModalOpen(true); }}
-            className="bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] flex items-center gap-2 font-semibold">
+            className="bg-[#D4AF37] text-white px-4 py-2.5 text-lg rounded-md hover:bg-[#b8962e] flex items-center gap-2 font-semibold">
             <Plus className="w-4 h-4" /> Add Slide
           </button>
         </div>

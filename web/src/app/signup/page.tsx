@@ -16,7 +16,12 @@ const signupSchema = z
     firstName: z.string().min(1, 'First name is required'),
     lastName: z.string().min(1, 'Last name is required'),
     email: z.string().min(1, 'Email is required').email('Please enter a valid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+      .regex(/[0-9]/, 'Password must contain at least one number'),
     confirmPassword: z.string().min(1, 'Please confirm your password'),
     marketingEmails: z.boolean().optional(),
   })
@@ -54,15 +59,15 @@ export default function SignupPage() {
 
   const onSubmit = async (data: SignupForm) => {
     setApiError('');
-    const success = await signup(
+    const result = await signup(
       `${data.firstName} ${data.lastName}`.trim(),
       data.email,
       data.password,
     );
-    if (success) {
+    if (result.success) {
       router.push('/dashboard');
-    } else {
-      setApiError('Failed to create account. Please try again.');
+    } else if (result.error) {
+      setApiError(result.error);
     }
   };
 
@@ -75,10 +80,10 @@ export default function SignupPage() {
           transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
           className="w-full max-w-sm"
         >
-          <div className="flex flex-col items-center gap-3 mb-8 tracking-tight">
+          <div className="flex flex-col items-center gap-3 mb-8 tracking-wide">
             <div className="text-center">
-              <h1 className="lastik text-4xl text-black">Join Us</h1>
-              <p className="text-base text-black mt-1">Create your account</p>
+              <h1 className="text-4xl text-zinc-900 font-bold swansea">Join Us</h1>
+              <p className="text-2xl text-zinc-600 mt-1 swansea">Create your account</p>
             </div>
           </div>
 
@@ -91,28 +96,28 @@ export default function SignupPage() {
           <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-base font-medium text-black">First Name</label>
-                <input {...register('firstName')} className={`w-full px-4 py-3 border ${errors.firstName ? 'border-red-400' : 'border-gray-300'} rounded-lg text-base text-gray-900 outline-none focus:border-black transition-colors placeholder:text-gray-400`} placeholder="John" />
+                <label className="text-base font-medium text-zinc-600">First Name</label>
+                <input {...register('firstName')} className={`w-full px-4 py-3 border ${errors.firstName ? 'border-red-400' : 'border-gray-300'} rounded-lg text-base text-zinc-600 outline-none focus:border-black transition-colors placeholder:text-zinc-600`} placeholder="John" />
                 {errors.firstName && <p className="text-sm text-red-500">{errors.firstName.message}</p>}
               </div>
               <div className="space-y-1.5">
-                <label className="text-base font-medium text-black">Last Name</label>
-                <input {...register('lastName')} className={`w-full px-4 py-3 border ${errors.lastName ? 'border-red-400' : 'border-gray-300'} rounded-lg text-base text-gray-900 outline-none focus:border-black transition-colors placeholder:text-gray-400`} placeholder="Doe" />
+                <label className="text-base font-medium text-zinc-600">Last Name</label>
+                <input {...register('lastName')} className={`w-full px-4 py-3 border ${errors.lastName ? 'border-red-400' : 'border-gray-300'} rounded-lg text-base text-zinc-600 outline-none focus:border-black transition-colors placeholder:text-zinc-600`} placeholder="Doe" />
                 {errors.lastName && <p className="text-sm text-red-500">{errors.lastName.message}</p>}
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-base font-medium text-black">Email</label>
-              <input {...register('email')} className={`w-full px-4 py-3 border ${errors.email ? 'border-red-400' : 'border-gray-300'} rounded-lg text-base text-gray-900 outline-none focus:border-black transition-colors placeholder:text-gray-400`} placeholder="name@example.com" />
+              <label className="text-base font-medium text-zinc-600">Email</label>
+              <input {...register('email')} className={`w-full px-4 py-3 border ${errors.email ? 'border-red-400' : 'border-gray-300'} rounded-lg text-base text-zinc-600 outline-none focus:border-black transition-colors placeholder:text-zinc-600`} placeholder="name@example.com" />
               {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-base font-medium text-black">Password</label>
+              <label className="text-base font-medium text-zinc-600">Password</label>
               <div className="relative">
-                <input type={showPassword ? 'text' : 'password'} {...register('password')} className={`w-full px-4 pr-10 py-3 border ${errors.password ? 'border-red-400' : 'border-gray-300'} rounded-lg text-base text-gray-900 outline-none focus:border-black transition-colors placeholder:text-gray-400`} placeholder="At least 8 characters" />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-black hover:text-gray-600">
+                <input type={showPassword ? 'text' : 'password'} {...register('password')} className={`w-full px-4 pr-10 py-3 border ${errors.password ? 'border-red-400' : 'border-gray-300'} rounded-lg text-base text-zinc-600 outline-none focus:border-black transition-colors placeholder:text-zinc-600`} placeholder="At least 8 characters" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-zinc-600">
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
@@ -120,14 +125,14 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-base font-medium text-black">Confirm Password</label>
-              <input {...register('confirmPassword')} className={`w-full px-4 pr-10 py-3 border ${errors.confirmPassword ? 'border-red-400' : 'border-gray-300'} rounded-lg text-base text-gray-900 outline-none focus:border-black transition-colors placeholder:text-gray-400`} placeholder="Confirm your password" />
+              <label className="text-base font-medium text-zinc-600">Confirm Password</label>
+              <input {...register('confirmPassword')} className={`w-full px-4 pr-10 py-3 border ${errors.confirmPassword ? 'border-red-400' : 'border-gray-300'} rounded-lg text-base text-zinc-600 outline-none focus:border-black transition-colors placeholder:text-zinc-600`} placeholder="Confirm your password" />
               {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>}
             </div>
 
             <div className="flex items-start gap-3 py-1">
-              <input id="marketing" type="checkbox" {...register('marketingEmails')} className="mt-0.5 h-4 w-4 rounded border-gray-300 text-black focus:ring-black cursor-pointer" />
-              <label htmlFor="marketing" className="text-sm text-black cursor-pointer select-none">
+              <input id="marketing" type="checkbox" {...register('marketingEmails')} className="mt-0.5 h-4 w-4 rounded border-gray-300 text-zinc-600 focus:ring-black cursor-pointer" />
+              <label htmlFor="marketing" className="text-sm text-zinc-600 cursor-pointer select-none">
                 Join our newsletter for exclusive restocks and new arrivals.
               </label>
             </div>
@@ -140,14 +145,15 @@ export default function SignupPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <span className="text-base text-black">Already have an account? </span>
-            <Link href="/login" className="text-base font-semibold text-black hover:underline">Sign In</Link>
+            <span className="text-base text-zinc-600">Already have an account? </span>
+            <Link href="/login" className="text-base font-semibold text-zinc-600 hover:underline">Sign In</Link>
           </div>
 
-          <p className="mt-8 text-center text-sm text-black">
-            <Link href="/privacy" className="text-black hover:text-gray-600 transition-colors">Privacy</Link>
-            <span className="mx-2">&bull;</span>
-            <Link href="/terms" className="text-gray-500 hover:text-black transition-colors">Terms</Link>
+          <p className="mt-6 text-center text-[11px] text-zinc-600 leading-relaxed">
+            By clicking &quot;Create Account&quot; you agree to our{' '}
+            <Link href="/terms" className="text-zinc-600 hover:text-zinc-600 transition-colors underline">Terms of Use</Link>{' '}
+            and{' '}
+            <Link href="/privacy" className="text-zinc-600 hover:text-zinc-600 transition-colors underline">Privacy Policy</Link>
           </p>
         </motion.div>
       </main>

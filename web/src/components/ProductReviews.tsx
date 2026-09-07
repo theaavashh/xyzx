@@ -97,7 +97,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
     return [...Array(5)].map((_, i) => (
       <svg
         key={`star-${i}`}
-        className={`${size} ${i < Math.floor(rating) ? 'text-yellow-400' : 'text-gray-300'}`}
+        className={`${size} ${i < Math.floor(rating) ? 'text-yellow-400' : 'text-zinc-600'}`}
         fill="currentColor"
         viewBox="0 0 20 20"
       >
@@ -199,18 +199,18 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Reviews Summary */}
         <div className="lg:w-1/3">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <h2 className="swansea text-2xl font-medium text-zinc-600 mb-6 tracking-wide">
             Customer Reviews
           </h2>
 
           <div className="text-center mb-6">
-            <div className="text-4xl font-bold text-gray-900 mb-2">
+            <div className="text-4xl font-bold text-zinc-600 mb-2">
               {averageRating.toFixed(1)}
             </div>
             <div className="flex justify-center mb-2">
               {renderStars(averageRating, 'w-5 h-5')}
             </div>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-zinc-600">
               Based on {reviews.length} reviews
             </p>
           </div>
@@ -227,14 +227,14 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                   key={`rating-${rating}`}
                   className="flex items-center space-x-2"
                 >
-                  <span className="text-sm text-gray-600 w-8">{rating}</span>
+                  <span className="text-sm text-zinc-600 w-8">{rating}</span>
                   <div className="flex-1 bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
-                  <span className="text-sm text-gray-600 w-8">{count}</span>
+                  <span className="text-sm text-zinc-600 w-8">{count}</span>
                 </div>
               );
             })}
@@ -242,7 +242,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
 
           {/* Fit Summary */}
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-900 mb-3">
+            <h3 className="text-sm font-medium text-zinc-600 mb-3">
               How does it fit?
             </h3>
             <div className="space-y-2">
@@ -252,14 +252,14 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                   reviews.length > 0 ? (count / reviews.length) * 100 : 0;
                 return (
                   <div key={fit} className="flex items-center space-x-2">
-                    <span className="text-xs text-gray-600 flex-1">{fit}</span>
+                    <span className="text-xs text-zinc-600 flex-1">{fit}</span>
                     <div className="flex-1 bg-gray-200 rounded-full h-1.5">
                       <div
                         className="bg-gray-600 h-1.5 rounded-full transition-all duration-300"
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
-                    <span className="text-xs text-gray-500 w-6">{count}</span>
+                    <span className="text-xs text-zinc-600 w-6">{count}</span>
                   </div>
                 );
               })}
@@ -281,13 +281,13 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
           {/* Write Review Form */}
           {showWriteReview && (
             <div className="mb-8 p-6 bg-gray-50 rounded-lg">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <h3 className="text-lg font-medium text-zinc-600 mb-4">
                 Write Your Review
               </h3>
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Overall Rating */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-zinc-600 mb-2">
                     Overall Rating <span className="text-red-500">*</span>
                   </label>
                   <div className="flex space-x-1">
@@ -301,7 +301,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                         className="w-8 h-8 transition-colors"
                       >
                         <svg
-                          className={`w-full h-full ${star <= (hoveredStar || selectedRating) ? 'text-yellow-400' : 'text-gray-300'}`}
+                          className={`w-full h-full ${star <= (hoveredStar || selectedRating) ? 'text-yellow-400' : 'text-zinc-600'}`}
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -309,7 +309,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                         </svg>
                       </button>
                     ))}
-                    <span className="ml-2 text-sm text-gray-600">
+                    <span className="ml-2 text-sm text-zinc-600">
                       {selectedRating > 0
                         ? ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][selectedRating - 1]
                         : ''}
@@ -322,7 +322,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
 
                 {/* Title */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-zinc-600 mb-1">
                     Review Title <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -341,7 +341,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
 
                 {/* Review Content */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-zinc-600 mb-1">
                     Your Review <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -353,7 +353,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black ${errors.content ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="Share your thoughts about this product. What did you like or dislike?"
                   />
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-zinc-600">
                     {formData.content.length}/500 characters minimum 20
                   </p>
                   {errors.content && (
@@ -363,7 +363,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
 
                 {/* Fit Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-zinc-600 mb-2">
                     How does the fit feel? <span className="text-red-500">*</span>
                   </label>
                   <div className="grid grid-cols-3 gap-3">
@@ -375,7 +375,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                         className={`py-2 px-3 border rounded-md text-sm font-medium transition-colors ${
                           formData.fit === fit
                             ? 'border-black bg-black text-white'
-                            : 'border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50'
+                            : 'border-gray-300 text-zinc-600 hover:border-gray-400 hover:bg-gray-50'
                         }`}
                       >
                         {fit}
@@ -389,7 +389,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
 
                 {/* Size Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-zinc-600 mb-2">
                     What size did you purchase? <span className="text-red-500">*</span>
                   </label>
                   <div className="grid grid-cols-5 gap-2">
@@ -401,7 +401,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                         className={`py-2 px-3 border rounded-md text-sm font-medium transition-colors ${
                           formData.size === size
                             ? 'border-black bg-black text-white'
-                            : 'border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50'
+                            : 'border-gray-300 text-zinc-600 hover:border-gray-400 hover:bg-gray-50'
                         }`}
                       >
                         {size}
@@ -415,7 +415,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
 
                 {/* Comfort Rating */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-zinc-600 mb-2">
                     Comfort Level
                   </label>
                   <div className="flex space-x-1">
@@ -429,7 +429,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                         className="w-7 h-7 transition-colors"
                       >
                         <svg
-                          className={`w-full h-full ${star <= (hoveredComfort || selectedComfort) ? 'text-yellow-400' : 'text-gray-300'}`}
+                          className={`w-full h-full ${star <= (hoveredComfort || selectedComfort) ? 'text-yellow-400' : 'text-zinc-600'}`}
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -437,7 +437,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                         </svg>
                       </button>
                     ))}
-                    <span className="ml-2 text-sm text-gray-600">
+                    <span className="ml-2 text-sm text-zinc-600">
                       {selectedComfort > 0
                         ? ['Uncomfortable', 'Slightly uncomfortable', 'Okay', 'Comfortable', 'Very comfortable'][selectedComfort - 1]
                         : ''}
@@ -447,7 +447,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
 
                 {/* Photo Upload */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-zinc-600 mb-2">
                     Add Photos (optional)
                   </label>
                   <div className="flex flex-wrap gap-3">
@@ -477,7 +477,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                           className="hidden"
                         />
                         <svg
-                          className="w-6 h-6 text-gray-400"
+                          className="w-6 h-6 text-zinc-600"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -492,7 +492,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                       </label>
                     )}
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-zinc-600">
                     Upload up to 4 photos of your purchase
                   </p>
                 </div>
@@ -500,7 +500,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                 {/* Name and Email */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-zinc-600 mb-1">
                       Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -517,7 +517,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-zinc-600 mb-1">
                       Email <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -549,7 +549,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                       setShowWriteReview(false);
                       setErrors({});
                     }}
-                    className="border border-gray-300 text-gray-700 py-2 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                    className="border border-gray-300 text-zinc-600 py-2 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors"
                   >
                     Cancel
                   </button>
@@ -560,7 +560,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
 
           {/* Sort/Filter Options */}
           <div className="flex items-center justify-between mb-6">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-zinc-600">
               Showing {reviews.length} reviews
             </p>
             <select className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-black">
@@ -581,7 +581,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <div className="flex items-center space-x-2 mb-1">
-                      <span className="font-medium text-gray-900">
+                      <span className="font-medium text-zinc-600">
                         {review.author}
                       </span>
                       {review.verified && (
@@ -603,7 +603,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                     </div>
                     <div className="flex items-center space-x-2">
                       <div className="flex">{renderStars(review.rating)}</div>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-zinc-600">
                         {new Date(review.date).toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'long',
@@ -614,21 +614,21 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                   </div>
                 </div>
 
-                <h4 className="font-medium text-gray-900 mb-2">
+                <h4 className="font-medium text-zinc-600 mb-2">
                   {review.title}
                 </h4>
-                <p className="text-gray-600 mb-3">{review.content}</p>
+                <p className="text-zinc-600 mb-3">{review.content}</p>
 
                 {/* Review Details */}
                 <div className="flex flex-wrap gap-4 mb-3 text-sm">
-                  <span className="text-gray-600">
+                  <span className="text-zinc-600">
                     <span className="font-medium">Size purchased:</span>{' '}
                     {review.size}
                   </span>
-                  <span className="text-gray-600">
+                  <span className="text-zinc-600">
                     <span className="font-medium">Fit:</span> {review.fit}
                   </span>
-                  <span className="text-gray-600 flex items-center">
+                  <span className="text-zinc-600 flex items-center">
                     <span className="font-medium">Comfort:</span>{' '}
                     {renderStars(review.comfort, 'w-3 h-3 ml-1')}
                   </span>
@@ -651,7 +651,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                 <div className="flex items-center space-x-4 text-sm">
                   <button
                     type="button"
-                    className="flex items-center space-x-1 text-gray-500 hover:text-gray-700"
+                    className="flex items-center space-x-1 text-zinc-600 hover:text-zinc-600"
                   >
                     <svg
                       className="w-4 h-4"
@@ -670,7 +670,7 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
                   </button>
                   <button
                     type="button"
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-zinc-600 hover:text-zinc-600"
                   >
                     Report
                   </button>

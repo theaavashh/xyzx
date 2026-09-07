@@ -1,6 +1,6 @@
 export function VisitOurStoreSkeleton() {
   return (
-    <section className="relative py-24 lg:py-28 bg-white overflow-hidden">
+    <section className="relative py-24 lg:py-28 bg-[#F7F6F3] overflow-hidden">
       <div className="container relative mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-12 space-y-4">
           <div className="h-8 w-48 bg-gray-100 rounded-full animate-pulse mx-auto" />

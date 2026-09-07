@@ -31,24 +31,24 @@ export const ProgressBar = memo(function ProgressBar({ currentStep }: ProgressBa
             <div key={step.step} className="relative flex md:flex-col items-center md:items-start gap-4 md:gap-0">
               <div className="relative flex-shrink-0">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
-                  isCompleted ? 'bg-gray-900 border-gray-900 text-white' : isCurrent ? 'bg-white border-gray-900 text-gray-900' : 'bg-white border-gray-200 text-gray-300'
+                  isCompleted ? 'bg-gray-900 border-gray-900 text-white' : isCurrent ? 'bg-white border-gray-900 text-zinc-600' : 'bg-white border-gray-200 text-zinc-600'
                 }`}>
                   <Icon className="h-4 w-4" />
                 </div>
                 <span className={`absolute -top-1 -right-1 w-5 h-5 rounded-full text-[10px] font-medium flex items-center justify-center ${
-                  isCompleted ? 'bg-[#D4AF37] text-white' : isCurrent ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-400'
+                  isCompleted ? 'bg-[#D4AF37] text-white' : isCurrent ? 'bg-gray-900 text-white' : 'bg-gray-100 text-zinc-600'
                 }`}>
                   {step.step}
                 </span>
               </div>
               <div className="md:mt-3 md:text-center">
-                <p className={`text-base font-medium ${isCompleted || isCurrent ? 'text-gray-900' : 'text-gray-400'}`}>
+                <p className={`text-base font-medium ${isCompleted || isCurrent ? 'text-zinc-600' : 'text-zinc-600'}`}>
                   {step.label}
                 </p>
                 {isCurrent && <p className="text-sm text-[#D4AF37] mt-0.5 font-medium">In Progress</p>}
               </div>
               {!isLast && (
-                <div className="hidden md:block absolute top-5 -right-3 text-gray-200">
+                <div className="hidden md:block absolute top-5 -right-3 text-zinc-600">
                   <svg width="24" height="12" viewBox="0 0 24 12" fill="none">
                     <path d="M0 6H22M22 6L17 1M22 6L17 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>

@@ -19,9 +19,13 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'api.rapharch.com.au',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'images.unsplash.com',
       },
-
     ],
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
@@ -61,6 +65,11 @@ const nextConfig: NextConfig = {
       {
         source: '/privacy-policy',
         destination: '/privacy',
+        permanent: true,
+      },
+      {
+        source: '/terms',
+        destination: '/terms-of-service',
         permanent: true,
       },
     ];

@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 import { clientLogger } from '@/lib/logger';
+import { authHeaders } from '@/utils/authHeaders';
 import type { FAQItem } from '../types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9999';
@@ -14,7 +15,7 @@ export function useFAQs() {
   const fetchFAQs = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/v1/faqs`, { credentials: 'include' });
+      const res = await fetch(`${API_BASE}/api/v1/faqs`, { credentials: 'include', headers: authHeaders() });
       if (res.ok) {
         const data = await res.json();
         setFAQs(data.data || []);
@@ -40,7 +41,7 @@ export function useCreateFAQ() {
     try {
       const res = await fetch(`${API_BASE}/api/v1/faqs`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify(payload),
       });
@@ -72,7 +73,7 @@ export function useUpdateFAQ() {
     try {
       const res = await fetch(`${API_BASE}/api/v1/faqs/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify(payload),
       });
@@ -105,6 +106,7 @@ export function useDeleteFAQ() {
       const res = await fetch(`${API_BASE}/api/v1/faqs/${id}`, {
         method: 'DELETE',
         credentials: 'include',
+        headers: authHeaders(),
       });
       if (res.ok) {
         toast.success('FAQ deleted successfully');
@@ -133,6 +135,7 @@ export function useToggleFAQ() {
       const res = await fetch(`${API_BASE}/api/v1/faqs/${id}/toggle`, {
         method: 'PATCH',
         credentials: 'include',
+        headers: authHeaders(),
       });
       if (res.ok) {
         const data = await res.json();

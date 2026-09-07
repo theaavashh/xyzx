@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { LogoHeader, LoginForm, useLogin } from '@/features/login';
 import { LoginFormData } from '@/features/login/types/login.types';
 import { OtpInput } from '@/features/login/components/OtpInput';
+import { maskEmail } from '@/utils/email';
 
 export default function AdminLogin() {
   const {
@@ -18,6 +19,8 @@ export default function AdminLogin() {
     pendingEmail,
     backToLogin,
     setStep,
+    handleResendOtp,
+    resendCooldown,
   } = useLogin();
 
   const [forgotEmail, setForgotEmail] = useState('');
@@ -76,7 +79,7 @@ export default function AdminLogin() {
               </h2>
               <p className="text-base text-gray-500 mt-2 font-medium">
                 Enter the 6-digit code sent to{' '}
-                <span className="font-bold text-gray-900">{pendingEmail}</span>
+                <span className="font-bold text-gray-900">{maskEmail(pendingEmail)}</span>
               </p>
             </div>
             <OtpInput
@@ -93,7 +96,24 @@ export default function AdminLogin() {
             >
               {isLoading ? 'Verifying...' : 'Verify'}
             </button>
-            <div className="text-center">
+            <div className="text-center space-y-3">
+              <div>
+                <span className="text-base font-medium text-gray-500">
+                  Didn&apos;t get the code?{' '}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  disabled={resendCooldown > 0 || isLoading}
+                  className="text-base font-bold text-[#D4AF37] hover:text-[#c9a32e] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {resendCooldown > 0
+                    ? `Resend in ${resendCooldown}s`
+                    : isLoading
+                      ? 'Sending...'
+                      : 'Resend OTP'}
+                </button>
+              </div>
               <button
                 type="button"
                 onClick={() => {
@@ -112,7 +132,7 @@ export default function AdminLogin() {
         {step === 'forgotPassword' && !forgotSent && (
           <form onSubmit={handleForgotSubmit} className="space-y-5">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 outer-sans">
+              <h2 className="text-2xl font-bold text-gray-900">
                 Forgot Password
               </h2>
               <p className="text-base text-gray-500 mt-2 font-medium tracking-normal">

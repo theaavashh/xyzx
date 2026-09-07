@@ -85,7 +85,7 @@ export function DataTable<T>({ data, columns, loading, onRowClick, keyField = 'i
         <thead>
           <tr className="border-b border-gray-200">
             {columns.map((col, idx) => (
-              <th key={idx} className="px-4 py-3 text-left text-sm font-medium text-gray-500 outer-sans">
+              <th key={idx} className="px-4 py-3 text-left text-sm font-medium text-gray-500">
                 {col.header}
               </th>
             ))}

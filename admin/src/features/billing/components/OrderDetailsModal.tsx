@@ -53,11 +53,12 @@ export default function OrderDetailsModal({
                 <div className="text-sm space-y-1 text-gray-600">
                   <div>
                     Payment Status:{' '}
-                    <span className={getPaymentStatusColor(order.paymentStatus)}>
-                      {order.paymentStatus}
+                    <span className={getPaymentStatusColor(order.paymentStatus ?? 'PENDING')}>
+                      {order.paymentStatus ?? 'PENDING'}
                     </span>
                   </div>
-                  <div>Shipping Status: {order.shippingStatus}</div>
+                  {order.paymentMethod && <div>Payment Method: {order.paymentMethod}</div>}
+                  {order.paidAt && <div>Paid At: {formatDate(order.paidAt)}</div>}
                 </div>
               </div>
             </div>
@@ -65,19 +66,28 @@ export default function OrderDetailsModal({
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="font-medium text-gray-900 mb-2">Customer Information</h3>
               <div className="text-sm space-y-1 text-gray-600">
-                <div>{order.user.firstName} {order.user.lastName}</div>
-                <div>{order.user.email}</div>
-                <div>{order.user.phone}</div>
+                <div>{order.user?.name ?? order.shippingName}</div>
+                <div>{order.user?.email ?? order.shippingEmail}</div>
+                {order.shippingPhone && <div>{order.shippingPhone}</div>}
+              </div>
+            </div>
+
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-medium text-gray-900 mb-2">Shipping Address</h3>
+              <div className="text-sm space-y-1 text-gray-600">
+                <div>{order.shippingAddress}</div>
+                <div>{order.shippingCity}{order.shippingState ? `, ${order.shippingState}` : ''} {order.shippingZip}</div>
+                <div>{order.shippingCountry}</div>
               </div>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="font-medium text-gray-900 mb-2">Order Items</h3>
               <div className="space-y-2">
-                {order.items.map((item) => (
+                {order.orderItems.map((item) => (
                   <div key={item.id} className="flex justify-between text-sm">
                     <div>{item.product.name} x {item.quantity}</div>
-                    <div>{formatCurrency(item.total, item.currency, item.currencySymbol)}</div>
+                    <div>{formatCurrency(item.price * item.quantity, order.currency)}</div>
                   </div>
                 ))}
               </div>
@@ -89,33 +99,25 @@ export default function OrderDetailsModal({
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal:</span>
                   <span className="font-medium">
-                    {formatCurrency(order.subtotal, order.currency, order.currencySymbol)}
+                    {formatCurrency(order.subtotal, order.currency)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Shipping:</span>
                   <span className="font-medium">
-                    {formatCurrency(order.shippingAmount, order.currency, order.currencySymbol)}
+                    {formatCurrency(order.shipping, order.currency)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Tax:</span>
                   <span className="font-medium">
-                    {formatCurrency(order.taxAmount, order.currency, order.currencySymbol)}
+                    {formatCurrency(order.tax, order.currency)}
                   </span>
                 </div>
-                {order.discountAmount > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>Discount:</span>
-                    <span className="font-medium">
-                      -{formatCurrency(order.discountAmount, order.currency, order.currencySymbol)}
-                    </span>
-                  </div>
-                )}
                 <div className="flex justify-between text-lg font-semibold border-t pt-2">
                   <span>Total:</span>
                   <span>
-                    {formatCurrency(order.totalAmount, order.currency, order.currencySymbol)}
+                    {formatCurrency(order.total, order.currency)}
                   </span>
                 </div>
               </div>
@@ -125,6 +127,13 @@ export default function OrderDetailsModal({
               <div className="bg-yellow-50 rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">Notes</h3>
                 <p className="text-sm text-gray-600">{order.notes}</p>
+              </div>
+            )}
+
+            {order.adminNotes && (
+              <div className="bg-blue-50 rounded-lg p-4">
+                <h3 className="font-medium text-gray-900 mb-2">Admin Notes</h3>
+                <p className="text-sm text-gray-600">{order.adminNotes}</p>
               </div>
             )}
           </div>

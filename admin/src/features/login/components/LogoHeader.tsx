@@ -10,11 +10,11 @@ export function LogoHeader() {
           alt="Rapharch Admin Logo"
           width={300}
           height={300}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
           priority
         />
       </div>
-      <h1 className={`text-2xl md:text-3xl font-bold text-black mb-2 tracking-normal outer-sans`}>
+      <h1 className={`text-2xl md:text-3xl font-bold text-black mb-2 tracking-normal`}>
         Welcome back
       </h1>
       <p className="text-black text-base font-semibold tracking-normal">

@@ -1,13 +1,13 @@
 import type { Category } from '../types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9999';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9999';
 
 export async function fetchCategoryGridItems(): Promise<Category[]> {
   try {
     const response = await fetch(
       `${API_BASE_URL}/api/v1/public/category-grid/active`,
       {
-        next: { revalidate: 60 },
+        next: { revalidate: 60, tags: ['category-grid'] },
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',

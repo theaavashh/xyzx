@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 import { clientLogger } from '@/lib/logger';
+import { authHeaders } from '@/utils/authHeaders';
 
 interface ContentApiPaths {
   fetchPath: string;
@@ -13,7 +14,9 @@ export function useContentPageQueries(apiPaths: ContentApiPaths) {
 
   const fetchContent = useCallback(async (): Promise<string> => {
     try {
-      const response = await fetch(apiPaths.fetchPath);
+      const response = await fetch(apiPaths.fetchPath, {
+        headers: authHeaders(),
+      });
       if (response.ok) {
         const json = await response.json();
         return json.data?.content || '';
@@ -31,7 +34,7 @@ export function useContentPageQueries(apiPaths: ContentApiPaths) {
     try {
       const response = await fetch(apiPaths.savePath, {
         method: apiPaths.method || 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ content }),
       });
       if (response.ok) {

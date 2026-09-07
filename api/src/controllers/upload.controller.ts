@@ -83,8 +83,9 @@ const createUploadMiddleware = (subdir: string, prefix: string, maxSizeMB: numbe
   });
 
 const heroBannerUpload = createUploadMiddleware('herobanner', 'hero-banner', 10);
-const shopByCategoryUpload = createUploadMiddleware('shop-by-category', 'shop-by-category', 5);
+const storeUpload = createUploadMiddleware('store', 'store', 10);
 const categoryUpload = createUploadMiddleware('category', 'category', 5);
+
 const heroSlideUpload = createUploadMiddleware('hero-slide', 'hero-slide', 10);
 const categoryGridUpload = createUploadMiddleware('category-grid', 'category-grid', 10);
 const imageGridUpload = createUploadMiddleware('image-grid', 'image-grid', 10);
@@ -93,7 +94,10 @@ const salesBannerUpload = createUploadMiddleware('sales-banner', 'sales-banner',
 const editorialUpload = createUploadMiddleware('editorial', 'editorial', 10);
 const dualCardUpload = createUploadMiddleware('dual-card', 'dual-card', 10);
 const followSectionUpload = createUploadMiddleware('follow-section', 'follow-section', 5);
-const productUpload = createUploadMiddleware('products', 'product', 10);
+const productUpload = createUploadMiddleware('products', 'product', 50);
+const threeImageGridUpload = createUploadMiddleware('three-image-grid', 'three-image-grid', 10);
+const categoryTileGridUpload = createUploadMiddleware('category-tile-grid', 'category-tile-grid', 10);
+const womenItemsUpload = createUploadMiddleware('women-items', 'women-items', 10);
 
 const handleUpload = (subdir: string) =>
   asyncHandler(async (req: Request, res: Response) => {
@@ -123,8 +127,8 @@ const handleUpload = (subdir: string) =>
   });
 
 export const uploadHeroBannerImage: RequestHandler = handleUpload('herobanner');
-export const uploadShopByCategoryImage: RequestHandler = handleUpload('shop-by-category');
 export const uploadCategoryImage: RequestHandler = handleUpload('category');
+export const uploadStoreImage: RequestHandler = handleUpload('store');
 export const uploadHeroSlideImage: RequestHandler = handleUpload('hero-slide');
 export const uploadCategoryGridImage: RequestHandler = handleUpload('category-grid');
 export const uploadImageGridImage: RequestHandler = handleUpload('image-grid');
@@ -134,8 +138,11 @@ export const uploadEditorialImage: RequestHandler = handleUpload('editorial');
 export const uploadDualCardImage: RequestHandler = handleUpload('dual-card');
 export const uploadFollowSectionImage: RequestHandler = handleUpload('follow-section');
 export const uploadProductImage: RequestHandler = handleUpload('products');
+export const uploadThreeImageGridImage: RequestHandler = handleUpload('three-image-grid');
+export const uploadCategoryTileGridImage: RequestHandler = handleUpload('category-tile-grid');
+export const uploadWomenItemsImage: RequestHandler = handleUpload('women-items');
 
-export { heroBannerUpload, shopByCategoryUpload, categoryUpload, heroSlideUpload, categoryGridUpload, imageGridUpload, featuredSectionUpload, salesBannerUpload, editorialUpload, dualCardUpload, followSectionUpload, productUpload };
+export { heroBannerUpload, storeUpload, categoryUpload, heroSlideUpload, categoryGridUpload, imageGridUpload, featuredSectionUpload, salesBannerUpload, editorialUpload, dualCardUpload, followSectionUpload, productUpload, threeImageGridUpload, categoryTileGridUpload, womenItemsUpload };
 
 export const genericUpload = createUploadMiddleware('general', 'file', 10);
 

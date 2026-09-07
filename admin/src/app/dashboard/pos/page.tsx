@@ -216,10 +216,10 @@ export default function POSPage() {
         <table>
           <thead>
             <tr>
-              <th style="width:45%" className="outer-sans">Item</th>
-              <th style="width:15%;text-align:center" className="outer-sans">Qty</th>
-              <th style="width:20%;text-align:right" className="outer-sans">Price</th>
-              <th style="width:20%" className="outer-sans">Total</th>
+              <th style="width:45%" className="">Item</th>
+              <th style="width:15%;text-align:center" className="">Qty</th>
+              <th style="width:20%;text-align:right" className="">Price</th>
+              <th style="width:20%" className="">Total</th>
             </tr>
           </thead>
           <tbody>
@@ -333,7 +333,7 @@ export default function POSPage() {
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-10 h-10 text-green-600" />
             </div>
-            <h2 className="text-2xl font-bold text-black outer-sans mb-2">Sale Complete!</h2>
+            <h2 className="text-2xl font-bold text-black mb-2">Sale Complete!</h2>
             <p className="text-black mb-2">Order: <span className="font-mono font-semibold">{saleData?.orderNumber}</span></p>
             <p className="text-black mb-2">Total: <span className="font-bold">NPR {saleData?.total.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span></p>
             <p className="text-black mb-8">Payment: <span className="font-medium capitalize">{saleData?.paymentMethod}</span></p>
@@ -344,7 +344,7 @@ export default function POSPage() {
               >
                 <Printer className="w-4 h-4" /> Print
               </button>
-              <button onClick={resetSuccess} className="bg-[#D4AF37] text-white px-8 py-3 rounded-lg font-medium outer-sans text-lg hover:bg-[#b8962e] transition-colors">
+              <button onClick={resetSuccess} className="bg-[#D4AF37] text-white px-8 py-3 rounded-lg font-medium text-lg hover:bg-[#b8962e] transition-colors">
                 New Sale
               </button>
             </div>
@@ -364,7 +364,7 @@ export default function POSPage() {
         </div>
 
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-black outer-sans">Sales History</h2>
+          <h2 className="text-xl font-bold text-black">Sales History</h2>
           <button onClick={loadSalesHistory} disabled={historyLoading} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
             <RefreshCw className={`w-4 h-4 ${historyLoading ? 'animate-spin' : ''}`} /> Refresh
           </button>
@@ -387,12 +387,12 @@ export default function POSPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans">Order #</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans">Date</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans">Customer</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase outer-sans">Total</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans">Payment</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase outer-sans">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order #</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -462,11 +462,11 @@ export default function POSPage() {
     <DashboardLayout title="Point of Sale">
       <div className="flex gap-3 mb-4">
           <button onClick={() => setTab('new-sale')}
-          className={`px-4 py-2.5 outer-sans text-lg rounded-md transition-all ${tab === 'new-sale' ? 'bg-[#D4AF37] text-white' : 'bg-white text-black border border-gray-200 hover:bg-gray-50'}`}>
+          className={`px-4 py-2.5 text-lg rounded-md transition-all ${tab === 'new-sale' ? 'bg-[#D4AF37] text-white' : 'bg-white text-black border border-gray-200 hover:bg-gray-50'}`}>
           New Sale
         </button>
         <button onClick={() => setTab('history')}
-          className="px-4 py-2.5 outer-sans text-lg rounded-md bg-white text-black border border-gray-200 hover:bg-gray-50 transition-all">
+          className="px-4 py-2.5 text-lg rounded-md bg-white text-black border border-gray-200 hover:bg-gray-50 transition-all">
           <Clock className="w-4 h-4 inline mr-1" /> Sales History
         </button>
       </div>
@@ -475,7 +475,7 @@ export default function POSPage() {
         <div className="lg:col-span-7 bg-white rounded-xl border border-gray-200 flex flex-col">
           <div className="p-5 border-b border-gray-200">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-black outer-sans">Products</h2>
+              <h2 className="text-xl font-bold text-black">Products</h2>
               <span className="text-sm text-gray-500">{Array.isArray(products) ? products.length : 0} items</span>
             </div>
             <div className="relative">
@@ -499,7 +499,7 @@ export default function POSPage() {
                     className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-left hover:border-[#D4AF37] hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed group">
                     <div className="aspect-square bg-gray-200 rounded-lg mb-2 overflow-hidden">
                       {product.images?.[0]
-                        ? <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                        ? <img src={product.images[0]} alt={product.name} className="w-full h-full object-contain" />
                         : <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">No Image</div>}
                     </div>
                     <h3 className="font-medium text-black text-sm mb-1 line-clamp-2">{product.name}</h3>
@@ -520,7 +520,7 @@ export default function POSPage() {
         <div className="lg:col-span-5 bg-white rounded-xl border border-gray-200 flex flex-col">
           <div className="p-5 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-black outer-sans flex items-center gap-2"><ShoppingCart className="w-5 h-5" /> Bill</h2>
+              <h2 className="text-xl font-bold text-black flex items-center gap-2"><ShoppingCart className="w-5 h-5" /> Bill</h2>
               {cart.length > 0 && <span className="bg-[#D4AF37]/10 text-[#D4AF37] px-3 py-1 rounded-full text-sm font-semibold">{totalItems} items</span>}
             </div>
           </div>
@@ -569,13 +569,13 @@ export default function POSPage() {
 
           {cart.length > 0 && (
             <div className="px-4 py-3 border-t border-gray-200">
-              <div className="flex items-center gap-2 mb-2"><Percent className="w-4 h-4 text-gray-500" /> <span className="text-sm font-medium text-black outer-sans">Discount</span></div>
+              <div className="flex items-center gap-2 mb-2"><Percent className="w-4 h-4 text-gray-500" /> <span className="text-sm font-medium text-black">Discount</span></div>
               <div className="flex gap-2">
                 <div className="flex gap-1">
                   <button onClick={() => setDiscountType('percent')}
-                    className={`px-3 py-1.5 outer-sans text-sm rounded-md ${discountType === 'percent' ? 'bg-[#D4AF37] text-white' : 'bg-gray-100 text-black border border-gray-300'}`}>%</button>
+                    className={`px-3 py-1.5 text-sm rounded-md ${discountType === 'percent' ? 'bg-[#D4AF37] text-white' : 'bg-gray-100 text-black border border-gray-300'}`}>%</button>
                   <button onClick={() => setDiscountType('fixed')}
-                    className={`px-3 py-1.5 outer-sans text-sm rounded-md ${discountType === 'fixed' ? 'bg-[#D4AF37] text-white' : 'bg-gray-100 text-black border border-gray-300'}`}>NPR</button>
+                    className={`px-3 py-1.5 text-sm rounded-md ${discountType === 'fixed' ? 'bg-[#D4AF37] text-white' : 'bg-gray-100 text-black border border-gray-300'}`}>NPR</button>
                 </div>
                 <input type="number" placeholder="0" value={discountValue || ''}
                   onChange={(e) => setDiscountValue(parseFloat(e.target.value) || 0)}
@@ -586,7 +586,7 @@ export default function POSPage() {
 
           {cart.length > 0 && (
             <div className="px-4 py-3 border-t border-gray-200">
-              <span className="text-sm font-medium text-black outer-sans mb-2 block">Payment Method</span>
+              <span className="text-sm font-medium text-black mb-2 block">Payment Method</span>
               <div className="grid grid-cols-5 gap-2">
                 {paymentMethods.map(method => (
                   <button key={method.value} onClick={() => setPaymentMethod(method.value)}
@@ -609,7 +609,7 @@ export default function POSPage() {
               <div className="flex gap-2">
                 <button onClick={clearCart} className="px-4 py-4 bg-gray-100 text-black rounded-lg font-medium hover:bg-gray-200"><X className="w-5 h-5" /></button>
                 <button onClick={handleCheckout} disabled={cart.length === 0 || processing}
-                  className="flex-1 bg-[#D4AF37] text-white py-4 rounded-lg font-bold outer-sans text-lg hover:bg-[#b8962e] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                  className="flex-1 bg-[#D4AF37] text-white py-4 rounded-lg font-bold text-lg hover:bg-[#b8962e] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                   <Receipt className="w-5 h-5" />
                   {processing ? 'Processing...' : `Charge NPR ${total.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
                 </button>

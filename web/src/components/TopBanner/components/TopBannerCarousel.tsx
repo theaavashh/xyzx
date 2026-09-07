@@ -1,5 +1,6 @@
 'use client';
 
+import { forwardRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useBannerRotation } from '../hooks';
 import type { Banner } from '../types';
@@ -12,11 +13,11 @@ interface TopBannerCarouselProps {
   autoRotateInterval?: number;
 }
 
-export function TopBannerCarousel({
+export const TopBannerCarousel = forwardRef<HTMLElement, TopBannerCarouselProps>(function TopBannerCarousel({
   banners,
   enableRotation = false,
   autoRotateInterval = 5000,
-}: TopBannerCarouselProps) {
+}, ref) {
   const { currentBanner, next, previous, goTo, currentIndex } =
     useBannerRotation({
       banners,
@@ -27,8 +28,9 @@ export function TopBannerCarousel({
   if (!currentBanner) return null;
 
   return (
-    <div
-      className="text-gray-800 relative"
+    <header
+      ref={ref}
+      className="text-zinc-600 relative"
       style={{
         backgroundColor: currentBanner.backgroundColor || DEFAULT_BANNER_BG_COLOR,
         color: currentBanner.textColor || DEFAULT_BANNER_TEXT_COLOR,
@@ -52,7 +54,7 @@ export function TopBannerCarousel({
         <AnimatePresence mode="wait">
           <motion.div
             key={currentBanner.id}
-            className="flex items-center justify-center min-h-[24px] overflow-hidden"
+            className="flex items-center justify-center min-h-[28px] overflow-hidden"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -72,6 +74,6 @@ export function TopBannerCarousel({
           </svg>
         </button>
       </div>
-    </div>
+    </header>
   );
-}
+});

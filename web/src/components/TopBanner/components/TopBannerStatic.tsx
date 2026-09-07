@@ -1,5 +1,6 @@
 'use client';
 
+import { forwardRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Banner } from '../types';
 import { TopBannerContent } from './TopBannerContent';
@@ -9,10 +10,11 @@ interface TopBannerStaticProps {
   banner: Banner;
 }
 
-export function TopBannerStatic({ banner }: TopBannerStaticProps) {
+export const TopBannerStatic = forwardRef<HTMLElement, TopBannerStaticProps>(function TopBannerStatic({ banner }, ref) {
   return (
     <header
-      className="text-gray-800"
+      ref={ref}
+      className="text-zinc-600"
       style={{
         backgroundColor: banner.backgroundColor || DEFAULT_BANNER_BG_COLOR,
         color: banner.textColor || DEFAULT_BANNER_TEXT_COLOR,
@@ -23,7 +25,7 @@ export function TopBannerStatic({ banner }: TopBannerStaticProps) {
       <meta itemProp="name" content="Promotional Banner" />
       <div className="max-w-7xl mx-auto py-1 px-4 sm:px-6 lg:px-8">
         <motion.div
-          className="flex items-center justify-center min-h-[24px] overflow-hidden"
+          className="flex items-center justify-center min-h-[28px] overflow-hidden"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
@@ -33,4 +35,4 @@ export function TopBannerStatic({ banner }: TopBannerStaticProps) {
       </div>
     </header>
   );
-}
+});

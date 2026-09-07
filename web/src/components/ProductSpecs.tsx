@@ -7,12 +7,12 @@ interface ProductSpecsProps {
 export default function ProductSpecs({ product }: ProductSpecsProps) {
   return (
     <div className="py-12 border-t border-gray-200">
-      <h2 className="text-2xl font-bold text-gray-900 mb-8">Specifications</h2>
+      <h2 className="swansea text-2xl font-bold text-zinc-600 mb-8">Specifications</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Specifications Table */}
         <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3 className="text-lg font-medium text-zinc-600 mb-4">
             Product Details
           </h3>
           <div className="space-y-3">
@@ -22,10 +22,10 @@ export default function ProductSpecs({ product }: ProductSpecsProps) {
                   key={`spec-${product.id}-${key}`}
                   className="flex justify-between py-2 border-b border-gray-100"
                 >
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-zinc-600">
                     {key}
                   </span>
-                  <span className="text-sm text-gray-600">{value}</span>
+                  <span className="text-sm text-zinc-600">{value}</span>
                 </div>
               ))}
           </div>
@@ -35,32 +35,32 @@ export default function ProductSpecs({ product }: ProductSpecsProps) {
         <div className="space-y-6">
           {product.material && (
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-zinc-600 mb-2">
                 Material
               </h3>
-              <p className="text-sm text-gray-600">{product.material}</p>
+              <p className="text-sm text-zinc-600">{product.material}</p>
             </div>
           )}
 
           {product.care && (
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-zinc-600 mb-2">
                 Care Instructions
               </h3>
-              <p className="text-sm text-gray-600">{product.care}</p>
+              <p className="text-sm text-zinc-600">{product.care}</p>
             </div>
           )}
 
           {product.origin && (
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Origin</h3>
-              <p className="text-sm text-gray-600">{product.origin}</p>
+              <h3 className="text-lg font-medium text-zinc-600 mb-2">Origin</h3>
+              <p className="text-sm text-zinc-600">{product.origin}</p>
             </div>
           )}
 
           {/* Size Guide */}
           <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-zinc-600 mb-2">
               Size Guide
             </h3>
             <button
@@ -77,7 +77,7 @@ export default function ProductSpecs({ product }: ProductSpecsProps) {
       {/* Features List */}
       {product.features && product.features.length > 0 && (
         <div className="mt-8">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3 className="text-lg font-medium text-zinc-600 mb-4">
             Features & Benefits
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -97,7 +97,7 @@ export default function ProductSpecs({ product }: ProductSpecsProps) {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="text-sm text-gray-600">{feature}</span>
+                <span className="text-sm text-zinc-600">{feature}</span>
               </div>
             ))}
           </div>

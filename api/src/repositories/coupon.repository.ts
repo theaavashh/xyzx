@@ -157,6 +157,28 @@ export const getCouponStats = async () => {
   };
 };
 
+export const findActivePublicCoupons = async (): Promise<Coupon[]> => {
+  const now = new Date();
+  return prisma.coupon.findMany({
+    where: {
+      isActive: true,
+      startDate: { lte: now },
+      endDate: { gte: now },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 5,
+  });
+};
+
+export const incrementUsedCount = async (id: string): Promise<Coupon> => {
+  const coupon = await prisma.coupon.update({
+    where: { id },
+    data: { usedCount: { increment: 1 } },
+  });
+  await invalidateCache();
+  return coupon;
+};
+
 export const couponRepository = {
   findCoupons,
   findCouponById,
@@ -168,4 +190,6 @@ export const couponRepository = {
   existsByCode,
   toggleCouponStatus,
   getCouponStats,
+  findActivePublicCoupons,
+  incrementUsedCount,
 };

@@ -181,7 +181,7 @@ export const getTopProducts: RequestHandler = asyncHandler(async (req: Request, 
       take: limit,
     });
 
-    const productIds = productSales.map((p) => p.productId);
+    const productIds = productSales.map((p) => p.productId).filter((id): id is string => id !== null);
     const products = await prisma.product.findMany({
       where: { id: { in: productIds } },
       select: { id: true, name: true, images: true },
@@ -190,7 +190,7 @@ export const getTopProducts: RequestHandler = asyncHandler(async (req: Request, 
     const productMap = new Map(products.map((p) => [p.id, p]));
 
     const result = productSales.map((ps) => {
-      const product = productMap.get(ps.productId);
+      const product = productMap.get(ps.productId as string);
       return {
         id: ps.productId,
         name: product?.name || 'Unknown',

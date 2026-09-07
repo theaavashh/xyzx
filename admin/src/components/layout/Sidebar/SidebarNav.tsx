@@ -8,6 +8,7 @@ import type { NavItem } from '@/constants/navigation';
 import { SidebarSection } from './SidebarSection';
 
 interface SidebarNavProps {
+  isCollapsed: boolean;
   expandedSections: string[];
   toggleSection: (id: string) => void;
   handleNavigation: (itemId: string, parentId?: string) => void;
@@ -46,6 +47,7 @@ function getInitialTab(pathname: string, contentRoutes: Set<string>): 'main' | '
 }
 
 export function SidebarNav({
+  isCollapsed,
   expandedSections,
   toggleSection,
   handleNavigation,
@@ -65,28 +67,32 @@ export function SidebarNav({
 
   return (
     <nav suppressHydrationWarning className="flex-1 overflow-y-auto px-1 py-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-      <div className="flex gap-1 px-2 py-1 mb-3 bg-gray-50 rounded-md mx-2">
-        <button
-          onClick={() => setActiveTab('main')}
-          className={`flex-1 py-1.5 text-xl font-medium rounded-md transition-all outer-sans ${
-            activeTab === 'main'
-              ? 'bg-[#D4AF37] text-white'
-              : 'bg-gray-50 text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Main
-        </button>
-        <button
-          onClick={() => setActiveTab('content')}
-          className={`flex-1 py-1.5 text-xl font-medium rounded-md transition-all outer-sans ${
-            activeTab === 'content'
-              ? 'bg-[#D4AF37] text-white'
-              : 'bg-gray-50 text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Content
-        </button>
-      </div>
+      {!isCollapsed && (
+        <div className="flex gap-1 px-2 py-1 mb-3 bg-gray-50 rounded-lg mx-2">
+          <button
+            onClick={() => setActiveTab('main')}
+            title="Main"
+            className={`flex-1 py-1.5 text-xl font-medium rounded-lg transition-all ${
+              activeTab === 'main'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'bg-gray-50 text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Main
+          </button>
+          <button
+            onClick={() => setActiveTab('content')}
+            title="Content"
+            className={`flex-1 py-1.5 text-xl font-medium rounded-lg transition-all ${
+              activeTab === 'content'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'bg-gray-50 text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Content
+          </button>
+        </div>
+      )}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}
@@ -99,6 +105,7 @@ export function SidebarNav({
           {filteredSections.map((section) => (
             <SidebarSection
               key={section.id}
+              isCollapsed={isCollapsed}
               title={section.title}
               items={section.items}
               expandedSections={expandedSections}

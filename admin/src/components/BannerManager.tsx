@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { authHeaders } from '@/utils/authHeaders';
 
 interface Banner {
   id: string;
@@ -45,6 +46,7 @@ interface BannerFormData {
 const fetchBanners = async (): Promise<Banner[]> => {
   const response = await fetch('/api/v1/banners', {
     credentials: 'include',
+    headers: authHeaders(),
   });
   if (!response.ok) throw new Error('Failed to fetch banners');
   const data = await response.json();
@@ -55,7 +57,7 @@ const createBanner = async (banner: BannerFormData): Promise<Banner> => {
   const response = await fetch('/api/v1/banners', {
     method: 'POST',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(banner),
   });
   if (!response.ok) throw new Error('Failed to create banner');
@@ -70,7 +72,7 @@ const updateBanner = async ({
   const response = await fetch(`/api/v1/banners/${id}`, {
     method: 'PUT',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(banner),
   });
   if (!response.ok) throw new Error('Failed to update banner');
@@ -82,6 +84,7 @@ const deleteBanner = async (id: string): Promise<void> => {
   const response = await fetch(`/api/v1/banners/${id}`, {
     method: 'DELETE',
     credentials: 'include',
+    headers: authHeaders(),
   });
   if (!response.ok) throw new Error('Failed to delete banner');
 };
@@ -96,7 +99,7 @@ const toggleBannerStatus = async ({
   const response = await fetch(`/api/v1/banners/${id}`, {
     method: 'PUT',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify({ isActive: !isActive }),
   });
   if (!response.ok) throw new Error('Failed to update banner status');
@@ -408,16 +411,16 @@ export default function BannerManager() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider outer-sans">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Banner
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider outer-sans">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Position
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider outer-sans">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider outer-sans">
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -439,7 +442,7 @@ export default function BannerManager() {
                           <img
                             src={banner.imageUrl}
                             alt={banner.title}
-                            className="h-full w-full object-cover"
+                            className="h-full w-full object-contain"
                           />
                         ) : (
                           <Image className="w-6 h-6 text-gray-400 m-auto" />

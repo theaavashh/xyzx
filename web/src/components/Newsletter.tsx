@@ -35,10 +35,10 @@ export default function Newsletter() {
           </div>
 
           {/* Heading */}
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="swansea text-3xl md:text-4xl font-bold text-white mb-4">
             Stay in the Loop
           </h2>
-          <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
+          <p className="text-zinc-600 text-lg mb-8 max-w-2xl mx-auto">
             Subscribe to our newsletter for exclusive deals, new arrivals, and
             insider access to special promotions.
           </p>
@@ -58,7 +58,7 @@ export default function Newsletter() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-8 py-4 bg-white text-gray-900 font-semibold rounded-full hover:bg-gray-100 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="px-8 py-4 bg-white text-zinc-600 font-semibold rounded-full hover:bg-gray-100 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isLoading ? (
                     <span>Subscribing...</span>
@@ -70,7 +70,7 @@ export default function Newsletter() {
                   )}
                 </button>
               </div>
-              <p className="text-gray-500 text-sm mt-4">
+              <p className="text-zinc-600 text-sm mt-4">
                 By subscribing, you agree to our Privacy Policy and consent to
                 receive updates.
               </p>
@@ -82,8 +82,8 @@ export default function Newsletter() {
               className="flex flex-col items-center gap-4"
             >
               <CheckCircle className="w-16 h-16 text-green-400" />
-              <h3 className="text-2xl font-bold text-white">Thank You!</h3>
-              <p className="text-gray-400">
+              <h3 className="swansea text-2xl font-bold text-white">Thank You!</h3>
+              <p className="text-zinc-600">
                 You&apos;ve successfully subscribed to our newsletter.
               </p>
             </motion.div>
@@ -100,17 +100,17 @@ export default function Newsletter() {
         >
           <div className="text-center">
             <p className="text-2xl font-bold text-white mb-2">10% OFF</p>
-            <p className="text-gray-400 text-sm">On your first order</p>
+            <p className="text-zinc-600 text-sm">On your first order</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-white mb-2">Early Access</p>
-            <p className="text-gray-400 text-sm">To new collections</p>
+            <p className="text-zinc-600 text-sm">To new collections</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-white mb-2">
               Exclusive Deals
             </p>
-            <p className="text-gray-400 text-sm">Members only sales</p>
+            <p className="text-zinc-600 text-sm">Members only sales</p>
           </div>
         </motion.div>
       </div>

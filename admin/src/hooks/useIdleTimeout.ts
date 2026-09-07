@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 
-const IDLE_TIMEOUT_MS = 60 * 60 * 1000;
+const IDLE_TIMEOUT_MS = 3 * 60 * 60 * 1000;
 
 interface UseIdleTimeoutOptions {
   onIdle: () => void;

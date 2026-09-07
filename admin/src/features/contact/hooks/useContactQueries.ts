@@ -1,5 +1,6 @@
 'use client';
 
+import { authHeaders } from '@/utils/authHeaders';
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import type { ContactSubmission } from '../types';
@@ -15,6 +16,7 @@ export function useContactSubmissions() {
     try {
       const response = await fetch(`${API_BASE}/api/v1/contact/submissions`, {
         credentials: 'include',
+        headers: authHeaders(),
       });
       if (response.ok) {
         const result = await response.json();
@@ -45,6 +47,7 @@ export function useDeleteSubmission() {
       const response = await fetch(`${API_BASE}/api/v1/contact/submissions/${id}`, {
         method: 'DELETE',
         credentials: 'include',
+        headers: authHeaders(),
       });
 
       if (!response.ok) {
@@ -74,7 +77,7 @@ export function useMarkAsRead() {
     try {
       const response = await fetch(`${API_BASE}/api/v1/contact/submissions/${id}/read`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
       });
 

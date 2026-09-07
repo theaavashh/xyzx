@@ -1,25 +1,27 @@
 'use client';
 
+import type { UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue, Control } from 'react-hook-form';
 import { Input } from '@/components/ui/Input';
 import { Select, Textarea } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
-import type { CouponFormData, DiscountType, ApplicableTo } from '../types';
+import type { CouponFormData } from '../types';
 
 interface CouponFormProps {
-  initial: CouponFormData;
-  onChange: (data: CouponFormData) => void;
+  register: UseFormRegister<CouponFormData>;
+  errors: FieldErrors<CouponFormData>;
+  watch: UseFormWatch<CouponFormData>;
+  setValue: UseFormSetValue<CouponFormData>;
   disabled?: boolean;
 }
 
-export function CouponForm({ initial, onChange, disabled }: CouponFormProps) {
-  const update = <K extends keyof CouponFormData>(key: K, value: CouponFormData[K]) =>
-    onChange({ ...initial, [key]: value });
+export function CouponForm({ register, errors, watch, setValue, disabled }: CouponFormProps) {
+  const discountType = watch('type');
 
   const generateCode = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let code = '';
     for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-    update('code', code);
+    setValue('code', code, { shouldValidate: true });
   };
 
   return (
@@ -29,11 +31,11 @@ export function CouponForm({ initial, onChange, disabled }: CouponFormProps) {
           <label className="block text-sm font-medium text-gray-700 mb-1.5">Coupon Code *</label>
           <div className="flex gap-2">
             <Input
-              value={initial.code}
-              onChange={(e) => update('code', e.target.value.toUpperCase())}
+              {...register('code', { required: 'Coupon code is required', minLength: { value: 2, message: 'Code must be at least 2 characters' } })}
               placeholder="WELCOME10"
               disabled={disabled}
               className="flex-1"
+              error={errors.code?.message}
             />
             <Button type="button" size="sm" onClick={generateCode} disabled={disabled}>
               Generate
@@ -42,58 +44,53 @@ export function CouponForm({ initial, onChange, disabled }: CouponFormProps) {
         </div>
         <Input
           label="Coupon Name *"
-          value={initial.name}
-          onChange={(e) => update('name', e.target.value)}
+          {...register('name', { required: 'Coupon name is required' })}
           placeholder="Welcome Discount"
           disabled={disabled}
+          error={errors.name?.message}
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Select
           label="Discount Type *"
-          value={initial.type}
-          onChange={(e) => update('type', e.target.value as DiscountType)}
+          {...register('type', { required: 'Discount type is required' })}
           options={[
             { label: 'Percentage', value: 'percentage' },
             { label: 'Fixed Amount', value: 'fixed' },
           ]}
           disabled={disabled}
+          error={errors.type?.message}
         />
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Discount Value *</label>
-          <div className="relative">
-            <Input
-              type="text"
-              value={initial.value}
-              onChange={(e) => update('value', e.target.value as any)}
-              placeholder="10"
-              disabled={disabled}
-              className="pr-10"
-            />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
-              {initial.type === 'percentage' ? '%' : 'A$'}
-            </span>
-          </div>
-        </div>
+        <Input
+          label="Discount Value *"
+          type="number"
+          step="0.01"
+          {...register('value', { required: 'Discount value is required', valueAsNumber: true, min: { value: 0.01, message: 'Value must be greater than 0' } })}
+          placeholder="10"
+          disabled={disabled}
+          error={errors.value?.message}
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
           label="Minimum Order Amount"
           type="number"
-          value={initial.minOrderAmount ?? 0}
-          onChange={(e) => update('minOrderAmount', Number(e.target.value))}
-          placeholder="1000"
+          step="0.01"
+          {...register('minOrderAmount', { valueAsNumber: true, min: { value: 0, message: 'Cannot be negative' } })}
+          placeholder="0"
           disabled={disabled}
+          error={errors.minOrderAmount?.message}
         />
         <Input
           label="Maximum Discount Amount"
           type="number"
-          value={initial.maxDiscountAmount ?? 0}
-          onChange={(e) => update('maxDiscountAmount', Number(e.target.value))}
-          placeholder="500"
+          step="0.01"
+          {...register('maxDiscountAmount', { valueAsNumber: true, min: { value: 0, message: 'Cannot be negative' } })}
+          placeholder="0"
           disabled={disabled}
+          error={errors.maxDiscountAmount?.message}
         />
       </div>
 
@@ -101,54 +98,43 @@ export function CouponForm({ initial, onChange, disabled }: CouponFormProps) {
         <Input
           label="Usage Limit"
           type="number"
-          value={initial.usageLimit ?? 0}
-          onChange={(e) => update('usageLimit', Number(e.target.value))}
-          placeholder="100"
+          {...register('usageLimit', { valueAsNumber: true, min: { value: 0, message: 'Cannot be negative' } })}
+          placeholder="0"
           disabled={disabled}
+          error={errors.usageLimit?.message}
         />
-        <Select
-          label="Applicable To"
-          value={initial.applicableTo}
-          onChange={(e) => update('applicableTo', e.target.value as ApplicableTo)}
-          options={[
-            { label: 'All Products', value: 'all' },
-            { label: 'Specific Products', value: 'products' },
-            { label: 'Product Categories', value: 'categories' },
-          ]}
-          disabled={disabled}
-        />
+        <div />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
-          label="Start Date"
+          label="Start Date *"
           type="date"
-          value={initial.startDate}
-          onChange={(e) => update('startDate', e.target.value)}
+          {...register('startDate', { required: 'Start date is required' })}
           disabled={disabled}
+          error={errors.startDate?.message}
         />
         <Input
-          label="End Date"
+          label="End Date *"
           type="date"
-          value={initial.endDate}
-          onChange={(e) => update('endDate', e.target.value)}
+          {...register('endDate', { required: 'End date is required' })}
           disabled={disabled}
+          error={errors.endDate?.message}
         />
       </div>
 
       <Textarea
         label="Description"
-        value={initial.description ?? ''}
-        onChange={(e) => update('description', e.target.value)}
+        {...register('description')}
         placeholder="Describe the coupon and its benefits"
         disabled={disabled}
+        error={errors.description?.message}
       />
 
       <label className="flex items-center gap-2 cursor-pointer">
         <input
           type="checkbox"
-          checked={initial.isActive}
-          onChange={(e) => update('isActive', e.target.checked)}
+          {...register('isActive')}
           disabled={disabled}
           className="rounded border-gray-300 text-[#D4AF37] focus:ring-[#D4AF37]"
         />

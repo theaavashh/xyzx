@@ -1,7 +1,6 @@
 export interface ImageGridItem {
   id: string;
   src: string;
-  alt: string;
   title: string | null;
   subtitle: string | null;
   link: string | null;
@@ -13,7 +12,6 @@ export interface ImageGridItem {
 
 export interface ImageGridForm {
   src: string;
-  alt: string;
   title: string;
   subtitle: string;
   link: string;

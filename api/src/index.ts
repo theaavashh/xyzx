@@ -6,6 +6,7 @@ import { initializeCache, closeCache } from './services/cache.service';
 import { autoCreateAdmin } from './scripts/auto-create-admin';
 import { logger } from './utils/logger';
 import { startGrpcServer, stopGrpcServer } from './grpc';
+import { initWebSocket, closeWebSocket } from './services/websocket.service';
 
 dotenv.config();
 
@@ -24,6 +25,9 @@ const gracefulShutdown = async (signal: string) => {
 
     await closeCache();
     logger.info('Cache service closed');
+
+    closeWebSocket();
+    logger.info('WebSocket server stopped');
 
     await disconnectDB();
     logger.info('Database disconnected');
@@ -61,6 +65,9 @@ const startServer = async () => {
         uptime: process.uptime(),
       });
     });
+
+    initWebSocket(server);
+    logger.info('WebSocket server initialized');
 
     server.on('error', (err: Error) => {
       logger.error('Server error', undefined, err);

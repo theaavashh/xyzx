@@ -4,11 +4,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import type { User } from '@/lib/dashboard/types';
+import { csrfHeaders } from '@/utils/csrf';
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  signup: (name: string, email: string, password: string) => Promise<boolean>;
+  signup: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   isLoading: boolean;
   isAuthenticated: boolean;
@@ -38,7 +39,8 @@ async function fetchWithCredentials(endpoint: string, options: RequestInit = {})
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        ...options.headers,
+        ...(options.headers as Record<string, string> | undefined),
+        ...csrfHeaders(options.method),
       },
     });
     
@@ -179,13 +181,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const response = await fetchWithCredentials('/api/v1/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, role: 'user' }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
+      }
+
+      if (data.data?.requiresOtp) {
+        return false;
       }
 
       const profileRes = await fetchWithCredentials('/api/v1/auth/profile');
@@ -207,7 +213,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const signup = async (name: string, email: string, password: string): Promise<boolean> => {
+  const signup = async (name: string, email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       setIsLoading(true);
 
@@ -219,15 +225,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Signup failed');
+        return { success: false, error: data.message || 'Signup failed' };
       }
 
       toast.success('Account created successfully!');
-      return true;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Signup failed';
-      toast.error(message);
-      return false;
+      return { success: true };
+    } catch {
+      return { success: false, error: 'Network error. Please try again.' };
     } finally {
       setIsLoading(false);
     }

@@ -32,13 +32,13 @@ export default function SizeGuideModal({
           <div className="h-full flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-zinc-600">
                 Size Guide
               </h2>
               <button
                 type="button"
                 onClick={onClose}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 text-zinc-600 hover:text-zinc-600 hover:bg-gray-100 rounded-full transition-colors"
                 aria-label="Close size guide"
               >
                 <svg
@@ -62,7 +62,7 @@ export default function SizeGuideModal({
             <div className="flex-1 overflow-y-auto px-6 py-6">
               {/* Measurement Chart */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 general-sans">
+                <h3 className="text-lg font-semibold text-zinc-600 mb-4 general-sans">
                   Size Chart
                 </h3>
 
@@ -70,13 +70,13 @@ export default function SizeGuideModal({
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-600 uppercase tracking-wider">
                           Size
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-600 uppercase tracking-wider">
                           Chest (in)
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-600 uppercase tracking-wider">
                           Length (in)
                         </th>
                       </tr>
@@ -89,16 +89,16 @@ export default function SizeGuideModal({
                             index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                           }
                         >
-                          <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-gray-900">
+                          <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-zinc-600">
                             {size}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-zinc-600">
                             {32 +
                               ['XS', 'S', 'M', 'L', 'XL', 'XXL'].indexOf(size) *
                                 2}
                             "
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-zinc-600">
                             {24 +
                               ['XS', 'S', 'M', 'L', 'XL', 'XXL'].indexOf(size) *
                                 0.5}

@@ -52,11 +52,11 @@ export function FAQList({ faqs, onEdit, onDelete, onToggle, isLoading }: FAQList
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-200 bg-gray-50 text-left text-gray-500 text-xs uppercase tracking-wider">
-            <th className="px-4 py-3 font-medium outer-sans">Question</th>
-            <th className="px-4 py-3 font-medium outer-sans">Category</th>
-            <th className="px-4 py-3 font-medium w-16 outer-sans">Order</th>
-            <th className="px-4 py-3 font-medium w-20 outer-sans">Status</th>
-            <th className="px-4 py-3 font-medium w-28 outer-sans">Actions</th>
+            <th className="px-4 py-3 font-medium">Question</th>
+            <th className="px-4 py-3 font-medium">Category</th>
+            <th className="px-4 py-3 font-medium w-16">Order</th>
+            <th className="px-4 py-3 font-medium w-20">Status</th>
+            <th className="px-4 py-3 font-medium w-28">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">

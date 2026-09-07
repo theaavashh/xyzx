@@ -31,29 +31,21 @@ export function CategoryGridGrid({
 }: CategoryGridGridProps) {
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="border border-gray-200 rounded-lg p-4 animate-pulse"
+            className="border border-gray-200 rounded-xl overflow-hidden animate-pulse flex"
           >
-            <div className="flex items-start justify-between">
-              <div className="flex-1 space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="h-5 bg-gray-200 rounded w-32" />
-                  <div className="h-4 bg-gray-200 rounded w-16" />
-                  <div className="h-4 bg-gray-200 rounded w-20" />
-                </div>
-                <div className="h-4 bg-gray-200 rounded w-48" />
-                <div className="flex items-center gap-4">
-                  <div className="h-16 w-16 bg-gray-200 rounded" />
-                </div>
+            <div className="w-44 h-40 bg-gray-100 flex-shrink-0" />
+            <div className="flex-1 p-4 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-5 bg-gray-200 rounded w-32" />
+                <div className="h-4 bg-gray-200 rounded w-16" />
+                <div className="h-4 bg-gray-200 rounded w-20" />
               </div>
-              <div className="flex items-center gap-2 ml-4">
-                <div className="h-8 w-8 bg-gray-200 rounded" />
-                <div className="h-8 w-8 bg-gray-200 rounded" />
-                <div className="h-8 w-8 bg-gray-200 rounded" />
-              </div>
+              <div className="h-4 bg-gray-200 rounded w-48" />
+              <div className="h-3 bg-gray-200 rounded w-32" />
             </div>
           </div>
         ))}
@@ -74,7 +66,7 @@ export function CategoryGridGrid({
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex items-center gap-2 bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all font-semibold"
+          className="inline-flex items-center gap-2 bg-[#D4AF37] text-white px-4 py-2.5 text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all font-semibold"
         >
           <Plus className="w-4 h-4" />
           Create Item
@@ -84,60 +76,62 @@ export function CategoryGridGrid({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {items.map((item, index) => (
         <motion.div
           key={item.id}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+          className="bg-white border border-gray-200 rounded-xl overflow-hidden group flex hover:shadow-md transition-shadow"
         >
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
+          <div className="relative w-44 h-40 bg-gray-100 flex-shrink-0">
+            {item.image ? (
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-full object-contain"
+                crossOrigin="anonymous"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <ImageIcon className="w-8 h-8 text-gray-300" />
+              </div>
+            )}
+            <div className="absolute top-2 left-2 bg-black/60 text-white text-xs font-bold px-2 py-0.5 rounded">
+              #{item.order}
+            </div>
+            <div className="absolute top-2 right-2">
+              <span
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                  item.isActive
+                    ? 'bg-emerald-500/90 text-white border-emerald-400/30'
+                    : 'bg-gray-500/90 text-white border-gray-400/30'
+                }`}
+              >
+                {item.isActive ? 'ACTIVE' : 'INACTIVE'}
+              </span>
+            </div>
+          </div>
+          <div className="flex-1 p-4 flex flex-col justify-between min-w-0">
+            <div>
               <div className="flex items-center gap-3 mb-2">
-                <h3 className="font-semibold text-gray-900">{item.title}</h3>
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    item.isActive
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
-                  {item.isActive ? 'Active' : 'Inactive'}
-                </span>
-                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                  Order: {item.order}
-                </span>
+                <h3 className="font-semibold text-gray-900 truncate">{item.title}</h3>
               </div>
-
-              <div className="flex items-center gap-4 mb-2">
-                {item.image ? (
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-16 h-16 object-cover rounded border border-gray-200"
-                    crossOrigin="anonymous"
-                  />
-                ) : null}
-                {item.link && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <LinkIcon className="w-4 h-4" />
-                    <span className="truncate max-w-xs">{item.link}</span>
-                  </div>
-                )}
-              </div>
-
               {item.subtitle && (
-                <p className="text-sm text-gray-500 mb-1">{item.subtitle}</p>
+                <p className="text-sm text-gray-500 mb-2 truncate">{item.subtitle}</p>
               )}
-
-              <div className="text-xs text-gray-500">
+              {item.link && (
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <LinkIcon className="w-3.5 h-3.5" />
+                  <span className="truncate max-w-md">{item.link}</span>
+                </div>
+              )}
+              <div className="text-xs text-gray-400 mt-2">
                 Created: {new Date(item.createdAt).toLocaleDateString()}
               </div>
             </div>
-
-            <div className="flex items-center gap-1">
-              <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between pt-3 mt-2 border-t border-gray-100">
+              <div className="flex gap-0.5">
                 <button
                   type="button"
                   onClick={() => onReorder(item.id, 'up')}
@@ -157,32 +151,33 @@ export function CategoryGridGrid({
                   <ArrowDown className="w-3.5 h-3.5" />
                 </button>
               </div>
-              <div className="w-px h-6 bg-gray-200 mx-1" />
-              <button
-                type="button"
-                onClick={() => onEdit(item)}
-                className="px-2.5 py-1 text-xs font-medium text-[#D4AF37] bg-[#D4AF37]/10 rounded-md hover:bg-[#D4AF37]/20 transition-colors"
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                onClick={() => onToggle(item)}
-                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
-                  item.isActive
-                    ? 'text-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20'
-                    : 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100'
-                }`}
-              >
-                {item.isActive ? 'Deactivate' : 'Activate'}
-              </button>
-              <button
-                type="button"
-                onClick={() => onDelete(item)}
-                className="px-2.5 py-1 text-xs font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors"
-              >
-                Delete
-              </button>
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  onClick={() => onEdit(item)}
+                  className="px-2.5 py-1 text-xs font-medium text-[#D4AF37] bg-[#D4AF37]/10 rounded-md hover:bg-[#D4AF37]/20 transition-colors"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onToggle(item)}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
+                    item.isActive
+                      ? 'text-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20'
+                      : 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100'
+                  }`}
+                >
+                  {item.isActive ? 'Deactivate' : 'Activate'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onDelete(item)}
+                  className="px-2.5 py-1 text-xs font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
         </motion.div>

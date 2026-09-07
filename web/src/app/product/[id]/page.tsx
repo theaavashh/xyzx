@@ -42,20 +42,20 @@ export default async function ProductPage({
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-gray-500">
+          <ol className="flex items-center space-x-2 text-sm text-zinc-600">
             <li>
-              <Link href="/" className="hover:text-gray-700">
+              <Link href="/" className="hover:text-zinc-600">
                 Home
               </Link>
             </li>
             <li>/</li>
             <li>
-              <Link href="/products" className="hover:text-gray-700">
+              <Link href="/products" className="hover:text-zinc-600">
                 Products
               </Link>
             </li>
             <li>/</li>
-            <li className="text-gray-900">{product.name}</li>
+            <li className="text-zinc-600">{product.name}</li>
           </ol>
         </nav>
 
@@ -92,8 +92,8 @@ export default async function ProductPage({
           <div className="space-y-8">
             {/* Product Header */}
             <div>
-              <span className="text-sm text-gray-500">{product.category}</span>
-              <h1 className="text-4xl font-bold text-gray-900 mt-2">
+              <span className="text-sm text-zinc-600">{product.category}</span>
+              <h1 className="text-4xl font-bold text-zinc-600 mt-2">
                 {product.name}
               </h1>
 
@@ -104,7 +104,7 @@ export default async function ProductPage({
                     {[...Array(5)].map((_, i) => (
                       <svg
                         key={`star-${product.id}-${i}`}
-                        className={`w-5 h-5 ${i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'}`}
+                        className={`w-5 h-5 ${i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-zinc-600'}`}
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -112,12 +112,12 @@ export default async function ProductPage({
                       </svg>
                     ))}
                   </div>
-                  <span className="ml-2 text-sm text-gray-600">
+                  <span className="ml-2 text-sm text-zinc-600">
                     {product.rating} ({product.reviews} reviews)
                   </span>
                 </div>
                 {product.sku && (
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-zinc-600">
                     SKU: {product.sku}
                   </span>
                 )}
@@ -127,12 +127,12 @@ export default async function ProductPage({
             {/* Price */}
             <div>
               <div className="flex items-baseline space-x-3">
-                <span className="text-4xl font-bold text-gray-900">
+                <span className="text-4xl font-bold text-zinc-600">
                   ${product.price.toFixed(2)}
                 </span>
                 {product.originalPrice > product.price && (
                   <>
-                    <span className="text-xl text-gray-500 line-through">
+                    <span className="text-xl text-zinc-600 line-through">
                       ${product.originalPrice.toFixed(2)}
                     </span>
                     <span className="bg-red-100 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded">
@@ -146,7 +146,7 @@ export default async function ProductPage({
             {/* Color Options */}
             {product.colorOptions && product.colorOptions.length > 0 && (
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-3">
+                <h3 className="text-lg font-medium text-zinc-600 mb-3">
                   Color: Black
                 </h3>
                 <div className="flex space-x-3">
@@ -164,18 +164,18 @@ export default async function ProductPage({
 
             {/* Size Selector */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">Size</h3>
+              <h3 className="text-lg font-medium text-zinc-600 mb-3">Size</h3>
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {product.sizes.map((size) => (
                   <button
                     key={size}
-                    className="py-2 px-3 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                    className="py-2 px-3 border border-gray-300 rounded-md text-sm font-medium text-zinc-600 hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
                   >
                     {size}
                   </button>
                 ))}
               </div>
-              <p className="mt-2 text-sm text-gray-500">
+              <p className="mt-2 text-sm text-zinc-600">
                 <Link href="#" className="underline hover:no-underline">
                   Size Guide
                 </Link>
@@ -189,7 +189,7 @@ export default async function ProductPage({
               </button>
               <Link
                 href="/checkout"
-                className="block w-full border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors text-center"
+                className="block w-full border border-gray-300 text-zinc-600 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors text-center"
               >
                 Buy Now
               </Link>
@@ -197,25 +197,23 @@ export default async function ProductPage({
 
             {/* Product Description */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3">
+              <h3 className="text-lg font-medium text-zinc-600 mb-3">
                 Description
               </h3>
-              <p className="text-gray-600 leading-relaxed">
-                {product.description}
-              </p>
+              <div className="text-zinc-600 leading-relaxed" dangerouslySetInnerHTML={{ __html: product.description }} />
             </div>
 
             {/* Product Features */}
             {product.features && product.features.length > 0 && (
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-3">
+                <h3 className="text-lg font-medium text-zinc-600 mb-3">
                   Product Details
                 </h3>
                 <ul className="space-y-2">
                   {product.features.map((feature, index) => (
                     <li
                       key={`feature-${product.id}-${index}`}
-                      className="flex items-start text-sm text-gray-600"
+                      className="flex items-start text-sm text-zinc-600"
                     >
                       <svg
                         className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0"
@@ -264,7 +262,7 @@ export default async function ProductPage({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                 <div className="flex items-center space-x-2">
                   <svg
-                    className="w-4 h-4 text-gray-400"
+                    className="w-4 h-4 text-zinc-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -276,11 +274,11 @@ export default async function ProductPage({
                       d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
                     />
                   </svg>
-                  <span className="text-gray-600">Free Shipping</span>
+                  <span className="text-zinc-600">Free Shipping</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <svg
-                    className="w-4 h-4 text-gray-400"
+                    className="w-4 h-4 text-zinc-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -292,11 +290,11 @@ export default async function ProductPage({
                       d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                     />
                   </svg>
-                  <span className="text-gray-600">Easy Returns</span>
+                  <span className="text-zinc-600">Easy Returns</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <svg
-                    className="w-4 h-4 text-gray-400"
+                    className="w-4 h-4 text-zinc-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -308,7 +306,7 @@ export default async function ProductPage({
                       d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  <span className="text-gray-600">24/7 Support</span>
+                  <span className="text-zinc-600">24/7 Support</span>
                 </div>
               </div>
             </div>
@@ -319,7 +317,7 @@ export default async function ProductPage({
         {product.specifications &&
           Object.keys(product.specifications).length > 0 && (
             <div className="mb-16">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">
+              <h3 className="text-xl font-bold text-zinc-600 mb-6">
                 Product Details
               </h3>
               <div className="bg-gray-50 rounded-lg p-6">
@@ -330,10 +328,10 @@ export default async function ProductPage({
                         key={key}
                         className="flex justify-between py-2 border-b border-gray-200"
                       >
-                        <dt className="text-sm font-medium text-gray-500">
+                        <dt className="text-sm font-medium text-zinc-600">
                           {key}
                         </dt>
-                        <dd className="text-sm text-gray-900">{value}</dd>
+                        <dd className="text-sm text-zinc-600">{value}</dd>
                       </div>
                     ),
                   )}
@@ -348,7 +346,7 @@ export default async function ProductPage({
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div className="mb-16">
-            <h3 className="text-xl font-bold text-gray-900 mb-6">
+            <h3 className="text-xl font-bold text-zinc-600 mb-6">
               You May Also Like
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -371,13 +369,13 @@ export default async function ProductPage({
                     />
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 group-hover:underline">
+                    <h4 className="text-sm font-medium text-zinc-600 group-hover:underline">
                       {relatedProduct.name}
                     </h4>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-zinc-600">
                       {relatedProduct.category}
                     </p>
-                    <p className="text-sm font-bold text-gray-900">
+                    <p className="text-sm font-bold text-zinc-600">
                       ${relatedProduct.price.toFixed(2)}
                     </p>
                   </div>

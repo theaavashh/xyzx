@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContextTanStack';
 
@@ -11,22 +11,19 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isLoading && !isAuthenticated) {
       router.replace('/');
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [mounted, isLoading, isAuthenticated, router]);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
+  if (isLoading || (!mounted && !isAuthenticated)) {
     return null;
   }
 

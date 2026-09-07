@@ -124,7 +124,7 @@ export default function NavigationPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Navigation Menu</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black">Navigation Menu</h1>
             <p className="text-black text-lg mt-2">
               Manage your storefront navigation structure
             </p>
@@ -157,7 +157,7 @@ export default function NavigationPage() {
             <button
               type="button"
               onClick={() => openModal()}
-              className="bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold"
+              className="bg-[#D4AF37] text-white px-4 py-2.5 text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold"
             >
               <Plus className="w-4 h-4" />
               New Item
@@ -240,7 +240,7 @@ function JsonViewModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4"
-      onClick={onClose}
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <motion.div
         initial={{ y: '100%', scale: 0.95 }}

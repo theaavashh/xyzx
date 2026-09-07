@@ -10,8 +10,8 @@ interface LoadingStateProps {
 export function LoadingState({ message = 'Loading...', fullScreen = false }: LoadingStateProps) {
   const content = (
     <div className="flex flex-col items-center justify-center gap-3">
-      <Loader2 className="w-8 h-8 animate-spin text-gray-600" />
-      {message && <p className="text-sm text-gray-500">{message}</p>}
+      <Loader2 className="w-8 h-8 animate-spin text-zinc-600" />
+      {message && <p className="text-sm text-zinc-600">{message}</p>}
     </div>
   );
 

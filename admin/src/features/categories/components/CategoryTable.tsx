@@ -99,7 +99,7 @@ function SortHeader({
   const isActive = currentField === field;
   return (
     <th
-      className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:text-gray-800 transition-colors outer-sans"
+      className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:text-gray-800 transition-colors"
       onClick={() => onSort(field)}
     >
       <div className="flex items-center gap-1.5">
@@ -240,22 +240,22 @@ export default function CategoryTable({
                     className="h-4 w-4 rounded border-gray-300 text-[#D4AF37] focus:ring-[#D4AF37] cursor-pointer"
                   />
                 </th>
-                <th className="w-10 px-2 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">
+                <th className="w-10 px-2 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   #
                 </th>
-                <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">
+                <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Image
                 </th>
                 <SortHeader field="name" currentField={sortField} direction={sortDirection} onSort={onSort}>
                   Name
                 </SortHeader>
-                <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">
+                <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Internal Link
                 </th>
                 <SortHeader field="status" currentField={sortField} direction={sortDirection} onSort={onSort}>
                   Status
                 </SortHeader>
-                <th className="px-4 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider outer-sans">
+                <th className="px-4 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -291,7 +291,7 @@ export default function CategoryTable({
                       <CategoryImage
                         src={category.image}
                         alt={category.name}
-                        className="w-full h-full object-cover cursor-pointer"
+                        className="w-full h-full object-contain cursor-pointer"
                         getFullImageUrl={getFullImageUrl}
                         onPreview={() => handleImagePreview(category.image)}
                       />
@@ -368,7 +368,7 @@ export default function CategoryTable({
                   <CategoryImage
                     src={category.image}
                     alt={category.name}
-                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                    className="h-full w-full object-contain transition duration-300 group-hover:scale-105"
                     getFullImageUrl={getFullImageUrl}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />

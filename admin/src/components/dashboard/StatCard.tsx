@@ -24,12 +24,12 @@ const StatCard: React.FC<StatCardProps> = ({
       
       <div className="relative">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-md font-semibold text-gray-800 uppercase tracking-wide outer-sans">{title}</h3>
+          <h3 className="text-md font-semibold text-gray-800 uppercase tracking-wide">{title}</h3>
           <div className={`p-2.5 rounded-lg ${iconBgColor}`}>
             <Icon className={`w-5 h-5 ${iconColor}`} />
           </div>
         </div>
-        <p className="text-2xl font-bold text-black tracking-tight outer-sans">{value}</p>
+        <p className="text-2xl font-bold text-black tracking-tight">{value}</p>
         {subtitle && <p className="text-sm text-gray-600 mt-1.5 font-medium">{subtitle}</p>}
       </div>
     </div>

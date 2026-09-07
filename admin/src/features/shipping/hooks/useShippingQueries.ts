@@ -1,5 +1,6 @@
 'use client';
 
+import { authHeaders } from '@/utils/authHeaders';
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { clientLogger } from '@/lib/logger';
@@ -15,7 +16,7 @@ export function useShippingItems(type?: string) {
     setIsLoading(true);
     try {
       const params = type ? `?type=${type}` : '';
-      const res = await fetch(`${API_BASE}/api/v1/shipping${params}`, { credentials: 'include' });
+      const res = await fetch(`${API_BASE}/api/v1/shipping${params}`, { credentials: 'include', headers: authHeaders() });
       if (res.ok) {
         const data = await res.json();
         setItems(data.data || []);
@@ -41,7 +42,7 @@ export function useCreateShippingItem() {
     try {
       const res = await fetch(`${API_BASE}/api/v1/shipping`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify(payload),
       });
@@ -73,7 +74,7 @@ export function useUpdateShippingItem() {
     try {
       const res = await fetch(`${API_BASE}/api/v1/shipping/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify(payload),
       });
@@ -106,6 +107,7 @@ export function useDeleteShippingItem() {
       const res = await fetch(`${API_BASE}/api/v1/shipping/${id}`, {
         method: 'DELETE',
         credentials: 'include',
+        headers: authHeaders(),
       });
       if (res.ok) {
         toast.success('Shipping item deleted');
@@ -134,6 +136,7 @@ export function useToggleShippingItem() {
       const res = await fetch(`${API_BASE}/api/v1/shipping/${id}/toggle`, {
         method: 'PATCH',
         credentials: 'include',
+        headers: authHeaders(),
       });
       if (res.ok) {
         const data = await res.json();
@@ -161,7 +164,7 @@ export function useShippingSettings() {
     let mounted = true;
     const load = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/v1/shipping/settings`, { credentials: 'include' });
+        const res = await fetch(`${API_BASE}/api/v1/shipping/settings`, { credentials: 'include', headers: authHeaders() });
         if (res.ok) {
           const data = await res.json();
           if (mounted) setSettings(data.data);
@@ -187,7 +190,7 @@ export function useUpdateShippingSettings() {
     try {
       const res = await fetch(`${API_BASE}/api/v1/shipping/settings`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify(payload),
       });

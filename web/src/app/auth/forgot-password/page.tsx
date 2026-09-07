@@ -32,8 +32,8 @@ export default function ForgotPasswordPage() {
               <Image src="/raphard-logo.png" alt="Rapharch" width={140} height={140} className="h-12 w-auto object-contain" priority />
             </Link>
             <div className="text-center">
-              <h2 className="lastik text-4xl text-black">Reset Password</h2>
-              <p className="text-base text-black mt-1.5">
+              <h2 className="swansea text-4xl text-zinc-600">Reset Password</h2>
+              <p className="text-base text-zinc-600 mt-1.5">
                 Enter your email to receive a reset link.
               </p>
             </div>
@@ -61,18 +61,18 @@ export default function ForgotPasswordPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <label htmlFor="forgot-email" className="block text-base font-medium text-black">
+              <label htmlFor="forgot-email" className="block text-base font-medium text-zinc-600">
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-black" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600" />
                 <input
                   id="forgot-email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-base text-gray-900 outline-none focus:border-black transition-colors placeholder:text-gray-400"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-base text-zinc-600 outline-none focus:border-black transition-colors placeholder:text-zinc-600"
                   placeholder="name@example.com"
                 />
               </div>
@@ -97,7 +97,7 @@ export default function ForgotPasswordPage() {
           <div className="mt-6 text-center">
             <Link
               href="/login"
-              className="inline-flex items-center gap-1.5 text-sm text-black hover:text-gray-600 transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm text-zinc-600 hover:text-zinc-600 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               Back to Sign In

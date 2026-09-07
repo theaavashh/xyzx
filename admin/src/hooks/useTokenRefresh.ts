@@ -5,6 +5,7 @@ import { queryClient } from '@/lib/queryClient';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { tokenRefreshManager } from '@/services/apiClient';
+import { clearAccessToken } from '@/utils/authToken';
 
 interface UseTokenRefreshOptions {
   onLogout: () => void;
@@ -39,6 +40,7 @@ export function useTokenRefresh({ onLogout }: UseTokenRefreshOptions) {
     const handleAuth401 = () => {
       if (isHandlingRef.current) return;
       isHandlingRef.current = true;
+      clearAccessToken();
       forceLogout();
     };
 

@@ -45,7 +45,6 @@ export const createProductSchema = z.object({
   canonicalUrl: z.string().optional(),
   robotsMeta: z.string().optional(),
   seoFriendlyImageFilename: z.string().optional(),
-  imageAltText: z.string().optional(),
   productSchema: z.any().optional(),
   brandSchema: z.any().optional(),
   breadcrumbSchema: z.any().optional(),

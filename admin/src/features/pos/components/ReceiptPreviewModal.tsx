@@ -14,7 +14,7 @@ export default function ReceiptPreviewModal({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <button type="button" className="absolute inset-0 bg-black/50 cursor-default" onClick={onClose} />
+      <button type="button" className="absolute inset-0 bg-black/50 cursor-default" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }} />
       <div className="relative bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
         <div className="flex items-center justify-between p-5 border-b border-gray-200">
           <h3 className="text-lg font-bold text-black">Receipt Preview</h3>
@@ -40,7 +40,7 @@ export default function ReceiptPreviewModal({
             )}
             <div className="bg-white rounded p-3 mb-4">
               <table className="w-full text-xs">
-                <thead><tr className="border-b border-gray-200"><th className="text-left py-2 font-medium text-gray-500 outer-sans">Item</th><th className="text-center py-2 font-medium text-gray-500 outer-sans">Qty</th><th className="text-right py-2 font-medium text-gray-500 outer-sans">Total</th></tr></thead>
+                <thead><tr className="border-b border-gray-200"><th className="text-left py-2 font-medium text-gray-500">Item</th><th className="text-center py-2 font-medium text-gray-500">Qty</th><th className="text-right py-2 font-medium text-gray-500">Total</th></tr></thead>
                 <tbody>
                   {sale.items.map(item => (
                     <tr key={item.id} className="border-b border-dotted border-gray-200">

@@ -15,7 +15,6 @@ interface SeoTabProps {
     canonicalUrl: string;
     robotsMeta: string;
     seoFriendlyImageFilename: string;
-    imageAltText: string;
     productSchema: string;
     brandSchema: string;
     breadcrumbSchema: string;
@@ -384,21 +383,6 @@ const SeoTab: React.FC<SeoTabProps> = React.memo(({
             </p>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Image Alt Text
-            </label>
-            <textarea
-              value={formData.imageAltText}
-              onChange={(e) => onInputChange('imageAltText', e.target.value)}
-              rows={3}
-              placeholder="Describe the image content for accessibility and SEO"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none text-black"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Important for accessibility and image search ranking
-            </p>
-          </div>
         </div>
       </div>
 

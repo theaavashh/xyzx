@@ -63,7 +63,7 @@ export function SlidersModal({
                 <img
                   src={formData.imageUrl}
                   alt="Preview"
-                  className="w-20 h-20 object-cover rounded-lg"
+                  className="w-20 h-20 object-contain rounded-lg"
                 />
               </div>
             )}

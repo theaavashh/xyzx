@@ -21,7 +21,7 @@ export function DeleteCouponAlert({ isOpen, onClose, onConfirm, couponCode, isPe
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <div className="fixed inset-0 bg-black/50" onClick={isPending ? undefined : onClose} />
+          <div className="fixed inset-0 bg-black/50" onMouseDown={(e) => { if (e.target === e.currentTarget && !isPending) onClose(); }} />
           <div className="relative min-h-screen flex items-center justify-center p-4">
             <motion.div
               className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"

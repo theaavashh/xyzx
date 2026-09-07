@@ -33,7 +33,7 @@ export default function ReturnsExchangesPage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Returns & Exchanges
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-zinc-600 max-w-2xl mx-auto">
             Hassle-free returns and exchanges within 30 days
           </p>
         </div>
@@ -49,7 +49,7 @@ export default function ReturnsExchangesPage() {
                   <Clock className="w-8 h-8" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">30-Day Returns</h3>
-                <p className="text-gray-600">
+                <p className="text-zinc-600">
                   Return or exchange any item within 30 days of delivery
                 </p>
               </div>
@@ -58,7 +58,7 @@ export default function ReturnsExchangesPage() {
                   <Package className="w-8 h-8" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">Free Returns</h3>
-                <p className="text-gray-600">
+                <p className="text-zinc-600">
                   Free return shipping on all orders within the US
                 </p>
               </div>
@@ -67,7 +67,7 @@ export default function ReturnsExchangesPage() {
                   <RefreshCw className="w-8 h-8" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">Easy Exchanges</h3>
-                <p className="text-gray-600">
+                <p className="text-zinc-600">
                   Exchange for a different size or color at no extra cost
                 </p>
               </div>
@@ -88,7 +88,7 @@ export default function ReturnsExchangesPage() {
                   <h3 className="text-xl font-bold mb-2">
                     Initiate Your Return
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-zinc-600">
                     Log into your account and go to your order history. Select
                     the order you want to return and click "Return Items."
                     Alternatively, contact our customer service team with your
@@ -102,7 +102,7 @@ export default function ReturnsExchangesPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold mb-2">Package Your Items</h3>
-                  <p className="text-gray-600">
+                  <p className="text-zinc-600">
                     Pack the items securely in the original packaging if
                     possible. Include all tags, accessories, and documentation.
                     Items must be unworn, unwashed, and in original condition.
@@ -115,7 +115,7 @@ export default function ReturnsExchangesPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold mb-2">Ship Your Return</h3>
-                  <p className="text-gray-600">
+                  <p className="text-zinc-600">
                     Print and attach the prepaid return label (for US orders).
                     Drop off your package at any authorized shipping location.
                     For exchanges, we'll ship your new item once we receive your
@@ -131,7 +131,7 @@ export default function ReturnsExchangesPage() {
                   <h3 className="text-xl font-bold mb-2">
                     Receive Your Refund or Exchange
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-zinc-600">
                     Once we receive and inspect your return, we'll process your
                     refund or send your exchange. Refunds are issued to the
                     original payment method within 5-7 business days.
@@ -150,7 +150,7 @@ export default function ReturnsExchangesPage() {
                   <CheckCircle className="w-6 h-6 text-green-600" />
                   Items We Accept
                 </h3>
-                <ul className="space-y-2 text-gray-600">
+                <ul className="space-y-2 text-zinc-600">
                   <li>• Unworn and unwashed items</li>
                   <li>• Items with original tags attached</li>
                   <li>• Items in original packaging</li>
@@ -164,7 +164,7 @@ export default function ReturnsExchangesPage() {
                   <XCircle className="w-6 h-6 text-red-600" />
                   Items We Cannot Accept
                 </h3>
-                <ul className="space-y-2 text-gray-600">
+                <ul className="space-y-2 text-zinc-600">
                   <li>• Worn, washed, or altered items</li>
                   <li>• Items without original tags</li>
                   <li>• Items damaged due to customer misuse</li>
@@ -183,7 +183,7 @@ export default function ReturnsExchangesPage() {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-xl font-bold mb-2">Refund Method</h3>
-                  <p className="text-gray-600">
+                  <p className="text-zinc-600">
                     Refunds will be issued to the original payment method used
                     for the purchase. If you paid with a credit card, the refund
                     will appear on your statement within 5-10 business days
@@ -192,7 +192,7 @@ export default function ReturnsExchangesPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold mb-2">Refund Timing</h3>
-                  <p className="text-gray-600">
+                  <p className="text-zinc-600">
                     Once we receive your return, please allow 2-3 business days
                     for inspection and processing. After approval, refunds are
                     processed within 5-7 business days. You will receive an
@@ -201,7 +201,7 @@ export default function ReturnsExchangesPage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold mb-2">Partial Refunds</h3>
-                  <p className="text-gray-600">
+                  <p className="text-zinc-600">
                     In some cases, partial refunds may be issued for items that
                     are returned with missing parts, damaged packaging, or signs
                     of use. The amount will be determined based on the condition
@@ -215,7 +215,7 @@ export default function ReturnsExchangesPage() {
           {/* Exchange Policy */}
           <section className="mb-16">
             <h2 className="text-3xl font-bold mb-8">Exchange Policy</h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-zinc-600 mb-6">
               We want you to love your purchase. If you need a different size or
               color, exchanges are easy and free within the US. Simply follow
               the return process and select "Exchange" instead of "Return."
@@ -252,7 +252,7 @@ export default function ReturnsExchangesPage() {
             <h2 className="text-3xl font-bold mb-8">
               Damaged or Defective Items
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-zinc-600 mb-6">
               We take quality seriously. If you receive a damaged or defective
               item, please contact us immediately. We will replace the item at
               no cost or provide a full refund, including shipping costs.
@@ -272,14 +272,14 @@ export default function ReturnsExchangesPage() {
             <h2 className="text-2xl font-bold mb-4">
               Need Help with a Return?
             </h2>
-            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+            <p className="text-zinc-600 mb-6 max-w-2xl mx-auto">
               Our customer service team is here to help you with any questions
               about returns or exchanges. Contact us and we'll assist you every
               step of the way.
             </p>
             <a
               href="/contact-us"
-              className="inline-block bg-white text-black px-8 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+              className="inline-block bg-white text-zinc-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
             >
               Contact Customer Service
             </a>

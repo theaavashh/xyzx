@@ -4,6 +4,7 @@ import { SidebarItem } from './SidebarItem';
 import type { NavItem } from '@/constants/navigation';
 
 interface SidebarSectionProps {
+  isCollapsed: boolean;
   title: string;
   items: NavItem[];
   expandedSections: string[];
@@ -13,6 +14,7 @@ interface SidebarSectionProps {
 }
 
 export function SidebarSection({
+  isCollapsed,
   title,
   items,
   expandedSections,
@@ -22,13 +24,16 @@ export function SidebarSection({
 }: SidebarSectionProps) {
   return (
     <div className="mt-3 first:mt-0">
-      <h2 className="text-lg font-semibold text-gray-500 uppercase tracking-normal px-3 mb-1.5 outer-sans">
-        {title}
-      </h2>
+      {!isCollapsed && (
+        <h2 className="text-lg font-semibold text-gray-500 uppercase tracking-normal px-3 mb-1.5">
+          {title}
+        </h2>
+      )}
       <div className="space-y-0.5">
         {items.map((item) => (
           <SidebarItem
             key={item.id}
+            isCollapsed={isCollapsed}
             item={item}
             expandedSections={expandedSections}
             toggleSection={toggleSection}

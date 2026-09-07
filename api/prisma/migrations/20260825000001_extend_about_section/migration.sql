@@ -1,0 +1,22 @@
+-- AlterTable: extend about_sections with hero, story, video, banner, store, and SEO fields
+ALTER TABLE `about_sections`
+  ADD COLUMN `heroImage` VARCHAR(500) NULL,
+  ADD COLUMN `heroSubtitle` VARCHAR(1000) NULL,
+  ADD COLUMN `heroTagline` VARCHAR(500) NULL,
+  ADD COLUMN `storyTitle` VARCHAR(500) NULL,
+  ADD COLUMN `storyContent` TEXT NULL,
+  ADD COLUMN `storyImage` VARCHAR(500) NULL,
+  ADD COLUMN `pullQuote` VARCHAR(1000) NULL,
+  ADD COLUMN `videoUrl` VARCHAR(500) NULL,
+  ADD COLUMN `videoOverlayText` VARCHAR(500) NULL,
+  ADD COLUMN `bannerImage` VARCHAR(500) NULL,
+  ADD COLUMN `bannerText` VARCHAR(500) NULL,
+  ADD COLUMN `storeDescription` VARCHAR(1000) NULL,
+  ADD COLUMN `storeAddress` VARCHAR(500) NULL,
+  ADD COLUMN `storeCity` VARCHAR(200) NULL,
+  ADD COLUMN `storeState` VARCHAR(200) NULL,
+  ADD COLUMN `storeZip` VARCHAR(50) NULL,
+  ADD COLUMN `storePhone` VARCHAR(50) NULL,
+  ADD COLUMN `storeEmail` VARCHAR(200) NULL,
+  ADD COLUMN `metaTitle` VARCHAR(300) NULL,
+  ADD COLUMN `metaDescription` VARCHAR(500) NULL;

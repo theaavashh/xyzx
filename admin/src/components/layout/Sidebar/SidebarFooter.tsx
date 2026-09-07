@@ -4,6 +4,7 @@ import { SidebarUserMenu } from './SidebarUserMenu';
 import type { User } from '@/types';
 
 interface SidebarFooterProps {
+  isCollapsed: boolean;
   user: User | null;
   userInitials: string;
   fullName: string;
@@ -15,6 +16,7 @@ interface SidebarFooterProps {
 }
 
 export function SidebarFooter({
+  isCollapsed,
   user,
   userInitials,
   fullName,
@@ -27,6 +29,7 @@ export function SidebarFooter({
   return (
     <div className="flex-shrink-0 border-t border-gray-200">
       <SidebarUserMenu
+        isCollapsed={isCollapsed}
         user={user}
         userInitials={userInitials}
         fullName={fullName}

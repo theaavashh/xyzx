@@ -11,6 +11,7 @@ import {
   logout,
   refreshAccessToken,
   resetPassword,
+  resendOtp,
   signup,
   verifyCredentials,
   verifyOtp,
@@ -24,6 +25,7 @@ import {
   loginSchema,
   otpSchema,
   resetPasswordSchema,
+  resendOtpSchema,
   signupSchema,
   verifyCredentialsSchema,
   verifyTotpSchema,
@@ -76,6 +78,7 @@ const refreshLimiter = rateLimit({
 
 router.post('/login', authLimiter, validate(loginSchema), login);
 router.post('/verify-otp', otpLimiter, validate(otpSchema), verifyOtp);
+router.post('/resend-otp', otpLimiter, validate(resendOtpSchema), resendOtp);
 router.post('/forgot-password', passwordResetLimiter, validate(forgotPasswordSchema), forgotPassword);
 router.post('/reset-password', passwordResetLimiter, validate(resetPasswordSchema), resetPassword);
 router.post('/signup', authLimiter, validate(signupSchema), signup);

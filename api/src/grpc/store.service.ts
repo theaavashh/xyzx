@@ -129,17 +129,6 @@ export const footerSectionHandlers = make('footer-section', {
   ReorderFooterSections: (c, r) => r.reorder(c.request.orders).then(() => apiOk('Reordered')),
 });
 
-export const shopByCategoryHandlers = make('shop-by-category', {
-  GetActiveShopByCategories: (_c, r) => r.findActive().then((d: any) => listOk(d)),
-  GetAllShopByCategories: (_c, r) => r.findAll().then((d: any) => listOk(d)),
-  GetShopByCategoryById: (c, r) => gi(c, r, 'findById'),
-  CreateShopByCategory: (c, r) => r.create(c.request).then((d: any) => ok(d, 'Created')),
-  UpdateShopByCategory: (c, r) => ui(c, r, 'update'),
-  DeleteShopByCategory: (c, r) => di(c, r, 'delete'),
-  ToggleShopByCategoryStatus: (c, r) => r.toggleStatus(c.request.id).then((d: any) => ok(d, 'Toggled')),
-  ReorderShopByCategories: (c, r) => r.reorder(c.request.orders).then(() => apiOk('Reordered')),
-});
-
 export const storeHandlers = make('store', {
   GetPublicStore: (_c, r) => r.findFirst().then((d: any) => ok(d)),
   GetStore: (_c, r) => r.findFirst().then((d: any) => ok(d)),

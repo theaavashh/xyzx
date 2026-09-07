@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '../lib/database';
 
 export interface CartItemInput {
@@ -20,8 +21,13 @@ export interface CartWithItems {
       id: string;
       name: string;
       price: number;
-      images: string[];
+      images: Prisma.JsonValue;
       slug: string;
+      productVariants: Array<{
+        color: string | null;
+        size: string | null;
+        price: number;
+      }>;
     };
   }>;
 }
@@ -65,6 +71,13 @@ export const findOrCreateCart = async (
                 price: true,
                 images: true,
                 slug: true,
+                productVariants: {
+                  select: {
+                    color: true,
+                    size: true,
+                    price: true,
+                  },
+                },
               },
             },
           },
@@ -73,7 +86,7 @@ export const findOrCreateCart = async (
     });
   }
 
-  return cart as CartWithItems;
+  return cart as unknown as CartWithItems;
 };
 
 export const addToCart = async (

@@ -64,7 +64,7 @@ export default function ProductPreviewModal({ product, onClose, onEdit }: Produc
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
           <motion.div
             className="bg-white rounded-lg shadow-2xl w-full max-w-5xl max-h-[85vh] overflow-hidden flex flex-col"
@@ -76,7 +76,7 @@ export default function ProductPreviewModal({ product, onClose, onEdit }: Produc
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
               <div className="flex items-center gap-3 min-w-0">
-                <h2 className="text-lg font-semibold text-gray-900 truncate outer-sans">{product.name}</h2>
+                <h2 className="text-lg font-semibold text-gray-900 truncate">{product.name}</h2>
                 {product.isFeatured && <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />}
               </div>
               <div className="flex items-center gap-3 shrink-0">
@@ -98,7 +98,7 @@ export default function ProductPreviewModal({ product, onClose, onEdit }: Produc
                       <img
                         src={getImageUrl(product.images[0])}
                         alt={product.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
@@ -111,7 +111,7 @@ export default function ProductPreviewModal({ product, onClose, onEdit }: Produc
                     <div className="grid grid-cols-4 gap-2 mt-3">
                       {product.images.slice(0, 4).map((image, index) => (
                         <div key={index} className="aspect-square rounded-lg overflow-hidden bg-white ring-1 ring-gray-200">
-                          <img src={getImageUrl(image)} alt="" className="w-full h-full object-cover" />
+                          <img src={getImageUrl(image)} alt="" className="w-full h-full object-contain" />
                         </div>
                       ))}
                     </div>
@@ -252,10 +252,10 @@ export default function ProductPreviewModal({ product, onClose, onEdit }: Produc
                         <table className="w-full text-sm">
                           <thead className="bg-gray-50">
                             <tr>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase outer-sans">Variant</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase outer-sans">SKU</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase outer-sans">Price</th>
-                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase outer-sans">Stock</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Variant</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">SKU</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Price</th>
+                              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Stock</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-100">

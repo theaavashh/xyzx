@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { clientLogger } from '@/lib/logger';
+import { authHeaders } from '@/utils/authHeaders';
 import { apiRequest } from '@/services/apiClient';
 import type { SiteSettings } from '../types';
 
@@ -119,6 +120,7 @@ export function useUploadMedia() {
       const response = await fetch('/api/v1/upload/file', {
         method: 'POST',
         credentials: 'include',
+        headers: authHeaders(),
         body: formData,
       });
 

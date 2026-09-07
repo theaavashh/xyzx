@@ -38,7 +38,7 @@ export default function ProductStatsCards({ total, active, inactive, lowStock }:
               </div>
               <div>
                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">{c.label}</p>
-                <p className={`text-2xl outer-sans ${clr.text}`}>{c.value(values[c.label as keyof typeof values])}</p>
+                <p className={`text-2xl ${clr.text}`}>{c.value(values[c.label as keyof typeof values])}</p>
               </div>
             </div>
           </div>

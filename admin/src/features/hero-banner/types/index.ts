@@ -9,6 +9,7 @@ export interface HeroBanner {
   buttonText?: string;
   isActive: boolean;
   order: number;
+  position?: string;
 }
 
 export interface BannerFormEntry {
@@ -22,6 +23,7 @@ export interface BannerFormEntry {
   buttonText: string;
   isActive: boolean;
   order: number;
+  position: string;
   largePreview: string;
   smallPreview: string;
   isUploadingLarge: boolean;
@@ -50,6 +52,7 @@ export function createEntry(order: number): BannerFormEntry {
     id: `entry-${entryCounter}`,
     title: '', subtitle: '', largeImage: '', smallImage: '',
     videoUrl: '', buttonUrl: '', buttonText: '', isActive: true, order,
+    position: 'CENTER',
     largePreview: '', smallPreview: '',
     isUploadingLarge: false, isUploadingSmall: false,
   };

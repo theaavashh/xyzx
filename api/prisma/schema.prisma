@@ -76,7 +76,6 @@ model HeroSlide {
   subtitle    String?
   image       String
   imageMobile String?
-  alt         String?
   order       Int      @default(0)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -107,7 +106,7 @@ model Banner {
 
 model HeroBanner {
   id           String   @id @default(uuid())
-  title        String
+  title        String?
   subtitle     String?
   largeImage   String?
   smallImage   String?
@@ -116,6 +115,7 @@ model HeroBanner {
   buttonText   String?
   isActive     Boolean  @default(true)
   order        Int      @default(0)
+  position     String?  @default("CENTER")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   
@@ -130,7 +130,6 @@ model CategoryGridItem {
   subtitle  String?
   image     String
   link      String
-  alt       String?
   order     Int      @default(0)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -141,10 +140,38 @@ model CategoryGridItem {
   @@map("category_grid_items")
 }
 
+model CategoryTileGridSection {
+  id        String   @id @default(uuid())
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items CategoryTileGridItem[]
+
+  @@index([isActive, order])
+  @@map("category_tile_grid_sections")
+}
+
+model CategoryTileGridItem {
+  id        String   @id @default(uuid())
+  title     String
+  subtitle  String?
+  image     String
+  link      String
+  order     Int      @default(0)
+  sectionId String
+  section   CategoryTileGridSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sectionId, order])
+  @@map("category_tile_grid_items")
+}
+
 model ImageGridItem {
   id        String   @id @default(uuid())
   src       String
-  alt       String
   title     String?
   subtitle  String?
   link      String?
@@ -230,7 +257,6 @@ model Product {
   canonicalUrl            String?
   robotsMeta              String?  @default("index,follow")
   seoFriendlyImageFilename String?
-  imageAltText            String?
   productSchema           Json?
   brandSchema             Json?
   breadcrumbSchema        Json?
@@ -271,6 +297,7 @@ model Product {
   orderItems  OrderItem[]
   cartItems   CartItem[]
   inventoryLogs InventoryLog[]
+  productVariants ProductVariant[]
   
   customFields Json?
   notes        String?
@@ -295,6 +322,9 @@ model Product {
   @@index([isNew, isActive])
   @@index([categoryId, isFeatured, isActive])
   @@index([name])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([price])
   @@index([publishedAt, isActive])
   @@index([quantity, isActive])
   @@map("products")
@@ -321,8 +351,8 @@ model Brand {
 model Order {
   id              String      @id @default(uuid())
   orderNumber     String      @unique
-  userId          String
-  user            User        @relation(fields: [userId], references: [id])
+  userId          String?
+  user            User?       @relation(fields: [userId], references: [id])
   status          OrderStatus @default(PENDING)
   subtotal        Float
   tax             Float       @default(0)
@@ -375,8 +405,8 @@ model OrderItem {
   id        String @id @default(uuid())
   orderId   String
   order     Order  @relation(fields: [orderId], references: [id])
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   quantity  Int
   price     Float
   
@@ -408,7 +438,7 @@ model CartItem {
   cartId    String
   cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   quantity  Int      @default(1)
   size      String?
   color     String?
@@ -562,21 +592,6 @@ model NavigationLink {
   @@map("navigation_links")
 }
 
-model ShopByCategory {
-  id        String   @id @default(uuid())
-  title     String
-  image     String
-  link      String
-  order     Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  @@index([isActive, order])
-  @@index([isActive, createdAt(sort: Desc)])
-  @@map("shop_by_categories")
-}
-
 model ContentPage {
   id            String   @id @default(uuid())
   slug          String   @unique
@@ -652,12 +667,6 @@ model FooterSectionLink {
 
 model FollowSection {
   id               String   @id @default(uuid())
-  brandName        String   @default("Rapharch")
-  street           String   @default("123 Fashion Avenue")
-  city             String   @default("New York")
-  state            String   @default("NY")
-  zip              String   @default("10001")
-  country          String   @default("United States")
   copyrightText    String   @default("All rights reserved.")
   designerCredit   String   @default("Designed by: M.A.P Tech Pvt. Ltd.")
   showPaymentIcons Boolean  @default(true)
@@ -1017,6 +1026,27 @@ model FAQ {
   @@map("faqs")
 }
 
+model ShortDescription {
+  id          String   @id @default(uuid())
+  description String   @db.Text
+  updatedAt   DateTime @updatedAt
+
+  @@map("short_descriptions")
+}
+
+model WomenItemsConfig {
+  id          String   @id @default(uuid())
+  image       String
+  description String   @db.Text
+  buttonTitle String
+  buttonCta   String
+  filterType  String   @default("gender")
+  filterValue String   @default("Women")
+  updatedAt   DateTime @updatedAt
+
+  @@map("women_items_config")
+}
+
 model ShippingItem {
   id          String   @id @default(uuid())
   type        String   // "method" | "info" | "region"
@@ -1048,25 +1078,29 @@ model ShippingSettings {
 }
 
 model StoreSection {
-  id          String   @id @default(uuid())
-  title       String   @default("Visit Our Store")
-  subtitle    String?
-  description String   @db.Text
-  address     String   @default("123 Fashion Avenue")
-  city        String   @default("New York")
-  state       String   @default("NY")
-  zip         String   @default("10001")
-  country     String   @default("United States")
-  phone       String?
-  email       String?
-  image       String?
-  mapEmbedUrl String?
-  ctaText     String   @default("Get In Touch")
-  ctaUrl      String   @default("/contact-us")
-  hours       Json     @default("[]")
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(uuid())
+  // Page header
+  pageTitle       String?  @default("VISIT US")
+  pageDescription String?  @db.Text
+  // Store details
+  title           String   @default("Visit Our Store")
+  subtitle        String?
+  description     String   @db.Text
+  address         String   @default("123 Fashion Avenue")
+  city            String   @default("New York")
+  state           String   @default("NY")
+  zip             String   @default("10001")
+  country         String   @default("United States")
+  phone           String?
+  email           String?
+  image           String?
+  mapEmbedUrl     String?
+  ctaText         String   @default("Get In Touch")
+  ctaUrl          String   @default("/contact-us")
+  hours           Json     @default("[]")
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@index([isActive])
   @@map("store_sections")
@@ -1074,9 +1108,46 @@ model StoreSection {
 
 model AboutSection {
   id        String   @id @default(uuid())
-  quote     String
+
+  // Homepage quote section
+  quote     String   @db.Text
   ctaText   String   @default("More About Us")
   ctaUrl    String   @default("/about")
+
+  // Hero section
+  heroImage    String?
+  heroSubtitle String? @db.Text
+  heroTagline  String? @db.Text
+
+  // Our Story section
+  storyTitle   String? @db.Text
+  storyContent String? @db.LongText
+  storyImage   String?
+
+  // Pull quote
+  pullQuote String? @db.Text
+
+  // Video section
+  videoUrl        String?
+  videoOverlayText String? @db.Text
+
+  // Banner section
+  bannerImage String?
+  bannerText  String? @db.Text
+
+  // Store / Visit Us section
+  storeDescription String? @db.Text
+  storeAddress     String?
+  storeCity        String?
+  storeState       String?
+  storeZip         String?
+  storePhone       String?
+  storeEmail       String?
+
+  // SEO
+  metaTitle       String? @db.Text
+  metaDescription String? @db.Text
+
   isActive  Boolean  @default(true)
   order     Int      @default(0)
   createdAt DateTime @default(now())
@@ -1124,4 +1195,135 @@ enum DeliveryStatus {
   DELIVERED
   FAILED
   CANCELLED
+}
+
+model PromotionalBanner {
+  id          String   @id @default(uuid())
+  title       String
+  subtitle    String?
+  image       String
+  textColor   String   @default("#ffffff")
+  link        String?
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive, order])
+  @@map("promotional_banners")
+}
+
+model FeatureConfig {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  icon        String?
+  image       String?
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive, order])
+  @@map("feature_configs")
+}
+
+model ThreeImageGridSection {
+  id        String   @id @default(uuid())
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  columns ThreeImageGridColumn[]
+
+  @@index([isActive, order])
+  @@map("three_image_grid_sections")
+}
+
+model ThreeImageGridColumn {
+  id                 String   @id @default(uuid())
+  imageSrc           String
+  imageAlt           String
+  imageLink          String?
+  productName        String?
+  productPrice       Float?
+  productOriginalPrice Float?
+  productImage       String?
+  productLink        String?
+  order              Int      @default(0)
+  sectionId          String
+  section            ThreeImageGridSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([sectionId, order])
+  @@map("three_image_grid_columns")
+}
+
+model ContactPageSettings {
+  id              String   @id @default(uuid())
+  pageTitle       String?  @default("GET IN TOUCH WITH US")
+  pageSubtitle    String?
+  email           String?  @default("support@rapharch.com")
+  phone           String?  @default("+1 (212) 555-0189")
+  subjectOptions  String   @default("order,product,shipping,return,technical,other")
+  successTitle    String?  @default("Message Sent!")
+  successMessage  String?  @default("Thank you for reaching out. Our team will get back to you within 48 hours.")
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("contact_page_settings")
+}
+
+model ProductVariant {
+  id                 String   @id @default(uuid())
+  productId          String
+  product            Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantKey         String?
+  color              String?
+  size               String?
+  pattern            String?
+  sku                String?
+  barcode            String?
+  price              Float    @default(0)
+  discountPrice      Float?
+  costPrice          Float?
+  quantity           Int      @default(0)
+  lowStockThreshold  Int      @default(5)
+  images             Json?    @default("[]")
+  isActive           Boolean  @default(true)
+  isDefault          Boolean  @default(false)
+  combination        Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([productId])
+  @@index([sku])
+  @@map("product_variants")
+}
+
+model StoreLocation {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(200)
+  slug        String   @unique @db.VarChar(200)
+  address     String   @db.VarChar(500)
+  city        String   @db.VarChar(200)
+  state       String   @db.VarChar(200)
+  zip         String   @db.VarChar(50)
+  country     String   @db.VarChar(200) @default("United States")
+  phone       String?  @db.VarChar(50)
+  email       String?  @db.VarChar(255)
+  image       String?  @db.VarChar(500)
+  mapEmbedUrl String?  @db.VarChar(1000)
+  hours       Json     @default("[]")
+  features    Json     @default("[]")
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+  @@map("store_locations")
 }

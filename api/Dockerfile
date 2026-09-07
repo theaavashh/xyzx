@@ -6,7 +6,10 @@ RUN apk add --no-cache openssl3
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN corepack enable pnpm && \
+ENV COREPACK_ENABLE_STRICT=0
+ENV COREPACK_INTEGRITY_KEYS=0
+
+RUN corepack enable && \
     corepack prepare pnpm@10 --activate && \
     pnpm install --no-frozen-lockfile
 
@@ -29,7 +32,7 @@ RUN addgroup -g 1001 -S nodejs && \
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN corepack enable pnpm && \
+RUN COREPACK_ENABLE_STRICT=0 COREPACK_INTEGRITY_KEYS=0 corepack enable && \
     corepack prepare pnpm@10 --activate && \
     pnpm install --no-frozen-lockfile --prod && \
     npm install -g prisma@5.22.0 tsx
@@ -41,21 +44,18 @@ COPY --from=builder /app/src ./src
 COPY --from=builder /app/src/proto ./dist/proto
 COPY --from=builder /app/tsconfig.json ./
 
+RUN apk add --no-cache su-exec
+
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
 RUN chown -R nodejs:nodejs /app
-
-USER nodejs
 
 EXPOSE 9999
 
 ENV NODE_ENV=production
 ENV PORT=9999
 ENV GRPC_PORT=50051
-
-EXPOSE 9999
-EXPOSE 50051
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:9999/api/v1/health || exit 1

@@ -181,16 +181,16 @@ ${urlEntries}
         <div className="rounded-xl p-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Sitemap Management</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-black">Sitemap Management</h1>
               <p className="text-black text-lg mt-2">Manage your sitemap</p>
             </div>
             <div className="flex space-x-2">
               <button type="button" onClick={() => handleTabChange('visual')}
-                className={`px-4 py-2.5 rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all outer-sans ${activeTab === 'visual' ? 'bg-[#D4AF37] text-white' : 'bg-gray-100 text-black hover:bg-gray-200'}`}>
+                className={`px-4 py-2.5 rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all ${activeTab === 'visual' ? 'bg-[#D4AF37] text-white' : 'bg-gray-100 text-black hover:bg-gray-200'}`}>
                 Visual Editor
               </button>
               <button type="button" onClick={() => handleTabChange('xml')}
-                className={`px-4 py-2.5 rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all outer-sans ${activeTab === 'xml' ? 'bg-[#D4AF37] text-white' : 'bg-gray-100 text-black hover:bg-gray-200'}`}>
+                className={`px-4 py-2.5 rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all ${activeTab === 'xml' ? 'bg-[#D4AF37] text-white' : 'bg-gray-100 text-black hover:bg-gray-200'}`}>
                 XML Editor
               </button>
             </div>
@@ -219,7 +219,7 @@ ${urlEntries}
         {activeTab === 'visual' ? (
           <>
             <div className="bg-white rounded-md border border-gray-200 p-4">
-              <h2 className="text-lg font-bold text-black outer-sans mb-4">{editingIndex !== null ? 'Edit URL' : 'Add New URL'}</h2>
+              <h2 className="text-lg font-bold text-black mb-4">{editingIndex !== null ? 'Edit URL' : 'Add New URL'}</h2>
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div className="md:col-span-2">
                   <label htmlFor="url-location" className="block text-sm font-medium text-black mb-1">URL Location</label>
@@ -271,7 +271,7 @@ ${urlEntries}
             </div>
 
             <div className="bg-white rounded-md border border-gray-200 p-4">
-              <h2 className="text-lg font-bold text-black outer-sans mb-4">Bulk Actions</h2>
+              <h2 className="text-lg font-bold text-black mb-4">Bulk Actions</h2>
               <div className="flex space-x-2">
                 <button type="button" onClick={handleUpdateAllLastmod}
                   className="px-4 py-2.5 bg-[#D4AF37] text-white rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] font-medium transition-all">
@@ -285,7 +285,7 @@ ${urlEntries}
             </div>
 
             <div className="bg-white rounded-md border border-gray-200 p-4">
-              <h2 className="text-lg font-bold text-black outer-sans mb-4">Sitemap URLs</h2>
+              <h2 className="text-lg font-bold text-black mb-4">Sitemap URLs</h2>
               {urls.length === 0 ? (
                 <p className="text-black opacity-75 text-center py-4">No URLs found. Add URLs or generate sitemap.</p>
               ) : (
@@ -323,7 +323,7 @@ ${urlEntries}
         ) : (
           <div className="bg-white rounded-md border border-gray-200 p-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text-black outer-sans">XML Editor</h2>
+              <h2 className="text-lg font-bold text-black">XML Editor</h2>
               <button type="button" onClick={handleSaveXml} disabled={updateSitemap.isPending}
                 className="px-4 py-2.5 bg-[#D4AF37] text-white rounded-md hover:bg-[#b8962e] disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] font-medium transition-all">
                 {updateSitemap.isPending ? 'Saving...' : 'Save Sitemap'}
@@ -336,7 +336,7 @@ ${urlEntries}
         )}
 
         <div className="bg-[#D4AF37]/5 rounded-lg border border-[#D4AF37]/20 p-4">
-          <h2 className="text-lg font-bold text-black outer-sans mb-4">SEO Best Practices</h2>
+          <h2 className="text-lg font-bold text-black mb-4">SEO Best Practices</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-black">
             <div>
               <h3 className="font-semibold mb-2">Priority Guidelines:</h3>

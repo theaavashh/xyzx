@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { apiRequest } from '@/utils/api';
 import { formatCurrency } from '@/utils/currency';
+import { useNewOrderSocket } from '@/hooks/useNewOrderSocket';
 import type { Order, OrderStats, OrderPagination } from '../types';
 
 const defaultPagination: OrderPagination = { page: 1, limit: 10, total: 0, totalPages: 0 };
@@ -59,6 +60,24 @@ function formatDate(dateString: string): string {
   });
 }
 
+function computeStats(orders: Order[], total: number): OrderStats {
+  const byStatus = { pending: 0, confirmed: 0, processing: 0, shipped: 0, delivered: 0, cancelled: 0, refunded: 0 };
+  let totalRevenue = 0;
+
+  for (const o of orders) {
+    const key = o.status.toLowerCase() as keyof typeof byStatus;
+    if (key in byStatus) byStatus[key]++;
+    if (o.paymentStatus === 'PAID') totalRevenue += o.total;
+  }
+
+  return {
+    totalOrders: total,
+    totalRevenue,
+    averageOrderValue: total > 0 ? totalRevenue / total : 0,
+    byStatus,
+  };
+}
+
 export function useBillingQueries() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState<OrderStats>({
@@ -111,6 +130,18 @@ export function useBillingQueries() {
     setRefreshKey((k) => k + 1);
   }, []);
 
+  useNewOrderSocket(
+    useCallback((order) => {
+      toast.success(`New order ${order.orderNumber} received`);
+      setStatusFilter('all');
+      setPaymentStatusFilter('all');
+      setCommittedSearch('');
+      setSearchTerm('');
+      setPagination((prev) => ({ ...prev, page: 1 }));
+      setRefreshKey((k) => k + 1);
+    }, []),
+  );
+
   useEffect(() => {
     let mounted = true;
 
@@ -123,18 +154,26 @@ export function useBillingQueries() {
           limit: pg.limit,
         };
         if (statusRef.current !== 'all') params.status = statusRef.current;
-        if (paymentRef.current !== 'all') params.paymentStatus = paymentRef.current;
         if (searchRef.current) params.search = searchRef.current;
 
         const response = await apiRequest<{
-          data: { orders: Order[]; stats: OrderStats; pagination: OrderPagination };
+          success: boolean;
+          data: Order[];
+          pagination: { page: number; limit: number; total: number; pages: number };
         }>('/api/v1/orders', 'GET', undefined, { params });
 
         if (mounted) {
-          const data = response?.data ?? response;
-          setOrders(data?.orders ?? []);
-          setStats(data?.stats ?? stats);
-          setPagination(data?.pagination ?? defaultPagination);
+          const orderList = response?.data ?? [];
+          const pag = response?.pagination;
+          const paginationData: OrderPagination = {
+            page: pag?.page ?? pg.page,
+            limit: pag?.limit ?? pg.limit,
+            total: pag?.total ?? 0,
+            totalPages: pag?.pages ?? 0,
+          };
+          setOrders(orderList);
+          setStats(computeStats(orderList, paginationData.total));
+          setPagination(paginationData);
         }
       } catch {
         if (mounted) toast.error('Failed to load orders');

@@ -64,7 +64,7 @@ export default function CookieConsentModal() {
             <button
               type="button"
               onClick={() => setIsVisible(false)}
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-900 transition-colors p-1 z-10"
+              className="absolute top-3 right-3 text-zinc-600 hover:text-zinc-900 transition-colors p-1 z-10"
               aria-label="Close"
             >
               <X className="w-5 h-5" strokeWidth={1.5} />
@@ -76,11 +76,11 @@ export default function CookieConsentModal() {
                     <Cookie className="w-5 h-5 text-[#D4AF37]" strokeWidth={1.5} />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-gray-900 tracking-tight">
+                    <h2 className="swansea text-lg font-bold text-zinc-600 tracking-wide">
                       Cookie Settings
                     </h2>
-                    <p className="text-gray-500 text-base leading-relaxed">
-                      We use cookies to optimize your experience, analyze traffic, and personalize content. By clicking <span className="font-medium text-gray-900">&ldquo;Accept All&rdquo;</span>, you consent. See our{' '}
+                    <p className="text-zinc-600 text-base leading-relaxed">
+                      We use cookies to optimize your experience, analyze traffic, and personalize content. By clicking <span className="font-medium text-zinc-600">&ldquo;Accept All&rdquo;</span>, you consent. See our{' '}
                       <Link href="/cookie-policy" className="text-[#D4AF37] hover:underline underline-offset-4 font-medium">
                         Cookie Policy
                       </Link>.
@@ -92,7 +92,7 @@ export default function CookieConsentModal() {
                   <button
                     type="button"
                     onClick={handleRejectAll}
-                    className="bg-white text-gray-700 py-2.5 px-5 rounded-lg font-semibold hover:bg-gray-50 border border-gray-200 transition-all active:scale-[0.98] text-sm whitespace-nowrap"
+                    className="bg-white text-zinc-600 py-2.5 px-5 rounded-lg font-semibold hover:bg-gray-50 border border-gray-200 transition-all active:scale-[0.98] text-sm whitespace-nowrap"
                   >
                     Manage Choices
                   </button>

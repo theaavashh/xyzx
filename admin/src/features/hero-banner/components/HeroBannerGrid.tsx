@@ -32,16 +32,17 @@ export function HeroBannerGrid({
 }: HeroBannerGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="space-y-3">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
             className="border border-gray-200 rounded-xl overflow-hidden animate-pulse"
           >
-            <div className="h-40 bg-gray-100" />
-            <div className="p-3 space-y-2">
+            <div className="h-72 bg-white" />
+            <div className="p-4 space-y-2">
               <div className="h-4 bg-gray-100 rounded w-2/3" />
               <div className="h-3 bg-gray-100 rounded w-1/3" />
+              <div className="h-6 bg-gray-100 rounded w-20" />
             </div>
           </div>
         ))}
@@ -61,15 +62,15 @@ export function HeroBannerGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+    <div className="space-y-3">
       {banners.map((banner, idx) => (
         <motion.div
           key={banner.id}
-          whileHover={{ y: -2 }}
-          transition={{ duration: 0.2 }}
+          whileHover={{ y: -1 }}
+          transition={{ duration: 0.15 }}
           className="bg-white border border-gray-200 rounded-xl overflow-hidden group"
         >
-          <div className="relative h-40 bg-gray-100">
+          <div className="relative h-72 bg-white">
             {banner.videoUrl ? (
               <div
                 className="w-full h-full cursor-pointer"
@@ -77,7 +78,7 @@ export function HeroBannerGrid({
               >
                 <video
                   src={banner.videoUrl}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
                 <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                   <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
@@ -96,10 +97,10 @@ export function HeroBannerGrid({
                     <img
                       src={banner.largeImage}
                       alt=""
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                       crossOrigin="anonymous"
                     />
-                    <span className="absolute bottom-1 left-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">
+                    <span className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">
                       Desktop
                     </span>
                   </button>
@@ -117,10 +118,10 @@ export function HeroBannerGrid({
                     <img
                       src={banner.smallImage}
                       alt=""
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                       crossOrigin="anonymous"
                     />
-                    <span className="absolute bottom-1 left-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">
+                    <span className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">
                       Mobile
                     </span>
                   </button>
@@ -146,7 +147,7 @@ export function HeroBannerGrid({
               </span>
             </div>
           </div>
-          <div className="p-3">
+          <div className="p-4">
             <div className="flex items-start justify-between mb-2">
               <div className="min-w-0 flex-1">
                 <h3 className="text-sm font-semibold text-gray-900 truncate">
@@ -160,12 +161,12 @@ export function HeroBannerGrid({
               </div>
             </div>
             {banner.buttonText && (
-              <div className="inline-flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded text-xs text-gray-600 border border-gray-200 mb-2">
+              <div className="inline-flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded text-xs text-gray-600 border border-gray-200 mb-3">
                 <Link2 className="w-3 h-3" />
                 {banner.buttonText}
               </div>
             )}
-            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+            <div className="flex items-center justify-between pt-3 border-t border-gray-100">
               <div className="flex gap-0.5">
                 <button
                   type="button"

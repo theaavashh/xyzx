@@ -1,6 +1,7 @@
 'use client';
 
 import { clientLogger } from '@/lib/logger';
+import { authHeaders } from '@/utils/authHeaders';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import type { CategoryGridItem, CategoryGridForm } from '../types';
@@ -24,7 +25,7 @@ export function useCategoryGridQueries() {
       }
       const response = await fetch(
         `${baseUrl()}/api/v1/category-grid`,
-        { credentials: 'include' },
+        { credentials: 'include', headers: authHeaders() },
       );
       if (response.ok) {
         const data = await response.json();
@@ -57,12 +58,11 @@ export function useCategoryGridQueries() {
           : `${baseUrl()}/api/v1/category-grid`;
         const response = await fetch(url, {
           method: editingItem ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
           credentials: 'include',
           body: JSON.stringify({
             ...form,
             subtitle: form.subtitle || null,
-            alt: form.alt || null,
           }),
         });
         if (response.ok) {
@@ -99,6 +99,7 @@ export function useCategoryGridQueries() {
           {
             method: 'DELETE',
             credentials: 'include',
+            headers: authHeaders(),
           },
         );
         if (response.ok) {
@@ -130,6 +131,7 @@ export function useCategoryGridQueries() {
           {
             method: 'PATCH',
             credentials: 'include',
+            headers: authHeaders(),
           },
         );
         if (response.ok) {
@@ -180,7 +182,7 @@ export function useCategoryGridQueries() {
           `${baseUrl()}/api/v1/category-grid/reorder`,
           {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
             credentials: 'include',
             body: JSON.stringify({ orders }),
           },
@@ -226,6 +228,7 @@ export function useCategoryGridQueries() {
           {
             method: 'POST',
             credentials: 'include',
+            headers: authHeaders(),
             body: formData,
           },
         );

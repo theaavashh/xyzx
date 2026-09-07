@@ -28,12 +28,16 @@ export function CategoryGridModal({
     subtitle: '',
     image: '',
     link: '',
-    alt: '',
     isActive: true,
     order: 0,
   });
   const [dragActive, setDragActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<{
+    title?: string;
+    image?: string;
+    link?: string;
+  }>({});
 
   useEffect(() => {
     if (isOpen) {
@@ -43,7 +47,6 @@ export function CategoryGridModal({
           subtitle: editingItem.subtitle || '',
           image: editingItem.image,
           link: editingItem.link,
-          alt: editingItem.alt || '',
           isActive: editingItem.isActive,
           order: editingItem.order,
         });
@@ -53,11 +56,11 @@ export function CategoryGridModal({
           subtitle: '',
           image: '',
           link: '',
-          alt: '',
           isActive: true,
           order: 0,
         });
       }
+      setErrors({});
     }
   }, [isOpen, editingItem]);
 
@@ -66,10 +69,30 @@ export function CategoryGridModal({
     value: string | number | boolean,
   ) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
+  const validate = (data: CategoryGridForm): typeof errors => {
+    const next: typeof errors = {};
+    if (!data.title.trim()) {
+      next.title = 'Title is required';
+    }
+    if (!data.image.trim()) {
+      next.image = 'Image is required';
+    }
+    if (!data.link.trim()) {
+      next.link = 'Link is required';
+    }
+    return next;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const nextErrors = validate(form);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
     setIsSubmitting(true);
     try {
       await onSubmit(form);
@@ -119,14 +142,17 @@ export function CategoryGridModal({
   const ImageUploadArea = ({
     label,
     value,
+    error,
   }: {
     label: string;
     value: string;
+    error?: string;
   }) => (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-2">
         {label}
       </label>
+      {error && <p className="text-xs text-red-500 mb-1">{error}</p>}
       {isUploading ? (
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
           <div className="flex flex-col items-center space-y-2">
@@ -139,7 +165,7 @@ export function CategoryGridModal({
           <img
             src={value}
             alt="Preview"
-            className="w-full h-48 object-cover rounded-lg border border-gray-200 bg-gray-100"
+            className="w-full h-48 object-contain rounded-lg border border-gray-200 bg-gray-100"
             crossOrigin="anonymous"
             onError={(e) => {
               clientLogger.error('Failed to load image:', value);
@@ -195,7 +221,7 @@ export function CategoryGridModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 flex items-end justify-center z-50 sm:items-center p-4"
-          onClick={onClose}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
           <motion.div
             initial={{ y: '100%' }}
@@ -207,7 +233,7 @@ export function CategoryGridModal({
           >
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-semibold text-black outer-sans">
+                <h2 className="text-2xl font-semibold text-black">
                   {editingItem ? 'Edit Category Grid Item' : 'Create Category Grid Item'}
                 </h2>
                 <button
@@ -220,7 +246,7 @@ export function CategoryGridModal({
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6 p-6">
+            <form onSubmit={handleSubmit} noValidate className="space-y-6 p-6">
               <div>
                 <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
                   Title *
@@ -231,9 +257,13 @@ export function CategoryGridModal({
                   value={form.title}
                   onChange={(e) => handleFormChange('title', e.target.value)}
                   placeholder="Enter item title"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-black placeholder:text-gray-400"
-                  required
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-black placeholder:text-gray-400 ${
+                    errors.title ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 />
+                {errors.title && (
+                  <p className="mt-1 text-xs text-red-500">{errors.title}</p>
+                )}
               </div>
 
               <div>
@@ -251,7 +281,11 @@ export function CategoryGridModal({
               </div>
 
               <div>
-                <ImageUploadArea label="Image *" value={form.image} />
+                <ImageUploadArea
+                  label="Image *"
+                  value={form.image}
+                  error={errors.image}
+                />
               </div>
 
               <div>
@@ -266,24 +300,14 @@ export function CategoryGridModal({
                     value={form.link}
                     onChange={(e) => handleFormChange('link', e.target.value)}
                     placeholder="/collections/wind or https://example.com"
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-black placeholder:text-gray-400"
-                    required
+                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-black placeholder:text-gray-400 ${
+                      errors.link ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   />
                 </div>
-              </div>
-
-              <div>
-                <label htmlFor="alt" className="block text-sm font-medium text-gray-700 mb-1">
-                  Alt Text
-                </label>
-                <input
-                  id="alt"
-                  type="text"
-                  value={form.alt}
-                  onChange={(e) => handleFormChange('alt', e.target.value)}
-                  placeholder="e.g., Wind of Change collection - timeless style with modern spirit"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-black placeholder:text-gray-400"
-                />
+                {errors.link && (
+                  <p className="mt-1 text-xs text-red-500">{errors.link}</p>
+                )}
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg">

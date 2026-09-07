@@ -167,7 +167,6 @@ export const ProductFormSchema = z.object({
   canonicalUrl: z.string().url().optional(),
   robotsMeta: z.string().optional(),
   seoFriendlyImageFilename: z.string().optional(),
-  imageAltText: z.string().optional(),
   productSchema: z.string().optional(),
   brandSchema: z.string().optional(),
   breadcrumbSchema: z.string().optional(),

@@ -280,8 +280,9 @@ export function useDeleteProduct() {
       qc.invalidateQueries({ queryKey: [PRODUCTS_KEY] });
       toast.success('Product deleted successfully!');
     },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Failed to delete product');
+    onError: (err: any) => {
+      const message = err?.message || 'Failed to delete product';
+      toast.error(message);
     },
   });
 }

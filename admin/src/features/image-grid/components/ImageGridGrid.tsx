@@ -74,7 +74,7 @@ export function ImageGridGrid({
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex items-center gap-2 bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all font-semibold"
+          className="inline-flex items-center gap-2 bg-[#D4AF37] text-white px-4 py-2.5 text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all font-semibold"
         >
           <Plus className="w-4 h-4" />
           Create Item
@@ -95,7 +95,7 @@ export function ImageGridGrid({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <h3 className="font-semibold text-gray-900">{item.title || item.alt}</h3>
+                <h3 className="font-semibold text-gray-900">{item.title}</h3>
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-medium ${
                     item.isActive
@@ -114,8 +114,8 @@ export function ImageGridGrid({
                 {item.src ? (
                   <img
                     src={item.src}
-                    alt={item.alt}
-                    className="w-16 h-16 object-cover rounded border border-gray-200"
+                    alt={item.title || ''}
+                    className="w-16 h-16 object-contain rounded border border-gray-200"
                     crossOrigin="anonymous"
                   />
                 ) : null}

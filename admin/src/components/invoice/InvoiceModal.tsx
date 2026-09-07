@@ -38,7 +38,7 @@ export default function InvoiceModal({
       <button
         type="button"
         className="absolute inset-0 bg-black/50 cursor-default"
-        onClick={onClose}
+        onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
         aria-label="Close modal"
       />
       <div className="relative bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden">
@@ -111,16 +111,16 @@ export default function InvoiceModal({
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase outer-sans">
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                     Item
                   </th>
-                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase outer-sans">
+                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">
                     Qty
                   </th>
-                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase outer-sans">
+                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">
                     Unit Price
                   </th>
-                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase outer-sans">
+                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">
                     Total
                   </th>
                 </tr>

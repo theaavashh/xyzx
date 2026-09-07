@@ -345,7 +345,7 @@ function StaffManagementContent() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black outer-sans">
+            <h1 className="text-2xl sm:text-3xl font-bold text-black">
               Staff Management
             </h1>
             <p className="text-black text-lg mt-2">
@@ -355,7 +355,7 @@ function StaffManagementContent() {
           <button
             type="button"
             onClick={openCreateModal}
-            className="bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold"
+            className="bg-[#D4AF37] text-white px-4 py-2.5 text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold"
           >
             <Plus className="w-4 h-4" />
             Add Staff
@@ -381,7 +381,7 @@ function StaffManagementContent() {
               <thead className="bg-gray-50">
                 <tr>
                   <th
-                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"
                     onClick={() => handleSort('email')}
                   >
                     <div className="flex items-center gap-1">
@@ -391,7 +391,7 @@ function StaffManagementContent() {
                     </div>
                   </th>
                   <th
-                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"
                     onClick={() => handleSort('name')}
                   >
                     <div className="flex items-center gap-1">
@@ -400,11 +400,11 @@ function StaffManagementContent() {
                         (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </div>
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                     Permissions
                   </th>
                   <th
-                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase"
                     onClick={() => handleSort('isActive')}
                   >
                     <div className="flex items-center gap-1">
@@ -413,7 +413,7 @@ function StaffManagementContent() {
                         (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </div>
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase outer-sans">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                     Actions
                   </th>
                 </tr>
@@ -801,7 +801,7 @@ function StaffModal({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="absolute inset-0 bg-black/50"
-        onClick={onClose}
+        onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
       />
       <motion.div
         initial={{ x: '100%' }}
@@ -813,7 +813,7 @@ function StaffModal({
         <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-[#D4AF37]" />
-              <h3 className="text-xl font-semibold text-black outer-sans">{title}</h3>
+              <h3 className="text-xl font-semibold text-black">{title}</h3>
             </div>
           <button
             type="button"
@@ -1066,7 +1066,7 @@ function PermissionsModal({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="absolute inset-0 bg-black/50"
-        onClick={onClose}
+        onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
       />
       <motion.div
         initial={{ x: '100%' }}

@@ -66,7 +66,7 @@ export function EditorialSectionGrid({
           <h3 className="text-lg font-semibold text-gray-900 mb-1">No editorial sections</h3>
           <p className="text-gray-500 mb-6">Create your first seasonal showcase to feature products.</p>
           <button type="button" onClick={onOpenModal}
-            className="inline-flex items-center gap-2 bg-[#D4AF37] text-white px-5 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all font-semibold">
+            className="inline-flex items-center gap-2 bg-[#D4AF37] text-white px-5 py-2.5 text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all font-semibold">
             <Plus className="w-4 h-4" /> Add Section
           </button>
         </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { clientLogger } from '@/lib/logger';
+import { authHeaders } from '@/utils/authHeaders';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import type { SliderImage, SliderFormData } from '../types';
@@ -16,7 +17,7 @@ export function useSliders() {
       setLoading(true);
       const response = await fetch(
         `${BASE_URL}/api/v1/sliders`,
-        { credentials: 'include' },
+        { credentials: 'include', headers: authHeaders() },
       );
       if (!response.ok) throw new Error('Failed to fetch sliders');
       const data = await response.json();
@@ -51,6 +52,7 @@ export function useUploadSliderImage() {
         {
           method: 'POST',
           credentials: 'include',
+          headers: authHeaders(),
           body: formData,
         },
       );
@@ -102,7 +104,7 @@ export function useSaveSlider() {
       const method = editingSlider ? 'PUT' : 'POST';
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify(sliderData),
       });
@@ -135,7 +137,7 @@ export function useDeleteSlider() {
     try {
       const response = await fetch(
         `${BASE_URL}/api/v1/sliders/${id}`,
-        { method: 'DELETE', credentials: 'include' },
+        { method: 'DELETE', credentials: 'include', headers: authHeaders() },
       );
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -172,7 +174,7 @@ export function useToggleSliderStatus() {
         `${BASE_URL}/api/v1/sliders/${id}`,
         {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
           credentials: 'include',
           body: JSON.stringify({ isActive: !isActive }),
         },
@@ -204,7 +206,7 @@ export function useReorderSliders() {
         sliders.map((slider) =>
           fetch(`${BASE_URL}/api/v1/sliders/${slider.id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
             credentials: 'include',
             body: JSON.stringify({ order: slider.order }),
           }),

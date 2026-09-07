@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticateToken, requireAdmin } from '../middlewares/auth';
 import { validate } from '../middlewares/validation';
-import { sectionCreateSchema, sectionUpdateSchema, sectionReorderSchema } from '../dto/section.dto';
+import { dualCardSectionCreateSchema, dualCardSectionUpdateSchema, dualCardSectionReorderSchema } from '../dto/dual-card-section.dto';
 import {
   getDualCardSections,
   getActiveDualCardSections,
@@ -18,10 +18,10 @@ const router: Router = Router();
 router.get('/active', getActiveDualCardSections);
 router.get('/', authenticateToken, requireAdmin, getDualCardSections);
 router.get('/:id', authenticateToken, requireAdmin, getDualCardSectionById);
-router.post('/', authenticateToken, requireAdmin, validate(sectionCreateSchema), createDualCardSection);
-router.put('/:id', authenticateToken, requireAdmin, validate(sectionUpdateSchema), updateDualCardSection);
+router.post('/', authenticateToken, requireAdmin, validate(dualCardSectionCreateSchema), createDualCardSection);
+router.put('/:id', authenticateToken, requireAdmin, validate(dualCardSectionUpdateSchema), updateDualCardSection);
 router.delete('/:id', authenticateToken, requireAdmin, deleteDualCardSection);
 router.patch('/:id/toggle', authenticateToken, requireAdmin, toggleDualCardSectionStatus);
-router.patch('/reorder', authenticateToken, requireAdmin, validate(sectionReorderSchema), reorderDualCardSections);
+router.patch('/reorder', authenticateToken, requireAdmin, validate(dualCardSectionReorderSchema), reorderDualCardSections);
 
 export default router;

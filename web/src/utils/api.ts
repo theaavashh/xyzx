@@ -2,6 +2,8 @@
  * Get the API base URL from environment variables
  * @throws Error if NEXT_PUBLIC_API_BASE_URL is not set
  */
+import { csrfHeaders } from './csrf';
+
 export function getApiBaseUrl(): string {
   const apiUrl =
     process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9999';
@@ -26,12 +28,13 @@ export async function apiRequest<T>(
   const url = `${getApiBaseUrl()}${endpoint}`;
 
   const config: RequestInit = {
+    ...options,
+    credentials: 'include', // Include cookies for authentication
     headers: {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...(options.headers as Record<string, string> | undefined),
+      ...csrfHeaders(options.method),
     },
-    credentials: 'include', // Include cookies for authentication
-    ...options,
   };
 
   const response = await fetch(url, config);

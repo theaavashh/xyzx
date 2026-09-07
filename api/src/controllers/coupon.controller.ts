@@ -9,6 +9,73 @@ import {
   sendSuccess,
 } from '../utils';
 
+export const validateCoupon: RequestHandler = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { code, subtotal } = req.body;
+
+    if (!code || typeof code !== 'string') {
+      sendBadRequest(res, 'Coupon code is required');
+      return;
+    }
+
+    const coupon = await couponRepository.findCouponByCode(code.toUpperCase().trim());
+
+    if (!coupon) {
+      sendBadRequest(res, 'Invalid coupon code');
+      return;
+    }
+
+    const now = new Date();
+
+    if (!coupon.isActive) {
+      sendBadRequest(res, 'This coupon is no longer active');
+      return;
+    }
+
+    if (now < coupon.startDate) {
+      sendBadRequest(res, 'This coupon is not yet valid');
+      return;
+    }
+
+    if (now > coupon.endDate) {
+      sendBadRequest(res, 'This coupon has expired');
+      return;
+    }
+
+    if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
+      sendBadRequest(res, 'This coupon has reached its usage limit');
+      return;
+    }
+
+    if (coupon.minOrderAmount && (subtotal || 0) < coupon.minOrderAmount) {
+      sendBadRequest(res, `Minimum order amount of $${coupon.minOrderAmount.toFixed(2)} required`);
+      return;
+    }
+
+    let discountAmount = 0;
+    if (coupon.type === 'percentage') {
+      discountAmount = (subtotal || 0) * (coupon.value / 100);
+      if (coupon.maxDiscountAmount && discountAmount > coupon.maxDiscountAmount) {
+        discountAmount = coupon.maxDiscountAmount;
+      }
+    } else {
+      discountAmount = Math.min(coupon.value, subtotal || 0);
+    }
+
+    discountAmount = Math.round(discountAmount * 100) / 100;
+
+    sendSuccess(res, {
+      id: coupon.id,
+      code: coupon.code,
+      name: coupon.name,
+      type: coupon.type,
+      value: coupon.value,
+      discountAmount,
+      description: coupon.description,
+    });
+  },
+);
+
 export const getCoupons: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const { page, limit, filters, sortBy, sortOrder } = parseQuery(req);
@@ -198,5 +265,18 @@ export const getCouponStats: RequestHandler = asyncHandler(
   async (_req: Request, res: Response) => {
     const stats = await couponRepository.getCouponStats();
     sendSuccess(res, stats);
+  },
+);
+
+export const getActivePublicCoupons: RequestHandler = asyncHandler(
+  async (_req: Request, res: Response) => {
+    const coupons = await couponRepository.findActivePublicCoupons();
+    const publicCoupons = coupons.map((c) => ({
+      code: c.code,
+      description: c.description,
+      discountType: c.type,
+      discountValue: c.value,
+    }));
+    sendSuccess(res, publicCoupons);
   },
 );

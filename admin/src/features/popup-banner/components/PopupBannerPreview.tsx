@@ -20,7 +20,7 @@ export function PopupBannerPreview({ image, size }: PopupBannerPreviewProps) {
               <img
                 src={image}
                 alt="Banner preview"
-                className="w-full h-48 object-cover rounded-lg mb-4"
+                className="w-full h-48 object-contain rounded-lg mb-4"
               />
               <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
                 {size.toUpperCase()}

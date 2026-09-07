@@ -70,7 +70,7 @@ export default async function TermsOfServicePage() {
       <div className="container mx-auto px-4 pt-24 pb-16">
         <div className="max-w-4xl mx-auto">
           <div
-            className="text-black prose prose-lg max-w-none prose-headings:text-black prose-h1:text-black prose-p:text-black prose-li:text-black prose-strong:text-black whitespace-pre-wrap"
+            className="text-zinc-600 prose prose-lg max-w-none prose-headings:text-zinc-600 prose-h1:text-zinc-600 prose-p:text-zinc-600 prose-li:text-zinc-600 prose-strong:text-zinc-600"
             dangerouslySetInnerHTML={{ __html: safeContent }}
           />
         </div>

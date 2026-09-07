@@ -139,7 +139,7 @@ const EnhancedProductCard: React.FC<EnhancedProductCardProps> = memo(
                     <img
                       src={imageUrl}
                       alt={product.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                       onError={() => setImageError(true)}
                     />
                   ) : (

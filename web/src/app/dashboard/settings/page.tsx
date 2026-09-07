@@ -55,8 +55,8 @@ export default function SettingsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
-        <p className="text-sm text-gray-400 mt-1">Manage your account preferences</p>
+        <h1 className="text-2xl font-semibold text-zinc-600">Settings</h1>
+        <p className="text-sm text-zinc-600 mt-1">Manage your account preferences</p>
       </div>
 
       {/* Profile */}
@@ -67,15 +67,15 @@ export default function SettingsPage() {
               {(user?.firstName?.[0] || user?.username?.[0] || 'U').toUpperCase()}
             </div>
             <div>
-              <h2 className="text-base font-medium text-gray-900 capitalize">
+              <h2 className="text-base font-medium text-zinc-600 capitalize">
                 {user?.firstName || user?.username}
               </h2>
-              <p className="text-sm text-gray-400">{user?.email}</p>
+              <p className="text-sm text-zinc-600">{user?.email}</p>
             </div>
           </div>
           <button
             onClick={() => setIsEditing(!isEditing)}
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-900 transition-colors"
+            className="flex items-center gap-2 text-sm text-zinc-600 hover:text-zinc-600 transition-colors"
           >
             {isEditing ? <X className="h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
             {isEditing ? 'Cancel' : 'Edit'}
@@ -86,16 +86,16 @@ export default function SettingsPage() {
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="edit-first-name" className="block text-xs text-gray-400 uppercase tracking-wide mb-1">First Name</label>
-                <input id="edit-first-name" type="text" value={profileForm.firstName} onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-black focus:outline-none focus:ring-1 focus:ring-gray-300" />
+                <label htmlFor="edit-first-name" className="block text-xs text-zinc-600 uppercase tracking-wide mb-1">First Name</label>
+                <input id="edit-first-name" type="text" value={profileForm.firstName} onChange={(e) => setProfileForm({ ...profileForm, firstName: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-zinc-600 focus:outline-none focus:ring-1 focus:ring-gray-300" />
               </div>
               <div>
-                <label htmlFor="edit-last-name" className="block text-xs text-gray-400 uppercase tracking-wide mb-1">Last Name</label>
-                <input id="edit-last-name" type="text" value={profileForm.lastName} onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-black focus:outline-none focus:ring-1 focus:ring-gray-300" />
+                <label htmlFor="edit-last-name" className="block text-xs text-zinc-600 uppercase tracking-wide mb-1">Last Name</label>
+                <input id="edit-last-name" type="text" value={profileForm.lastName} onChange={(e) => setProfileForm({ ...profileForm, lastName: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-zinc-600 focus:outline-none focus:ring-1 focus:ring-gray-300" />
               </div>
               <div>
-                <label htmlFor="edit-username" className="block text-xs text-gray-400 uppercase tracking-wide mb-1">Username</label>
-                <input id="edit-username" type="text" value={profileForm.username} onChange={(e) => setProfileForm({ ...profileForm, username: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-black focus:outline-none focus:ring-1 focus:ring-gray-300" />
+                <label htmlFor="edit-username" className="block text-xs text-zinc-600 uppercase tracking-wide mb-1">Username</label>
+                <input id="edit-username" type="text" value={profileForm.username} onChange={(e) => setProfileForm({ ...profileForm, username: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-zinc-600 focus:outline-none focus:ring-1 focus:ring-gray-300" />
               </div>
             </div>
             <button onClick={handleSaveProfile} disabled={updateProfile.isPending} className="px-5 py-2 bg-[#D4AF37] text-white rounded-lg text-sm font-medium hover:bg-[#C4A030] transition-colors disabled:opacity-50">
@@ -106,18 +106,18 @@ export default function SettingsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="p-4 bg-gray-50/50 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <User className="h-3.5 w-3.5 text-gray-300" />
-                <span className="text-xs text-gray-400 uppercase tracking-wide">Username</span>
+                <User className="h-3.5 w-3.5 text-zinc-600" />
+                <span className="text-xs text-zinc-600 uppercase tracking-wide">Username</span>
               </div>
-              <p className="text-sm font-medium text-gray-900">{user?.username}</p>
+              <p className="text-sm font-medium text-zinc-600">{user?.username}</p>
             </div>
             <div className="p-4 bg-gray-50/50 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <Mail className="h-3.5 w-3.5 text-gray-300" />
-                <span className="text-xs text-gray-400 uppercase tracking-wide">Email</span>
+                <Mail className="h-3.5 w-3.5 text-zinc-600" />
+                <span className="text-xs text-zinc-600 uppercase tracking-wide">Email</span>
               </div>
               <div className="flex items-center gap-2">
-                <p className="text-sm font-medium text-gray-900">{user?.email}</p>
+                <p className="text-sm font-medium text-zinc-600">{user?.email}</p>
                 {user?.emailVerified && <CheckCircle className="h-3.5 w-3.5 text-green-500" />}
               </div>
             </div>
@@ -127,18 +127,18 @@ export default function SettingsPage() {
 
       {/* Security */}
       <div className="bg-white border border-gray-100 rounded-xl p-6">
-        <h2 className="text-base font-medium text-gray-900 mb-4">Security</h2>
+        <h2 className="text-base font-medium text-zinc-600 mb-4">Security</h2>
         <div className="flex items-center justify-between p-4 bg-gray-50/50 rounded-lg">
           <div className="flex items-center gap-3">
-            <Key className="h-4 w-4 text-gray-300" />
+            <Key className="h-4 w-4 text-zinc-600" />
             <div>
-              <p className="text-sm font-medium text-gray-900">Password</p>
-              <p className="text-xs text-gray-400">Change your password</p>
+              <p className="text-sm font-medium text-zinc-600">Password</p>
+              <p className="text-xs text-zinc-600">Change your password</p>
             </div>
           </div>
           <button
             onClick={() => setShowPasswordForm(!showPasswordForm)}
-            className="text-sm text-gray-400 hover:text-gray-900 transition-colors"
+            className="text-sm text-zinc-600 hover:text-zinc-600 transition-colors"
           >
             {showPasswordForm ? 'Cancel' : 'Change'}
           </button>
@@ -147,16 +147,16 @@ export default function SettingsPage() {
         {showPasswordForm && (
           <div className="mt-4 space-y-4 p-4 bg-gray-50/50 rounded-lg">
             <div>
-              <label htmlFor="current-password" className="block text-xs text-gray-400 uppercase tracking-wide mb-1">Current Password</label>
-              <input id="current-password" type="password" value={passwordForm.currentPassword} onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-black focus:outline-none focus:ring-1 focus:ring-gray-300" />
+              <label htmlFor="current-password" className="block text-xs text-zinc-600 uppercase tracking-wide mb-1">Current Password</label>
+              <input id="current-password" type="password" value={passwordForm.currentPassword} onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-zinc-600 focus:outline-none focus:ring-1 focus:ring-gray-300" />
             </div>
             <div>
-              <label htmlFor="new-password" className="block text-xs text-gray-400 uppercase tracking-wide mb-1">New Password</label>
-              <input id="new-password" type="password" value={passwordForm.newPassword} onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-black focus:outline-none focus:ring-1 focus:ring-gray-300" />
+              <label htmlFor="new-password" className="block text-xs text-zinc-600 uppercase tracking-wide mb-1">New Password</label>
+              <input id="new-password" type="password" value={passwordForm.newPassword} onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-zinc-600 focus:outline-none focus:ring-1 focus:ring-gray-300" />
             </div>
             <div>
-              <label htmlFor="confirm-password" className="block text-xs text-gray-400 uppercase tracking-wide mb-1">Confirm Password</label>
-              <input id="confirm-password" type="password" value={passwordForm.confirmPassword} onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-black focus:outline-none focus:ring-1 focus:ring-gray-300" />
+              <label htmlFor="confirm-password" className="block text-xs text-zinc-600 uppercase tracking-wide mb-1">Confirm Password</label>
+              <input id="confirm-password" type="password" value={passwordForm.confirmPassword} onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-zinc-600 focus:outline-none focus:ring-1 focus:ring-gray-300" />
             </div>
             <button onClick={handleChangePassword} disabled={changePassword.isPending} className="px-5 py-2 bg-[#D4AF37] text-white rounded-lg text-sm font-medium hover:bg-[#C4A030] transition-colors disabled:opacity-50">
               {changePassword.isPending ? 'Updating...' : 'Update Password'}
@@ -167,7 +167,7 @@ export default function SettingsPage() {
 
       {/* Notifications */}
       <div className="bg-white border border-gray-100 rounded-xl p-6">
-        <h2 className="text-base font-medium text-gray-900 mb-4">Notifications</h2>
+        <h2 className="text-base font-medium text-zinc-600 mb-4">Notifications</h2>
         <div className="space-y-3">
           {[
             { key: 'orderUpdates' as const, label: 'Order updates', desc: 'Status changes and shipping info' },
@@ -176,8 +176,8 @@ export default function SettingsPage() {
           ].map((item) => (
             <div key={item.label} className="flex items-center justify-between p-4 bg-gray-50/50 rounded-lg">
               <div>
-                <p className="text-sm font-medium text-gray-900">{item.label}</p>
-                <p className="text-xs text-gray-400">{item.desc}</p>
+                <p className="text-sm font-medium text-zinc-600">{item.label}</p>
+                <p className="text-xs text-zinc-600">{item.desc}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input

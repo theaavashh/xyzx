@@ -43,33 +43,33 @@ export function CountdownTimer({ endDate, textColor }: CountdownTimerProps) {
 
   const units = [
     { label: 'd', value: timeLeft.days },
-    { label: 'h', value: timeLeft.hours },
-    { label: 'm', value: timeLeft.minutes },
-    { label: 's', value: timeLeft.seconds },
+    { label: 'hrs', value: timeLeft.hours },
+    { label: 'min', value: timeLeft.minutes },
+    { label: 'sec', value: timeLeft.seconds },
   ];
 
   return (
     <div
-      className="flex items-center gap-1.5 sm:ml-3 sm:pl-3 sm:border-l border-white/30"
+      className="flex items-center gap-1.5 sm:ml-0 sm:pl-3 sm:border-l border-white/30"
       style={{ borderColor: textColor ? `${textColor}30` : undefined }}
     >
       {units.map((unit, i) => (
         <div key={unit.label} className="flex items-center">
           <span
-            className="font-mono tabular-nums text-lg sm:text-lg font-bold min-w-[2.5ch] text-center"
+            className="tabular-nums text-base sm:text-xl font-bold text-center"
             style={{ color: textColor }}
           >
             {String(unit.value).padStart(2, '0')}
           </span>
           <span
-            className="text-xs sm:text-sm uppercase tracking-wider ml-1 text-gray-700"
+            className="text-[10px] sm:text-xs uppercase tracking-wider ml-0.5"
             style={{ color: textColor }}
           >
             {unit.label}
           </span>
           {i < units.length - 1 && (
             <span
-              className="mx-0.5 opacity-40 text-xs"
+              className="mx-1 opacity-40 text-sm font-bold"
               style={{ color: textColor }}
             >
               :

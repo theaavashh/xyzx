@@ -23,7 +23,7 @@ spec:
         fsGroup: 1001
       containers:
         - name: api
-          image: rapharch/api:latest
+          image: maptech07/rapharch-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 9999

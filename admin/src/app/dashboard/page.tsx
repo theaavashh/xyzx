@@ -17,7 +17,7 @@ function DashboardContent() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-black outer-sans">Dashboard</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-black">Dashboard</h2>
           <p className="text-black text-lg mt-2 saans">Welcome back! Here&apos;s what&apos;s happening with your store today.</p>
         </div>
       </div>

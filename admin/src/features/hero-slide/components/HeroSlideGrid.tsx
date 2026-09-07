@@ -56,7 +56,7 @@ export function HeroSlideGrid({
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex items-center gap-2 bg-[#D4AF37] text-white px-4 py-2.5 outer-sans text-lg rounded-md hover:bg-[#b8962e] font-semibold"
+          className="inline-flex items-center gap-2 bg-[#D4AF37] text-white px-4 py-2.5 text-lg rounded-md hover:bg-[#b8962e] font-semibold"
         >
           <Plus className="w-4 h-4" />
           Create Slide
@@ -86,7 +86,7 @@ export function HeroSlideGrid({
 
               <div className="flex items-center gap-4 mb-2">
                 {item.image ? (
-                  <img src={item.image} alt={item.title} className="w-24 h-16 object-cover rounded border border-gray-200" crossOrigin="anonymous" />
+                  <img src={item.image} alt={item.title} className="w-24 h-16 object-contain rounded border border-gray-200" crossOrigin="anonymous" />
                 ) : null}
               </div>
 

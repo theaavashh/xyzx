@@ -1,6 +1,7 @@
 'use client';
 
 import { clientLogger } from '@/lib/logger';
+import { authHeaders } from '@/utils/authHeaders';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import type {
@@ -47,6 +48,7 @@ export function useFooterSectionQueries() {
     try {
       const response = await fetch(`${API_BASE}/api/v1/footer-section`, {
         credentials: 'include',
+        headers: authHeaders(),
       });
       if (response.ok) {
         const data = await response.json();
@@ -109,7 +111,7 @@ export function useFooterSectionQueries() {
         : `${API_BASE}/api/v1/footer-section`;
       const response = await fetch(url, {
         method: editingSection ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         credentials: 'include',
         body: JSON.stringify(sectionForm),
       });
@@ -138,7 +140,7 @@ export function useFooterSectionQueries() {
     try {
       const response = await fetch(
         `${API_BASE}/api/v1/footer-section/${sectionToDelete.id}`,
-        { method: 'DELETE', credentials: 'include' },
+        { method: 'DELETE', credentials: 'include', headers: authHeaders() },
       );
       if (response.ok) {
         toast.success('Footer section deleted successfully');
@@ -158,7 +160,7 @@ export function useFooterSectionQueries() {
     try {
       const response = await fetch(
         `${API_BASE}/api/v1/footer-section/${id}/toggle`,
-        { method: 'PATCH', credentials: 'include' },
+        { method: 'PATCH', credentials: 'include', headers: authHeaders() },
       );
       if (response.ok) {
         toast.success('Status updated successfully');
@@ -196,7 +198,7 @@ export function useFooterSectionQueries() {
         `${API_BASE}/api/v1/footer-section/reorder`,
         {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
           credentials: 'include',
           body: JSON.stringify({ orders }),
         },
