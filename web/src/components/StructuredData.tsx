@@ -1,9 +1,11 @@
+import { serializeJsonLd } from '@/lib/sanitize';
+
 export function OrganizationStructuredData() {
   return (
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
+        __html: serializeJsonLd({
           '@context': 'https://schema.org',
           '@type': 'Organization',
           name: 'RaphArch',
@@ -41,7 +43,7 @@ export function ProductStructuredData(product: any) {
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
+        __html: serializeJsonLd({
           '@context': 'https://schema.org',
           '@type': 'Product',
           name: product.name,
@@ -68,7 +70,7 @@ export function WebsiteStructuredData() {
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
+        __html: serializeJsonLd({
           '@context': 'https://schema.org',
           '@type': 'WebSite',
           name: 'RaphArch',

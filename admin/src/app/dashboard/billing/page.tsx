@@ -77,7 +77,7 @@ export default function BillingPage() {
 
         <OrderTable orders={orders} formatCurrency={formatCurrency} formatDate={formatDate}
           getStatusColor={getStatusColor} getPaymentStatusColor={getPaymentStatusColor}
-          getStatusIcon={getStatusIcon} viewOrderDetails={viewOrderDetails} />
+          getStatusIcon={getStatusIcon} viewOrderDetails={viewOrderDetails} onStatusChanged={loadOrders} />
         <OrderPaginationComponent pagination={pagination} setPagination={setPagination} />
 
         <AnimatePresence>

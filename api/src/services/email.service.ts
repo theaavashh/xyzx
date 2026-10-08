@@ -473,6 +473,26 @@ export interface InvoiceData {
   tax: number;
   shipping: number;
   total: number;
+  paymentMethod?: string | null;
+  paymentStatus?: string | null;
+  paidAt?: Date | string | null;
+  notes?: string | null;
+  company?: InvoiceCompany;
+}
+
+export interface InvoiceCompany {
+  name?: string;
+  location?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  abn?: string;
+  bank?: {
+    name?: string;
+    bsb?: string;
+    account?: string;
+  };
 }
 
 const formatMoney = (_currency: string, amount: number): string =>
@@ -480,7 +500,7 @@ const formatMoney = (_currency: string, amount: number): string =>
 
 export const sendOrderInvoice = async (to: string, invoice: InvoiceData): Promise<void> => {
   const { generateInvoicePdf } = await import('./invoice-pdf.service.js');
-  const pdf = generateInvoicePdf(invoice);
+  const pdf = await generateInvoicePdf(invoice);
   const itemsHtml = invoice.items
     .map(
       (item) => `

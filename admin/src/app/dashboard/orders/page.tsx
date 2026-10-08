@@ -120,6 +120,7 @@ export default function OrdersPage() {
           getStatusIcon={getStatusIcon}
           formatCurrency={formatCurrency}
           formatDate={formatDate}
+          onStatusChanged={loadOrders}
         />
 
         <OrderPaginationComponent pagination={pagination} setPagination={setPagination} />

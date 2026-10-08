@@ -26,36 +26,8 @@ export const PaymentIcon = memo(function PaymentIcon({ name, type }: PaymentIcon
           <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold" fontFamily="sans-serif">PayPal</text>
         </svg>
       )}
-      {type === 'amex' && (
-        <svg viewBox="0 0 50 30" className="h-5 w-8" aria-hidden="true">
-          <rect width="50" height="30" rx="4" fill="#2E77BC" />
-          <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="6" fontWeight="bold" fontFamily="sans-serif">AMEX</text>
-        </svg>
-      )}
-      {type === 'applepay' && (
-        <svg viewBox="0 0 50 30" className="h-5 w-8" aria-hidden="true">
-          <rect width="50" height="30" rx="4" fill="black" />
-          <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="6" fontWeight="bold" fontFamily="sans-serif">Apple Pay</text>
-        </svg>
-      )}
-      {type === 'shopifypay' && (
-        <svg viewBox="0 0 50 30" className="h-5 w-8" aria-hidden="true">
-          <rect width="50" height="30" rx="4" fill="#7AB55C" />
-          <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="6" fontWeight="bold" fontFamily="sans-serif">Shop Pay</text>
-        </svg>
-      )}
-      {type === 'cartesbancaires' && (
-        <svg viewBox="0 0 50 30" className="h-5 w-8" aria-hidden="true">
-          <rect width="50" height="30" rx="4" fill="#0074B8" />
-          <text x="50%" y="45%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="5" fontWeight="bold" fontFamily="sans-serif">CB</text>
-          <text x="50%" y="62%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="3" fontFamily="sans-serif">cartes bancaires</text>
-        </svg>
-      )}
-      {!['visa', 'mastercard', 'paypal', 'amex', 'applepay', 'shopifypay', 'cartesbancaires'].includes(type) && (
-        <svg viewBox="0 0 50 30" className="h-5 w-8" aria-hidden="true">
-          <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="black" fontSize="5" fontWeight="bold" fontFamily="sans-serif">{name}</text>
-        </svg>
-      )}
+      
+     
     </div>
   );
 });

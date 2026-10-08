@@ -7,7 +7,7 @@ export function FooterBottom() {
   return (
     <div>
       <div className="flex flex-col items-center gap-1 sm:gap-2 pt-10">
-        <p className="text-xs sm:text-sm md:text-base text-zinc-600 text-center w-full">
+        <p className="text-sm md:text-base text-zinc-600 text-center w-full">
           &copy; {CURRENT_YEAR} RaphArch. All rights reserved.
         </p>
 

@@ -24,6 +24,7 @@ import {
 } from '../utils';
 
 const cookieSameSite = process.env.NODE_ENV === 'production' ? ('none' as const) : ('lax' as const);
+const cookieDomain = process.env.COOKIE_DOMAIN || '';
 
 const refreshCookieOptions = (maxAgeMs: number) => ({
   httpOnly: true,
@@ -31,6 +32,7 @@ const refreshCookieOptions = (maxAgeMs: number) => ({
   sameSite: cookieSameSite,
   maxAge: maxAgeMs,
   path: '/api/v1/auth/refresh',
+  ...(cookieDomain && { domain: cookieDomain }),
 });
 
 const accessCookieOptions = {
@@ -38,6 +40,7 @@ const accessCookieOptions = {
   secure: process.env.NODE_ENV === 'production',
   sameSite: cookieSameSite,
   path: '/',
+  ...(cookieDomain && { domain: cookieDomain }),
 };
 
 const csrfCookieOptions = {
@@ -45,6 +48,7 @@ const csrfCookieOptions = {
   secure: process.env.NODE_ENV === 'production',
   sameSite: cookieSameSite,
   path: '/',
+  ...(cookieDomain && { domain: cookieDomain }),
 };
 
 const setRefreshCookie = (res: Response, refreshToken: string): void => {
@@ -65,9 +69,12 @@ const setCsrfCookie = (res: Response): void => {
 };
 
 export const clearAuthCookies = (res: Response): void => {
-  res.clearCookie('refreshToken', { path: '/api/v1/auth/refresh' });
-  res.clearCookie('accessToken', { path: '/' });
-  res.clearCookie('csrf-token', { path: '/' });
+  const clearOptions = cookieDomain
+    ? { path: '/api/v1/auth/refresh', domain: cookieDomain }
+    : { path: '/api/v1/auth/refresh' };
+  res.clearCookie('refreshToken', clearOptions);
+  res.clearCookie('accessToken', cookieDomain ? { path: '/', domain: cookieDomain } : { path: '/' });
+  res.clearCookie('csrf-token', cookieDomain ? { path: '/', domain: cookieDomain } : { path: '/' });
 };
 
 const parseDurationToMs = (duration: string): number => {

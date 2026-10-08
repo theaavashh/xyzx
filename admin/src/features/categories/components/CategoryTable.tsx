@@ -3,6 +3,7 @@ import {
   ArrowDown,
   ArrowUp,
   ChevronDown,
+  ChevronRight,
   Edit,
   Eye,
   ImageIcon,
@@ -17,8 +18,14 @@ import type { Category } from '../types';
 type ViewMode = 'list' | 'grid';
 type SortField = 'name' | 'status' | 'createdAt';
 
+interface FlatCategory extends Category {
+  isParent: boolean;
+}
+
 interface CategoryTableProps {
   categories: Category[];
+  level: number;
+  onDrill: (category: Category) => void;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
   getFullImageUrl: (imagePath: string) => string;
@@ -170,8 +177,14 @@ function BulkActionsBar({
   );
 }
 
+function toRows(categories: Category[]): FlatCategory[] {
+  return categories.map((item) => ({ ...item, isParent: !!(item.children && item.children.length > 0) }));
+}
+
 export default function CategoryTable({
   categories,
+  level,
+  onDrill,
   viewMode,
   onViewModeChange,
   getFullImageUrl,
@@ -186,8 +199,11 @@ export default function CategoryTable({
   onBulkDelete,
   onBulkStatusToggle,
 }: CategoryTableProps) {
-  const allSelected = categories.length > 0 && categories.every((c) => selectedIds.includes(c.id));
-  const someSelected = categories.some((c) => selectedIds.includes(c.id));
+  const flatCategories = toRows(categories);
+  const itemType = level > 0 ? 'subcategory' : 'category';
+
+  const allSelected = flatCategories.length > 0 && flatCategories.every((c) => selectedIds.includes(c.id));
+  const someSelected = flatCategories.some((c) => selectedIds.includes(c.id));
 
   const selectAllRef = useRef<HTMLInputElement>(null);
 
@@ -199,10 +215,10 @@ export default function CategoryTable({
 
   const handleSelectAll = () => {
     if (allSelected) {
-      onSelectionChange(selectedIds.filter((id) => !categories.some((c) => c.id === id)));
+      onSelectionChange(selectedIds.filter((id) => !flatCategories.some((c) => c.id === id)));
     } else {
       const newIds = [...selectedIds];
-      for (const c of categories) {
+      for (const c of flatCategories) {
         if (!newIds.includes(c.id)) newIds.push(c.id);
       }
       onSelectionChange(newIds);
@@ -261,7 +277,7 @@ export default function CategoryTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {categories.map((category, index) => (
+              {flatCategories.map((category, index) => (
                 <motion.tr
                   key={category.id}
                   initial={{ opacity: 0 }}
@@ -298,9 +314,33 @@ export default function CategoryTable({
                     </div>
                   </td>
                   <td className="px-4 py-4">
-                    <div className="flex flex-col">
-                      <span className="text-base font-medium text-gray-900">{category.name}</span>
-                    </div>
+                    {category.isParent ? (
+                      <button
+                        onClick={() => onDrill(category)}
+                        className="group/name flex items-center gap-1.5 text-left"
+                        title="View subcategories"
+                      >
+                        <span className="flex h-6 w-6 items-center justify-center rounded hover:bg-gray-100 transition">
+                          <ChevronRight className="w-4 h-4 text-gray-400 transition group-hover/name:text-[#D4AF37] group-hover/name:translate-x-0.5" />
+                        </span>
+                        <span className="flex flex-col">
+                          <span className="text-base font-medium text-gray-900 transition-colors group-hover/name:text-[#D4AF37]">
+                            {category.name}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            {category.children?.length} subcategories
+                          </span>
+                        </span>
+                      </button>
+                    ) : (
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-6" />
+                        <span className="flex flex-col">
+                          <span className="text-base font-medium text-gray-900">{category.name}</span>
+                          <span className="text-xs text-gray-400">{itemType === 'subcategory' ? 'Subcategory' : 'Category'}</span>
+                        </span>
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-4">
                     <span className="text-sm text-gray-500 truncate max-w-[200px] block">
@@ -333,7 +373,7 @@ export default function CategoryTable({
                         <span className="hidden sm:inline">Edit</span>
                       </button>
                       <button
-                        onClick={() => handleDeleteClick(category.id, category.name, 'category')}
+                        onClick={() => handleDeleteClick(category.id, category.name, itemType)}
                         className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 transition"
                         title="Delete"
                       >
@@ -349,7 +389,7 @@ export default function CategoryTable({
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {categories.map((category, index) => (
+          {flatCategories.map((category, index) => (
             <motion.div
               key={category.id}
               initial={{ opacity: 0, y: 16 }}
@@ -375,7 +415,33 @@ export default function CategoryTable({
                 </div>
 
                 <div className="flex flex-1 flex-col p-4">
-                  <h3 className="text-base font-semibold text-gray-900 line-clamp-1">{category.name}</h3>
+                  {category.isParent ? (
+                    <button
+                      onClick={() => onDrill(category)}
+                      className="group/name text-left"
+                      title="View subcategories"
+                    >
+                      <span className="flex items-center gap-2">
+                        <ChevronRight className="w-4 h-4 text-gray-400 transition group-hover/name:text-[#D4AF37] group-hover/name:translate-x-0.5" />
+                        <h3 className="text-base font-semibold text-gray-900 line-clamp-1 transition-colors group-hover/name:text-[#D4AF37]">
+                          {category.name}
+                        </h3>
+                      </span>
+                      <span className="mt-1 block text-xs text-gray-400">
+                        {category.children?.length} subcategories
+                      </span>
+                    </button>
+                  ) : (
+                    <div>
+                      <span className="flex items-center gap-2">
+                        <span className="w-4" />
+                        <h3 className="text-base font-semibold text-gray-900 line-clamp-1">{category.name}</h3>
+                      </span>
+                      <span className="mt-1 block text-xs text-gray-400">
+                        {itemType === 'subcategory' ? 'Subcategory' : 'Category'}
+                      </span>
+                    </div>
+                  )}
 
                   <div className="mt-auto flex items-center gap-2 pt-4">
                     <button
@@ -393,7 +459,7 @@ export default function CategoryTable({
                       <Edit className="w-3.5 h-3.5" />
                     </button>
                     <button
-                      onClick={() => handleDeleteClick(category.id, category.name, 'category')}
+                      onClick={() => handleDeleteClick(category.id, category.name, itemType)}
                       className="inline-flex items-center justify-center rounded-lg border border-gray-200 p-2 text-red-400 hover:text-red-600 hover:bg-red-50 transition ml-auto"
                       title="Delete"
                     >

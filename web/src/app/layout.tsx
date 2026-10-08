@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: process.env.NEXT_PUBLIC_SITE_URL || 'https://rapharch.com',
-    title: 'RaphArch - Premium Fashion & Footwear',
+    title: 'RaphArch - Premium Fashion',
     description:
       'Discover the latest in premium fashion, footwear, and accessories at RaphArch',
     siteName: 'RaphArch',

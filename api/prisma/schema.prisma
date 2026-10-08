@@ -208,10 +208,10 @@ model Product {
   name                 String
   slug                 String   @unique
   productCode          String?
-  description          String?
-  shortDescription     String?
-  materialCare         String?
-  disclaimer           String?
+  description          String?  @db.Text
+  shortDescription     String?  @db.Text
+  materialCare         String?  @db.Text
+  disclaimer           String?  @db.Text
   showMaterialCare     Boolean  @default(false)
   
   gender        String?
@@ -252,7 +252,7 @@ model Product {
   thumbnail String?
 
   seoTitle                String?
-  seoDescription          String?
+  seoDescription          String?  @db.Text
   seoKeywords             Json?    @default("[]")
   canonicalUrl            String?
   robotsMeta              String?  @default("index,follow")
@@ -263,10 +263,10 @@ model Product {
   itemListSchema          Json?
   faqSchema               Json?
   ogTitle                 String?
-  ogDescription           String?
+  ogDescription           String?  @db.Text
   ogImage                 String?
   twitterCardMeta         Json?
-  productDescription      String?
+  productDescription      String?  @db.Text
   faqs                    Json?
   
   isActive        Boolean  @default(true)

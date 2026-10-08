@@ -10,6 +10,16 @@ import {
   sendSuccess,
 } from '../utils';
 import { logger } from '../utils/logger';
+import { sanitizeRichTextFields } from '../utils/sanitize';
+
+/** Rendered as HTML on the storefront, so they are sanitized on write. */
+const RICH_TEXT_FIELDS = [
+  'description',
+  'shortDescription',
+  'disclaimer',
+  'materialCare',
+  'productDescription',
+] as const;
 
 const getNumericValue = (val: unknown): number => {
   if (typeof val === 'number') return val;
@@ -66,7 +76,9 @@ export const getProducts: RequestHandler = asyncHandler(
 
     const productFilters = {
       search: filters.search,
+      slug: filters.slug,
       categoryId: filters.categoryId,
+      categorySlug: filters.categorySlug,
       isActive: filters.isActive ? filters.isActive === 'true' : undefined,
       isFeatured: filters.isFeatured ? filters.isFeatured === 'true' : undefined,
       isNew: filters.isNew ? filters.isNew === 'true' : undefined,
@@ -120,6 +132,7 @@ export const createProduct: RequestHandler = asyncHandler(
     }
 
     const { currencyPrices, pricingTiers, attributes, ...prismaData } = productData;
+    sanitizeRichTextFields(prismaData, RICH_TEXT_FIELDS);
 
     const product = await productRepository.createProduct({
       name: prismaData.name,
@@ -238,6 +251,7 @@ export const updateProduct: RequestHandler = asyncHandler(
     }
 
     const { currencyPrices, pricingTiers, attributes, ...prismaData } = productData;
+    sanitizeRichTextFields(prismaData, RICH_TEXT_FIELDS);
 
     const updatePayload: Record<string, any> = {
       name: prismaData.name,

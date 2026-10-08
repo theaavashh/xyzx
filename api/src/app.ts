@@ -34,6 +34,14 @@ const CORS_ORIGINS = process.env.CORS_ORIGINS
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+/** Paths that should never consume the rate-limit budget. */
+const isUnlimitedPath = (req: Request) =>
+  req.path.startsWith('/api/v1/public/') || req.path.startsWith('/uploads/');
+
+// In development the storefront (SSR + browser) shares one IP with the API, so
+// the limiter throttles the whole site; only rate limit real traffic.
+const skipRateLimit = (req: Request) => !isProduction || isUnlimitedPath(req);
+
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_MAX || '300', 10),
@@ -43,20 +51,14 @@ const globalLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) => {
-    const path = req.path;
-    return (
-      path.startsWith('/api/v1/public/') ||
-      path.startsWith('/uploads/')
-    );
-  },
+  skip: skipRateLimit,
 });
 
 const speedLimiter = slowDown({
   windowMs: 15 * 60 * 1000,
   delayAfter: 10,
   delayMs: () => 500,
-  skip: (req) => req.path.startsWith('/api/v1/public/') || req.path.startsWith('/uploads/'),
+  skip: skipRateLimit,
 });
 
 const publicLimiter = rateLimit({
@@ -68,6 +70,7 @@ const publicLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => !isProduction,
 });
 
 app.use(compression());
@@ -258,7 +261,10 @@ app.get('/metrics', (req: Request, res: Response, next: NextFunction) => {
   next();
 }, metricsEndpoint);
 
-setupSwagger(app);
+// Swagger documents the whole API surface, so it stays out of production.
+if (!isProduction) {
+  setupSwagger(app);
+}
 
 app.use('/api/v1', csrfProtection);
 

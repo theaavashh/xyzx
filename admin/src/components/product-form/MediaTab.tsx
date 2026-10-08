@@ -20,9 +20,7 @@ interface MediaTabProps {
 
 const validateMedia = (formData: MediaTabProps['formData']): Record<string, string> => {
   const errors: Record<string, string> = {};
-  if (formData.images.length === 0) {
-    errors.images = 'At least one product image is required';
-  }
+  // Images are optional - no validation required
   return errors;
 };
 
@@ -91,7 +89,7 @@ const MediaTab: React.FC<MediaTabProps> = React.memo(({
     <div className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Product Images *
+          Product Images
         </label>
         <div
           className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
@@ -131,9 +129,6 @@ const MediaTab: React.FC<MediaTabProps> = React.memo(({
             {formData.images.length}/12 images uploaded
           </p>
         </div>
-        {errors.images && (
-          <p className="mt-2 text-sm text-red-600">{errors.images}</p>
-        )}
 
         {formData.images.length > 0 && (
           <div className="mt-4">

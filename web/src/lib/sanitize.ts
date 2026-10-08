@@ -29,6 +29,20 @@ function sanitizeServer(dirty: string): string {
   return clean;
 }
 
+/**
+ * Serializes data for a `<script type="application/ld+json">` tag.
+ *
+ * `JSON.stringify` leaves `<` and `>` intact, so a CMS value containing
+ * `</script>` closes the tag early and injects markup. Escaping them as
+ * `\u003c` / `\u003e` keeps the payload inert and still parses as JSON.
+ */
+export function serializeJsonLd(data: unknown): string {
+  return JSON.stringify(data ?? {})
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026');
+}
+
 export async function sanitizeHtml(dirty: string): Promise<string> {
   if (typeof window !== 'undefined') {
     const dompurify = await import('dompurify');

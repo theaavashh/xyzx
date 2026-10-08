@@ -3,7 +3,6 @@
 import { memo, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingBag } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -24,8 +23,7 @@ interface WomenItemsConfig {
   filterValue: string;
 }
 
-const HERO_IMAGE =
-  'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=1200&q=85';
+const HERO_IMAGE ='/banner.png';
 
 const DEFAULT_CONFIG: WomenItemsConfig = {
   image: HERO_IMAGE,
@@ -94,7 +92,7 @@ function ProductCard({ product }: { product: Product }) {
       : `/products/all/${product.id}`;
 
   return (
-    <Link href={href} className="group block w-[160px] flex-shrink-0">
+    <Link href={href} className="group block w-[230px] flex-shrink-0">
       <div className="relative aspect-[2/3] overflow-hidden bg-zinc-100">
         {product.image ? (
           <Image
@@ -102,15 +100,12 @@ function ProductCard({ product }: { product: Product }) {
             alt={product.name}
             fill
             unoptimized
-            sizes="120px"
+            sizes="230px"
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           />
         ) : (
           <div className="w-full h-full bg-zinc-200" />
         )}
-        <div className="absolute bottom-2 left-2 flex h-9 w-9 items-center justify-center bg-white shadow-sm transition-transform duration-300 group-hover:scale-105">
-          <ShoppingBag className="h-4 w-4 text-zinc-900" strokeWidth={1.5} />
-        </div>
       </div>
       <div className="mt-3">
         <h4 className="line-clamp-2 text-sm font-medium leading-5 text-zinc-800">{product.name}</h4>
@@ -154,7 +149,7 @@ function WomenItems() {
     <section className="w-full bg-white py-4 sm:py-6">
       <div className="mx-auto w-full max-w-[1400px] px-3 sm:px-4">
         <div className="grid overflow-hidden md:grid-cols-[1fr_1fr]">
-          <div className="relative min-h-[500px] sm:min-h-[600px] md:min-h-[680px]">
+          <div className="relative min-h-[380px] sm:min-h-[460px] md:min-h-[520px]">
             <Image
               src={heroImage}
               alt="Women's Collection"

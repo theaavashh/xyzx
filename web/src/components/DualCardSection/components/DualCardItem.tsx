@@ -30,7 +30,7 @@ export const DualCardItem = ({ card, index }: DualCardItemProps) => {
         />
       </Link>
       <div className="mt-4 text-left space-y-3">
-        <h3 className="text-md sm:text-lg font-bold text-zinc-600  tracking-wide">
+        <h3 className="text-sm sm:text-lg font-normal text-zinc-600  tracking-wide">
           {card.label}
         </h3>
         <Link

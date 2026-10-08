@@ -81,6 +81,16 @@ export default function SignupPage() {
           className="w-full max-w-sm"
         >
           <div className="flex flex-col items-center gap-3 mb-8 tracking-wide">
+            <Link href="/" className="block">
+              <Image
+                src="/rapharch-logo.jpg"
+                alt="Rapharch Logo"
+                width={220}
+                height={220}
+                priority
+                className="h-14 w-auto object-contain"
+              />
+            </Link>
             <div className="text-center">
               <h1 className="text-4xl text-zinc-900 font-bold swansea">Join Us</h1>
               <p className="text-2xl text-zinc-600 mt-1 swansea">Create your account</p>

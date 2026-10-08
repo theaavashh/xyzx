@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Plus, Layers } from 'lucide-react';
 import { Controller, type UseFormReturn } from 'react-hook-form';
+import { useState } from 'react';
 import type { CategoryFormData } from '@/schemas/categorySchema';
 
 interface CategoryFormProps {
@@ -13,6 +14,7 @@ interface CategoryFormProps {
   onCancel: () => void;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   getFullImageUrl: (path: string) => string;
+  categories?: Array<{ id: string; name: string; children?: Array<{ id: string; name: string }> }>;
 }
 
 export default function CategoryForm({
@@ -25,13 +27,60 @@ export default function CategoryForm({
   onCancel,
   handleImageUpload,
   getFullImageUrl,
+  categories = [],
 }: CategoryFormProps) {
   const { control, formState: { errors }, watch } = form;
   const categoryName = watch('name');
+  const parentIdValue = watch('parentId');
+  const subcategories = watch('subcategories') || [];
   const metaTitleValue = watch('metaTitle');
   const metaTitlePreview = metaTitleValue || categoryName || 'Category Name';
   const metaDescriptionValue = watch('metaDescription');
   const metaDescriptionPreview = metaDescriptionValue || 'Enter a meta description for this category...';
+
+  const [newSubcategory, setNewSubcategory] = useState('');
+
+  type TreeNode = { id: string; name: string; children?: TreeNode[] };
+
+  const flattenCategories = (
+    items: TreeNode[],
+    depth = 0,
+    excludeId?: string,
+    excludedBranch = false,
+  ): Array<{ id: string; name: string; depth: number }> => {
+    const result: Array<{ id: string; name: string; depth: number }> = [];
+    for (const item of items) {
+      const isSelf = excludeId !== undefined && item.id === excludeId;
+      const skip = excludedBranch || isSelf;
+      if (!skip) result.push({ id: item.id, name: item.name, depth });
+      if (item.children && item.children.length > 0) {
+        result.push(...flattenCategories(item.children, depth + 1, excludeId, skip));
+      }
+    }
+    return result;
+  };
+
+  const parentOptions = flattenCategories(categories as TreeNode[], 0, editingCategory?.id, false);
+
+  const addSubcategory = () => {
+    if (newSubcategory.trim()) {
+      const current = form.getValues('subcategories') || [];
+      form.setValue('subcategories', [...current, newSubcategory.trim()], { shouldDirty: true });
+      setNewSubcategory('');
+    }
+  };
+
+  const removeSubcategory = (index: number) => {
+    const current = form.getValues('subcategories') || [];
+    form.setValue('subcategories', current.filter((_, i) => i !== index), { shouldDirty: true });
+  };
+
+  const handleSubcategoryKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addSubcategory();
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -84,7 +133,6 @@ export default function CategoryForm({
                   <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>
                 )}
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
                 <Controller
@@ -100,6 +148,30 @@ export default function CategoryForm({
                     </select>
                   )}
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Parent Category</label>
+                <Controller
+                  name="parentId"
+                  control={control}
+                  render={({ field }) => (
+                    <select
+                      {...field}
+                      value={field.value || ''}
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-black focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
+                    >
+                      <option value="">None (top-level)</option>
+                      {parentOptions.map((opt) => (
+                        <option key={opt.id} value={opt.id}>
+                          {' '.repeat(opt.depth)}
+                          {opt.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                />
+                <p className="mt-1.5 text-xs text-gray-500">Choose a parent to make this a subcategory</p>
               </div>
 
               <div>
@@ -124,7 +196,7 @@ export default function CategoryForm({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Category Image <span className="text-red-500">*</span>
+                  Category Image
                 </label>
                 <Controller
                   name="image"
@@ -176,6 +248,52 @@ export default function CategoryForm({
                 {errors.image && (
                   <p className="mt-1 text-xs text-red-500">{errors.image.message}</p>
                 )}
+              </div>
+            </div>
+
+            <div className="border-t border-gray-200 pt-5">
+              <h3 className="text-sm font-semibold text-black mb-1 flex items-center gap-2">
+                <Layers className="w-4 h-4 text-gray-500" />
+                Subcategories
+              </h3>
+              <p className="text-xs text-gray-500 mb-3">Add subcategories for this category (optional)</p>
+
+              <div className="space-y-2 mb-3">
+                {(subcategories || []).map((sub: string, index: number) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400 w-5 text-right">{index + 1}.</span>
+                    <span className="flex-1 text-sm text-black bg-gray-50 rounded-lg px-3 py-2 border border-gray-200">
+                      {sub}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeSubcategory(index)}
+                      className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newSubcategory}
+                  onChange={(e) => setNewSubcategory(e.target.value)}
+                  onKeyDown={handleSubcategoryKeyDown}
+                  className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm text-black focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
+                  placeholder="Enter subcategory name"
+                />
+                <button
+                  type="button"
+                  onClick={addSubcategory}
+                  disabled={!newSubcategory.trim()}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#D4AF37] px-3 py-2 text-sm font-medium text-white hover:bg-[#B8960C] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add
+                </button>
               </div>
             </div>
 

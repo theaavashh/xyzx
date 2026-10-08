@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { serializeJsonLd } from '@/lib/sanitize';
 
 interface SEOProps {
   title?: string;
@@ -82,7 +83,7 @@ export function StructuredData({ children }: { children: React.ReactNode }) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(children) }}
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(children) }}
     />
   );
 }

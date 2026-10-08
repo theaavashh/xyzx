@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Eye, EyeOff, ChevronLeft } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -18,16 +19,21 @@ const passwordSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
+const otpSchema = z.object({
+  otp: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code'),
+});
+
 type EmailForm = z.infer<typeof emailSchema>;
 type PasswordForm = z.infer<typeof passwordSchema>;
+type OtpForm = z.infer<typeof otpSchema>;
 
 export default function LoginPage() {
-  const [step, setStep] = useState<'email' | 'password'>('email');
+  const [step, setStep] = useState<'email' | 'password' | 'otp'>('email');
   const [email, setEmail] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState('');
 
-  const { login, isLoading: isAuthLoading } = useAuth();
+  const { login, verifyOtp, resendOtp, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
 
   const emailForm = useForm<EmailForm>({
@@ -42,6 +48,12 @@ export default function LoginPage() {
     mode: 'all',
   });
 
+  const otpForm = useForm<OtpForm>({
+    resolver: zodResolver(otpSchema),
+    defaultValues: { otp: '' },
+    mode: 'all',
+  });
+
   const handleEmailSubmit = (data: EmailForm) => {
     setApiError('');
     setEmail(data.email);
@@ -50,11 +62,39 @@ export default function LoginPage() {
 
   const handlePasswordSubmit = async (data: PasswordForm) => {
     setApiError('');
-    const success = await login(email, data.password);
-    if (success) {
+    const result = await login(email, data.password);
+
+    if (result.success) {
       router.push('/dashboard');
-    } else {
-      setApiError('Invalid email or password. Please try again.');
+      return;
+    }
+
+    if (result.requiresOtp) {
+      otpForm.reset({ otp: '' });
+      setStep('otp');
+      return;
+    }
+
+    setApiError(result.error || 'Invalid email or password. Please try again.');
+  };
+
+  const handleOtpSubmit = async (data: OtpForm) => {
+    setApiError('');
+    const result = await verifyOtp(email, data.otp);
+
+    if (result.success) {
+      router.push('/dashboard');
+      return;
+    }
+
+    setApiError(result.error || 'Invalid or expired OTP. Please try again.');
+  };
+
+  const handleResendOtp = async () => {
+    setApiError('');
+    const result = await resendOtp(email);
+    if (!result.success) {
+      setApiError(result.error || 'Unable to resend OTP. Please try again.');
     }
   };
 
@@ -72,8 +112,18 @@ export default function LoginPage() {
           className="w-full max-w-sm"
         >
           <div className="flex flex-col items-center gap-3 mb-8 tracking-wide">
+            <Link href="/" className="block">
+              <Image
+                src="/rapharch-logo.jpg"
+                alt="Rapharch Logo"
+                width={220}
+                height={220}
+                priority
+                className="h-14 w-auto object-contain"
+              />
+            </Link>
             <div className="text-center">
-              <h1 className="text-2xl sm:text-4xl text-zinc-900 font-extrabold swansea ">Welcome to Rapharch</h1>
+              <h1 className="text-2xl sm:text-4xl text-zinc-900 font-extrabold bound-regular ">Welcome to Rapharch</h1>
               <p className="text-lg text-zinc-600 text-zinc-600 mt-1">Sign in to your account</p>
             </div>
           </div>
@@ -133,7 +183,7 @@ export default function LoginPage() {
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </motion.form>
-            ) : (
+            ) : step === 'password' ? (
               <motion.form
                 key="password-step"
                 initial={{ opacity: 0, x: 20 }}
@@ -185,6 +235,76 @@ export default function LoginPage() {
                   <ChevronLeft className="w-4 h-4" />
                   Back
                 </button>
+              </motion.form>
+            ) : (
+              <motion.form
+                key="otp-step"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+                onSubmit={otpForm.handleSubmit(handleOtpSubmit)}
+                noValidate
+                className="space-y-5"
+              >
+                <div className="space-y-1.5">
+                  <label htmlFor="otp" className="text-base font-medium text-zinc-600">
+                    Verification code
+                  </label>
+                  <input
+                    id="otp"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    {...otpForm.register('otp')}
+                    className={`w-full px-4 py-3 border ${
+                      otpForm.formState.errors.otp ? 'border-red-400' : 'border-gray-300'
+                    } rounded-lg text-base tracking-[0.4em] text-center text-zinc-600 outline-none focus:border-black transition-colors`}
+                    placeholder="000000"
+                    autoFocus
+                  />
+                  {otpForm.formState.errors.otp && (
+                    <p className="text-sm text-red-500">{otpForm.formState.errors.otp.message}</p>
+                  )}
+                  <p className="text-sm text-zinc-600">
+                    Enter the 6-digit code sent to <span className="font-semibold">{email}</span>
+                  </p>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isAuthLoading}
+                  className="w-full py-3 bg-black text-white text-base font-semibold rounded-lg hover:bg-gray-800 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isAuthLoading ? (
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+                  ) : (
+                    <><span>Verify &amp; Sign In</span><ArrowRight className="w-4 h-4" /></>
+                  )}
+                </button>
+
+                <div className="flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep('password');
+                      setApiError('');
+                      otpForm.reset();
+                    }}
+                    className="flex items-center gap-1.5 text-sm text-zinc-600 hover:text-zinc-600 transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    className="text-sm text-zinc-600 hover:text-zinc-600 transition-colors"
+                  >
+                    Resend code
+                  </button>
+                </div>
               </motion.form>
             )}
           </AnimatePresence>

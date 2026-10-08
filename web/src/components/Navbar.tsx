@@ -183,7 +183,7 @@ export default function Navbar() {
               onClick={handleCloseAllMenus}
             >
               <Image
-                src="/logo.jpg"
+                src="/rapharch-logo.jpg"
                 alt="Rapharch Logo"
                 width={220}
                 height={220}
@@ -207,13 +207,18 @@ export default function Navbar() {
               {/* User */}
               {isAuthenticated ? (
                 <div
-                  className="relative hidden md:block"
-                  onMouseEnter={() => setIsUserDropdownOpen(true)}
-                  onMouseLeave={() => setIsUserDropdownOpen(false)}
+                  className="relative"
+                  onPointerEnter={(e) => {
+                    if (e.pointerType === 'mouse') setIsUserDropdownOpen(true);
+                  }}
+                  onPointerLeave={(e) => {
+                    if (e.pointerType === 'mouse') setIsUserDropdownOpen(false);
+                  }}
                 >
                   <button
                     type="button"
                     className="flex items-center gap-1 text-zinc-600 hover:text-zinc-900 transition-colors p-2"
+                    onClick={() => setIsUserDropdownOpen((prev) => !prev)}
                     aria-label="User menu"
                   >
                     <CiUser className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={0.5} />
@@ -293,28 +298,7 @@ export default function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  className="hidden md:block text-zinc-600 hover:text-zinc-900 transition-colors p-2"
-                  onClick={handleCloseAllMenus}
-                  aria-label="Login"
-                >
-                  <CiUser className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={0.5} />
-                </Link>
-              )}
-
-              {/* Mobile User */}
-              {isAuthenticated ? (
-                <button
-                  type="button"
-                  className="md:hidden text-zinc-600 hover:text-zinc-900 transition-colors p-2"
-                  onClick={logout}
-                  aria-label="Logout"
-                >
-<CiUser className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={0.5} />
-                        </button>
-              ) : (
-                <Link
-                  href="/login"
-                  className="md:hidden text-zinc-600 hover:text-zinc-600 transition-colors "
+                  className="text-zinc-600 hover:text-zinc-900 transition-colors p-2"
                   onClick={handleCloseAllMenus}
                   aria-label="Login"
                 >
@@ -353,7 +337,7 @@ export default function Navbar() {
                 >
                   <Link
                     href={item.href}
-                    className="text-lg font-medium text-zinc-600 hover:text-zinc-900 transition-colors py-3 inline-flex items-center gap-2"
+                    className="text-base font-medium text-zinc-600 hover:text-zinc-900 transition-colors py-3 inline-flex items-center gap-2"
                     onClick={handleCloseAllMenus}
                   >
                     {item.name}

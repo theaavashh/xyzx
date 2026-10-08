@@ -168,7 +168,7 @@ export default function RewardsDashboardPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Trophy className="w-8 h-8 text-yellow-500" />
-              <h1 className="text-3xl font-bold text-zinc-600">My Rewards</h1>
+              <h1 className="bound-regular text-3xl font-bold text-zinc-600">My Rewards</h1>
             </div>
             <button
               type="button"
@@ -187,7 +187,7 @@ export default function RewardsDashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-zinc-600">
+              <h3 className="bound-regular text-lg font-semibold text-zinc-600">
                 Current Balance
               </h3>
               <Trophy className="w-6 h-6 text-yellow-500" />
@@ -200,7 +200,7 @@ export default function RewardsDashboardPage() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-zinc-600">
+              <h3 className="bound-regular text-lg font-semibold text-zinc-600">
                 Total Earned
               </h3>
               <Star className="w-6 h-6 text-green-500" />
@@ -213,7 +213,7 @@ export default function RewardsDashboardPage() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-zinc-600">
+              <h3 className="bound-regular text-lg font-semibold text-zinc-600">
                 Total Redeemed
               </h3>
               <ShoppingCart className="w-6 h-6 text-red-500" />
@@ -229,7 +229,7 @@ export default function RewardsDashboardPage() {
         {showHistory && (
           <div className="bg-white rounded-lg shadow">
             <div className="p-6 border-b">
-              <h2 className="text-xl font-semibold text-zinc-600">
+              <h2 className="bound-regular text-xl font-semibold text-zinc-600">
                 Reward History
               </h2>
               <p className="text-sm text-zinc-600 mt-1">
@@ -318,7 +318,7 @@ export default function RewardsDashboardPage() {
             ) : (
               <div className="p-8 text-center">
                 <Gift className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-zinc-600 mb-2">
+                <h3 className="bound-regular text-lg font-semibold text-zinc-600 mb-2">
                   No reward history yet
                 </h3>
                 <p className="text-zinc-600">
@@ -336,7 +336,7 @@ export default function RewardsDashboardPage() {
             <div className="flex items-start space-x-3">
               <Trophy className="w-6 h-6 text-blue-600 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                <h3 className="bound-regular text-lg font-semibold text-blue-900 mb-2">
                   How to Earn More Points
                 </h3>
                 <ul className="space-y-2 text-blue-800">

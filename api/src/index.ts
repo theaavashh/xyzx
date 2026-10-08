@@ -1,28 +1,20 @@
 import dotenv from 'dotenv';
-import * as grpc from '@grpc/grpc-js';
 import app from './app';
 import { connectDB, disconnectDB } from './lib/database.connection';
 import { initializeCache, closeCache } from './services/cache.service';
+import { initializeDI, resetContainer } from './di';
 import { autoCreateAdmin } from './scripts/auto-create-admin';
 import { logger } from './utils/logger';
-import { startGrpcServer, stopGrpcServer } from './grpc';
 import { initWebSocket, closeWebSocket } from './services/websocket.service';
 
 dotenv.config();
 
 const PORT = parseInt(process.env.PORT || '3001', 10);
 
-let grpcServer: grpc.Server | null = null;
-
 const gracefulShutdown = async (signal: string) => {
   logger.info(`Received ${signal}, starting graceful shutdown`);
 
   try {
-    if (grpcServer) {
-      await stopGrpcServer(grpcServer);
-    }
-    logger.info('gRPC server stopped');
-
     await closeCache();
     logger.info('Cache service closed');
 
@@ -31,6 +23,9 @@ const gracefulShutdown = async (signal: string) => {
 
     await disconnectDB();
     logger.info('Database disconnected');
+
+    resetContainer();
+    logger.info('DI container reset');
 
     logger.info('Graceful shutdown completed');
     process.exit(0);
@@ -54,10 +49,11 @@ const startServer = async () => {
     await initializeCache();
     logger.info('Cache initialized');
 
+    await initializeDI();
+    logger.info('DI container initialized');
+
     await autoCreateAdmin();
     logger.info('Admin user check completed');
-
-    grpcServer = await startGrpcServer();
 
     const server = app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`, {
@@ -94,5 +90,4 @@ const startServer = async () => {
 
 startServer();
 
-export { grpcServer };
 export default app;

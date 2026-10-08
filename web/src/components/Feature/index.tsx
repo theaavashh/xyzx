@@ -39,7 +39,7 @@ export default function Feature() {
                 />
               </div>
 
-              <h3 className="bound-regular text-[18px] leading-tight text-zinc-900">
+              <h3 className="bound-regular text-md leading-tight text-zinc-900">
                 {feature.title}
               </h3>
 

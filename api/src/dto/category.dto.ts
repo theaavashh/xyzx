@@ -8,6 +8,7 @@ export const createCategorySchema = z.object({
     return val.startsWith('http') || val.startsWith('data:image') || val.startsWith('/');
   }, 'Image must be a valid URL, data URL, or path').optional().or(z.literal('')),
   internalLink: z.string().min(1, 'Internal link is required').refine((val) => val.startsWith('/') || val.startsWith('http'), 'Internal link must start with / or http'),
+  parentId: z.string().uuid('Parent ID must be a valid UUID').nullable().optional(),
   metaTitle: z.string().max(60, 'Meta title must be less than 60 characters').optional().or(z.literal('')),
   metaDescription: z.string().max(160, 'Meta description must be less than 160 characters').optional().or(z.literal('')),
   keywords: z.string().optional().or(z.literal('')),

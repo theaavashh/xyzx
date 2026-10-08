@@ -1,0 +1,302 @@
+import type { Request, RequestHandler, Response } from 'express';
+import { resolveUserService, resolveUserRepository } from '../di/index.js';
+import { IUserService } from '../interfaces/services/user.service.js';
+import { IUserRepository } from '../interfaces/repositories/user.repository.js';
+import {
+  asyncHandler,
+  sendBadRequest,
+  sendConflict,
+  sendCreated,
+  sendNotFound,
+  sendSuccess,
+  sendUnauthorized,
+} from '../utils/index.js';
+import { logger } from '../utils/logger.js';
+import { parseQuery } from '../utils/query.js';
+
+export const getUsers: RequestHandler = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userRepository = await resolveUserRepository();
+    const { page, limit, filters, sortBy, sortOrder } = parseQuery(req);
+
+    const userFilters = {
+      search: filters.search,
+      role: filters.role as 'user' | 'admin' | undefined,
+      isActive:
+        filters.isActive === 'true'
+          ? true
+          : filters.isActive === 'false'
+            ? false
+            : undefined,
+    };
+
+    const result = await userRepository.findUsers(page, limit, userFilters, {
+      sortBy,
+      sortOrder,
+    });
+
+    sendSuccess(res, result.data, undefined, 200, result.pagination);
+  },
+);
+
+export const getUserById: RequestHandler = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userRepository = await resolveUserRepository();
+    const id = req.params.id as string;
+
+    if (!id) {
+      sendBadRequest(res, 'User ID is required');
+      return;
+    }
+
+    const user = await userRepository.findUserById(id);
+
+    if (!user) {
+      sendNotFound(res, 'User not found');
+      return;
+    }
+
+    sendSuccess(res, user);
+  },
+);
+
+export const createUser: RequestHandler = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userService = await resolveUserService();
+    const userRepository = await resolveUserRepository();
+    const { name, email, password, role } = req.body;
+
+    const emailExists = await userRepository.existsByEmail(email);
+    if (emailExists) {
+      sendConflict(res, 'User with this email already exists');
+      return;
+    }
+
+    const user = await userRepository.createUser({
+      name,
+      email,
+      password,
+      role: role as 'user' | 'admin' | undefined,
+    });
+
+    logger.info('User created', {
+      action: 'user_created',
+      targetUserId: user.id,
+      targetEmail: email,
+      role: role || 'user',
+      performedBy: req.user?.userId,
+    });
+
+    sendCreated(res, user, 'User created successfully');
+  },
+);
+
+export const updateProfile: RequestHandler = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userRepository = await resolveUserRepository();
+    const userId = req.user?.userId;
+    if (!userId) {
+      sendUnauthorized(res, 'Not authenticated');
+      return;
+    }
+
+    const { name, email } = req.body;
+
+    if (email) {
+      const emailExists = await userRepository.existsByEmail(email);
+      if (emailExists) {
+        const currentUser = await userRepository.findUserById(userId);
+        if (currentUser && currentUser.email !== email) {
+          sendConflict(res, 'User with this email already exists');
+          return;
+        }
+      }
+    }
+
+    const user = await userRepository.updateUser(userId, {
+      name: name as string | undefined,
+      email: email as string | undefined,
+    });
+
+    sendSuccess(res, user, 'Profile updated successfully');
+  },
+);
+
+export const updateUser: RequestHandler = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userRepository = await resolveUserRepository();
+    const id = req.params.id as string;
+    const { name, email, password, role, isActive } = req.body;
+
+    if (!id) {
+      sendBadRequest(res, 'User ID is required');
+      return;
+    }
+
+    const exists = await userRepository.existsById(id);
+    if (!exists) {
+      sendNotFound(res, 'User not found');
+      return;
+    }
+
+    if (email) {
+      const emailExists = await userRepository.existsByEmail(email);
+      if (emailExists) {
+        const currentUser = await userRepository.findUserById(id);
+        if (currentUser && currentUser.email !== email) {
+          sendConflict(res, 'User with this email already exists');
+          return;
+        }
+      }
+    }
+
+    const user = await userRepository.updateUser(id, {
+      name: name as string | undefined,
+      email: email as string | undefined,
+      password: password as string | undefined,
+      role: role as 'user' | 'admin' | undefined,
+      isActive: isActive as boolean | undefined,
+    });
+
+    logger.info('User updated', {
+      action: 'user_updated',
+      targetUserId: id,
+      changes: { name: !!name, email: !!email, role: !!role, isActive: isActive !== undefined },
+      performedBy: req.user?.userId,
+    });
+
+    sendSuccess(res, user, 'User updated successfully');
+  },
+);
+
+export const deleteUser: RequestHandler = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userRepository = await resolveUserRepository();
+    const id = req.params.id as string;
+    const userId = (req as Request & { user?: { userId: string } }).user?.userId;
+
+    if (!id) {
+      sendBadRequest(res, 'User ID is required');
+      return;
+    }
+
+    if (userId === id) {
+      sendBadRequest(res, 'You cannot delete your own account');
+      return;
+    }
+
+    const exists = await userRepository.existsById(id);
+    if (!exists) {
+      sendNotFound(res, 'User not found');
+      return;
+    }
+
+    await userRepository.deleteUser(id);
+
+    logger.info('User deleted', {
+      action: 'user_deleted',
+      targetUserId: id,
+      performedBy: req.user?.userId,
+    });
+
+    sendSuccess(res, null, 'User deleted successfully');
+  },
+);
+
+export const toggleUserStatus: RequestHandler = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userRepository = await resolveUserRepository();
+    const id = req.params.id as string;
+    const userId = (req as Request & { user?: { userId: string } }).user?.userId;
+
+    if (!id) {
+      sendBadRequest(res, 'User ID is required');
+      return;
+    }
+
+    if (userId === id) {
+      sendBadRequest(res, 'You cannot deactivate your own account');
+      return;
+    }
+
+    try {
+      const user = await userRepository.toggleUserStatus(id);
+
+      logger.info('User status toggled', {
+        action: user.isActive ? 'user_activated' : 'user_deactivated',
+        targetUserId: id,
+        performedBy: req.user?.userId,
+      });
+
+      sendSuccess(
+        res,
+        user,
+        `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
+      );
+    } catch {
+      sendNotFound(res, 'User not found');
+    }
+  },
+);
+
+export const updateUserRole: RequestHandler = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userRepository = await resolveUserRepository();
+    const id = req.params.id as string;
+    const { role } = req.body;
+    const userId = (req as Request & { user?: { userId: string } }).user?.userId;
+
+    if (!id) {
+      sendBadRequest(res, 'User ID is required');
+      return;
+    }
+
+    if (!role || !['user', 'admin'].includes(role)) {
+      sendBadRequest(res, 'Invalid role. Must be either "user" or "admin"');
+      return;
+    }
+
+    if (userId === id) {
+      sendBadRequest(res, 'You cannot change your own role');
+      return;
+    }
+
+    try {
+      const user = await userRepository.updateUserRole(id, role);
+
+      logger.info('User role updated', {
+        action: 'user_role_changed',
+        targetUserId: id,
+        newRole: role,
+        performedBy: req.user?.userId,
+      });
+
+      sendSuccess(res, user, 'User role updated successfully');
+    } catch {
+      sendNotFound(res, 'User not found');
+    }
+  },
+);
+
+export const createPublicUser: RequestHandler = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userService = await resolveUserService();
+    const { name, email, password } = req.body;
+
+    const existingUser = await userService.findUserByEmail(email);
+    if (existingUser) {
+      sendConflict(res, 'User with this email already exists');
+      return;
+    }
+
+    const newUser = await userService.createUser(name, email, password);
+
+    sendCreated(
+      res,
+      {
+        user: { id: newUser.id, email: newUser.email, name: newUser.name },
+      },
+      'Account created successfully',
+    );
+  },
+);

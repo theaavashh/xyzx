@@ -34,7 +34,7 @@ function CategoryCardComponent({ category, priority }: CategoryCardProps) {
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent" />
 
       <div className="absolute bottom-3 left-0 right-0 text-left px-4 transition-transform duration-500 ease-out group-hover:-translate-y-1">
-        <h3 className="swansea text-base md:text-lg lg:text-xl text-white leading-tight">
+        <h3 className="bound-regular text-base md:text-lg lg:text-xl text-white leading-tight">
           {category.title}
         </h3>
         {category.subtitle && (

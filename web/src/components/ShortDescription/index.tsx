@@ -26,9 +26,9 @@ function ShortDescription() {
   }, []);
 
   return (
-    <section className="py-12 md:py-16 px-6 bg-white">
+    <section className="py-12 md:py-16 px-6 bg-gray-100">
       <div className="max-w-3xl mx-auto text-center">
-        <p className="text-sm md:text-base leading-relaxed text-zinc-600 font-light">
+        <p className="mt-4 text-sm md:text-base leading-relaxed text-zinc-600 font-light text-justify">
           {description}
         </p>
       </div>

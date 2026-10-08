@@ -76,10 +76,10 @@ export default function CookieConsentModal() {
                     <Cookie className="w-5 h-5 text-[#D4AF37]" strokeWidth={1.5} />
                   </div>
                   <div>
-                    <h2 className="swansea text-lg font-bold text-zinc-600 tracking-wide">
+                    <h2 className="bound-regular text-lg font-bold text-zinc-600 tracking-wide">
                       Cookie Settings
                     </h2>
-                    <p className="text-zinc-600 text-base leading-relaxed">
+                    <p className="text-zinc-600 text-sm leading-relaxed">
                       We use cookies to optimize your experience, analyze traffic, and personalize content. By clicking <span className="font-medium text-zinc-600">&ldquo;Accept All&rdquo;</span>, you consent. See our{' '}
                       <Link href="/cookie-policy" className="text-[#D4AF37] hover:underline underline-offset-4 font-medium">
                         Cookie Policy

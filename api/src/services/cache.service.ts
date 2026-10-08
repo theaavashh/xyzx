@@ -440,6 +440,8 @@ export const createInMemoryCacheService = (options: CacheOptions = {}): ICacheSe
 
 const useRedis = process.env.USE_REDIS === 'true';
 
+export { useRedis };
+
 export const cacheService: ICacheService = useRedis
   ? createRedisCacheService()
   : createInMemoryCacheService();

@@ -1,4 +1,5 @@
 import type { Request, RequestHandler, Response } from 'express';
+import { sanitizeRichText } from '../utils/sanitize';
 import { contentRepository } from '../repositories/content.repository';
 import {
   asyncHandler,
@@ -86,7 +87,7 @@ export const createContentPage: RequestHandler = asyncHandler(
     const newContent = await contentRepository.createContent({
       slug,
       title,
-      content,
+      content: sanitizeRichText(content),
       metaTitle: metaTitle || undefined,
       metaDescription: metaDescription || undefined,
       isActive: true,
@@ -114,7 +115,7 @@ export const updateContentPage: RequestHandler = asyncHandler(
 
     const updateData: Record<string, unknown> = {};
     if (title !== undefined) updateData.title = title;
-    if (content !== undefined) updateData.content = content;
+    if (content !== undefined) updateData.content = sanitizeRichText(content);
     if (metaTitle !== undefined) updateData.metaTitle = metaTitle;
     if (metaDescription !== undefined) updateData.metaDescription = metaDescription;
     if (isActive !== undefined) updateData.isActive = isActive;
@@ -143,7 +144,7 @@ export const updateContentPageBySlug: RequestHandler = asyncHandler(
 
     const updateData: Record<string, unknown> = {};
     if (title !== undefined) updateData.title = title;
-    if (content !== undefined) updateData.content = content;
+    if (content !== undefined) updateData.content = sanitizeRichText(content);
     if (metaTitle !== undefined) updateData.metaTitle = metaTitle;
     if (metaDescription !== undefined) updateData.metaDescription = metaDescription;
     if (isActive !== undefined) updateData.isActive = isActive;
@@ -211,7 +212,7 @@ export const upsertContentBySlug: RequestHandler = asyncHandler(
     if (exists) {
       const updateData: Record<string, unknown> = {};
       if (title !== undefined) updateData.title = title;
-      if (content !== undefined) updateData.content = content;
+      if (content !== undefined) updateData.content = sanitizeRichText(content);
       if (metaTitle !== undefined) updateData.metaTitle = metaTitle;
       if (metaDescription !== undefined) updateData.metaDescription = metaDescription;
 
@@ -221,7 +222,7 @@ export const upsertContentBySlug: RequestHandler = asyncHandler(
       const newContent = await contentRepository.createContent({
         slug,
         title: title || slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-        content: content || '',
+        content: sanitizeRichText(content || ''),
         metaTitle: metaTitle || undefined,
         metaDescription: metaDescription || undefined,
         isActive: true,

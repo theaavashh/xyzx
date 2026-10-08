@@ -1,9 +1,7 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
+import { effectivePrice } from "@/lib/price";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9999";
@@ -17,12 +15,12 @@ interface RelatedProduct {
   discountPercent: number | null;
   thumbnail: string | null;
   images: string[] | null;
-  category: { id: string; name: string; slug: string } | null;
+  variants?: { price?: number }[] | null;
+  category?: { id: string; name: string; slug: string } | null;
 }
 
 interface YouMayLikeProps {
-  categoryId: string | null;
-  excludeId: string;
+  products: RelatedProduct[];
 }
 
 function resolveImage(url: string): string {
@@ -36,6 +34,7 @@ function ProductCard({ product }: { product: RelatedProduct }) {
     ? `/products/${product.category.slug}/${product.slug}`
     : `/products/all/${product.slug}`;
   const image = product.thumbnail || product.images?.[0] || "";
+  const price = effectivePrice(product);
 
   return (
     <Link href={href} className="group block">
@@ -72,10 +71,10 @@ function ProductCard({ product }: { product: RelatedProduct }) {
         </h4>
         <div className="mt-1 flex items-center gap-2">
           <span className="text-sm font-medium text-zinc-900">
-            ${product.price.toFixed(2)}
+            ${price.toFixed(2)}
           </span>
           {product.originalPrice &&
-            product.originalPrice > product.price && (
+            product.originalPrice > price && (
               <span className="text-xs text-zinc-400 line-through">
                 ${product.originalPrice.toFixed(2)}
               </span>
@@ -86,49 +85,8 @@ function ProductCard({ product }: { product: RelatedProduct }) {
   );
 }
 
-export default function YouMayLike({
-  categoryId,
-  excludeId,
-}: YouMayLikeProps) {
-  const [products, setProducts] = useState<RelatedProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const params = new URLSearchParams({
-          isActive: "true",
-          limit: "8",
-        });
-        if (categoryId) {
-          params.set("categoryId", categoryId);
-        }
-        const res = await fetch(
-          `${API_BASE_URL}/api/v1/products?${params}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-          }
-        );
-        if (!res.ok) return;
-        const json = await res.json();
-        if (!json.success || !Array.isArray(json.data)) return;
-        const related = json.data
-          .filter((p: RelatedProduct) => p.id !== excludeId)
-          .slice(0, 4);
-        setProducts(related);
-      } catch {
-        // ignore
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, [categoryId, excludeId]);
-
-  if (!loading && products.length === 0) return null;
+export default function YouMayLike({ products }: YouMayLikeProps) {
+  if (products.length === 0) return null;
 
   return (
     <section className="border-t border-gray-100 py-12 mt-12">
@@ -137,22 +95,11 @@ export default function YouMayLike({
           You May Like
         </h2>
 
-        {loading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-            {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className="aspect-[3/4] bg-gray-100 animate-pulse"
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
       </div>
     </section>
   );

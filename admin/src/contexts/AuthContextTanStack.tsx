@@ -49,12 +49,17 @@ const AuthProviderInner: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       await logoutRequest();
     } catch {
-      // Ignore logout errors
+      // The access token may already be expired; renew it once so the API
+      // can revoke the session and clear its cookies, then retry.
+      try {
+        await tokenRefreshManager.refreshToken({ latchFailure: false });
+        await logoutRequest();
+      } catch {
+        // Ignore logout errors - the local session is cleared regardless.
+      }
     }
     tokenRefreshManager.reset();
     clearAccessToken();
-    document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     router.replace('/');
   }, [router]);
 
@@ -105,7 +110,9 @@ const AuthProviderInner: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [refetchProfile]);
 
-  useIdleTimeout({ onIdle: handleIdleLogout });
+  // The session lasts until the admin signs out: idle time must not end it.
+  // Tokens are renewed by `useTokenRefresh`, so nothing here expires silently.
+  useIdleTimeout({ onIdle: handleIdleLogout, isEnabled: false });
   useTokenRefresh({ onLogout: () => {} });
 
   const user = userData || null;

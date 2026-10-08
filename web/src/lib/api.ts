@@ -36,6 +36,26 @@ export class ApiError extends Error {
 
 const DEFAULT_TIMEOUT = 10_000;
 
+const SESSION_STORAGE_KEY = 'rapharch:sessionId';
+const SESSION_HEADER_NAME = 'x-session-id';
+
+/** Stable per-browser id so guest carts survive reloads. */
+export function getClientSessionId(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const stored = window.localStorage.getItem(SESSION_STORAGE_KEY);
+    if (stored) return stored;
+    const generated =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `s-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    window.localStorage.setItem(SESSION_STORAGE_KEY, generated);
+    return generated;
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchWithTimeout(
   url: string,
   options: RequestInit = {},
@@ -65,12 +85,15 @@ export async function apiRequest<T>(
 
   const method = options.method?.toUpperCase() ?? 'GET';
 
+  const sessionId = getClientSessionId();
+
   const config: RequestInit = {
     ...options,
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
+      ...(sessionId ? { [SESSION_HEADER_NAME]: sessionId } : {}),
       ...(options.headers as Record<string, string> | undefined),
       ...csrfHeaders(method),
     },

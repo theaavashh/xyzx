@@ -5,16 +5,41 @@ import { logger } from '../utils/logger';
 import { stripeCircuitBreaker } from '../services/circuit-breaker';
 import { getStripeConfig } from '../config/env-config';
 
+const NOT_CONFIGURED_MESSAGE =
+  'Payments are not configured. Set a valid STRIPE_SECRET_KEY in api/.env';
+
+class PaymentsNotConfiguredError extends Error {
+  constructor() {
+    super(NOT_CONFIGURED_MESSAGE);
+    this.name = 'PaymentsNotConfiguredError';
+  }
+}
+
 const getStripeClient = (): Stripe => {
   const config = getStripeConfig();
-  
-  if (!config.secretKey) {
-    throw new Error('STRIPE_SECRET_KEY is not configured');
+  const secretKey = config.secretKey?.trim();
+
+  if (!secretKey || secretKey.includes('REPLACE_WITH')) {
+    throw new PaymentsNotConfiguredError();
   }
 
-  return new Stripe(config.secretKey, {
+  return new Stripe(secretKey, {
     apiVersion: '2026-02-25.clover' as any,
   });
+};
+
+/**
+ * Stripe client for a request, or `null` after responding 503 when payments
+ * are not configured (avoids burning circuit-breaker failures on a bad key).
+ */
+const stripeOrNull = (res: Response): Stripe | null => {
+  try {
+    return getStripeClient();
+  } catch (error) {
+    logger.warn('Stripe unavailable', { error: (error as Error).message });
+    sendError(res, (error as Error).message || NOT_CONFIGURED_MESSAGE, 503);
+    return null;
+  }
 };
 
 export const createPaymentIntent: RequestHandler = asyncHandler(
@@ -26,7 +51,8 @@ export const createPaymentIntent: RequestHandler = asyncHandler(
       return;
     }
 
-    const stripe = getStripeClient();
+    const stripe = stripeOrNull(res);
+    if (!stripe) return;
 
     try {
       const paymentIntent = await stripeCircuitBreaker.execute(() =>
@@ -66,7 +92,8 @@ export const confirmPaymentIntent: RequestHandler = asyncHandler(
       return;
     }
 
-    const stripe = getStripeClient();
+    const stripe = stripeOrNull(res);
+    if (!stripe) return;
 
     try {
       const paymentIntent = await stripeCircuitBreaker.execute(() =>
@@ -91,7 +118,8 @@ export const createSetupIntent: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const { customerId } = req.body;
 
-    const stripe = getStripeClient();
+    const stripe = stripeOrNull(res);
+    if (!stripe) return;
 
     try {
       const setupIntent = await stripeCircuitBreaker.execute(() =>
@@ -121,7 +149,8 @@ export const createCustomer: RequestHandler = asyncHandler(
       return;
     }
 
-    const stripe = getStripeClient();
+    const stripe = stripeOrNull(res);
+    if (!stripe) return;
 
     try {
       const customer = await stripeCircuitBreaker.execute(() =>
@@ -155,7 +184,8 @@ export const getPaymentMethods: RequestHandler = asyncHandler(
       return;
     }
 
-    const stripe = getStripeClient();
+    const stripe = stripeOrNull(res);
+    if (!stripe) return;
 
     try {
       const paymentMethods = await stripeCircuitBreaker.execute(() =>
@@ -199,7 +229,8 @@ export const handleWebhook: RequestHandler = asyncHandler(
     let event: Stripe.Event;
 
     try {
-      const stripe = getStripeClient();
+      const stripe = stripeOrNull(res);
+    if (!stripe) return;
       event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
     } catch (err) {
       const error = err as Error;

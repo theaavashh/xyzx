@@ -48,6 +48,13 @@ export const findOrCreateCart = async (
               price: true,
               images: true,
               slug: true,
+              productVariants: {
+                select: {
+                  color: true,
+                  size: true,
+                  price: true,
+                },
+              },
             },
           },
         },

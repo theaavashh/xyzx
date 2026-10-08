@@ -70,13 +70,14 @@ export const getCategoryBySlug: RequestHandler = asyncHandler(
 
 export const createCategory: RequestHandler = asyncHandler(
   async (req: Request, res: Response) => {
-    const { name, slug, image, internalLink, metaTitle, metaDescription, keywords } = req.body;
+    const { name, slug, image, internalLink, parentId, metaTitle, metaDescription, keywords } = req.body;
 
     const category = await categoryService.createCategory({
       name,
       slug,
       image,
       internalLink,
+      parentId: parentId || null,
       metaTitle,
       metaDescription,
       keywords,
@@ -95,7 +96,7 @@ export const updateCategory: RequestHandler = asyncHandler(
       return;
     }
 
-    const { name, slug, image, internalLink, isActive, metaTitle, metaDescription, keywords } = req.body;
+    const { name, slug, image, internalLink, isActive, parentId, metaTitle, metaDescription, keywords } = req.body;
 
     const category = await categoryService.updateCategory(id, {
       name,
@@ -103,6 +104,7 @@ export const updateCategory: RequestHandler = asyncHandler(
       image,
       internalLink,
       isActive,
+      parentId: parentId !== undefined ? parentId : undefined,
       metaTitle,
       metaDescription,
       keywords,

@@ -1,7 +1,7 @@
 'use client';
 
-import { AlertTriangle, FolderOpen, LayoutGrid, List, Plus, Search } from 'lucide-react';
-import { useState } from 'react';
+import { AlertTriangle, ChevronRight, FolderOpen, LayoutGrid, List, Plus, Search } from 'lucide-react';
+import { Fragment, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -9,6 +9,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { type CategoryFormData, validateCategoryForm } from '@/schemas/categorySchema';
 import {
   useCategories,
+  useCategoriesHierarchy,
   useCreateCategory,
   useUpdateCategory,
   useDeleteCategory,
@@ -40,8 +41,10 @@ export default function CategoryPage() {
   const [sortField, setSortField] = useState<'name' | 'status' | 'createdAt' | null>('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [activePathIds, setActivePathIds] = useState<string[]>([]);
 
   const { data: categories = [], isLoading, error, refetch } = useCategories();
+  const { data: hierarchyCategories = [] } = useCategoriesHierarchy();
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
@@ -62,7 +65,7 @@ export default function CategoryPage() {
   }
 
   const form = useForm<CategoryFormData>({
-    defaultValues: { name: '', image: '', internalLink: '', status: 'active', metaTitle: '', metaDescription: '', keywords: '' },
+    defaultValues: { name: '', image: '', internalLink: '', status: 'active', parentId: '', metaTitle: '', metaDescription: '', keywords: '', subcategories: [] },
   });
   const { reset, setValue, setError, formState: { errors, isSubmitting } } = form;
 
@@ -86,19 +89,21 @@ export default function CategoryPage() {
       return;
     }
 
-    if (!data.image) { toast.error('Image is required'); return; }
-
-    const formData: CategoryFormData = { name: data.name, image: data.image, internalLink: data.internalLink, status: data.status, metaTitle: data.metaTitle, metaDescription: data.metaDescription, keywords: data.keywords };
+    const formData: CategoryFormData = { name: data.name, image: data.image, internalLink: data.internalLink, status: data.status, parentId: data.parentId || '', metaTitle: data.metaTitle, metaDescription: data.metaDescription, keywords: data.keywords, subcategories: data.subcategories || [] };
 
     if (editingCategory) {
-      await updateCategory.mutateAsync({ id: editingCategory.id, data: formData });
+      await updateCategory.mutateAsync({
+        id: editingCategory.id,
+        data: formData,
+        existingSubNames: (editingCategory.children || []).map((c) => c.name),
+      });
       setShowEditModal(false);
       setEditingCategory(null);
-      reset({ name: '', image: '', internalLink: '', status: 'active', metaTitle: '', metaDescription: '', keywords: '' });
+      reset({ name: '', image: '', internalLink: '', status: 'active', parentId: '', metaTitle: '', metaDescription: '', keywords: '', subcategories: [] });
     } else {
       await createCategory.mutateAsync(formData);
       setShowAddModal(false);
-      reset({ name: '', image: '', internalLink: '', status: 'active', metaTitle: '', metaDescription: '', keywords: '' });
+      reset({ name: '', image: '', internalLink: '', status: 'active', parentId: '', metaTitle: '', metaDescription: '', keywords: '', subcategories: [] });
     }
   };
 
@@ -106,9 +111,9 @@ export default function CategoryPage() {
   const handleDeleteConfirm = async () => { if (!deleteItem) return; await deleteCategory.mutateAsync(deleteItem.id); setShowDeleteModal(false); setDeleteItem(null); };
   const handleDeleteCancel = () => { setShowDeleteModal(false); setDeleteItem(null); };
   const handleImagePreview = (imageUrl: string) => { if (imageUrl) { setPreviewImage(getFullImageUrl(imageUrl)); setShowImagePreview(true); } };
-  const handleEditClick = (category: Category) => { setEditingCategory(category); setValue('name', category.name); setValue('image', category.image || ''); setValue('internalLink', category.internalLink || ''); setValue('status', category.status); setValue('metaTitle', category.metaTitle || ''); setValue('metaDescription', category.metaDescription || ''); setValue('keywords', category.keywords || ''); setShowEditModal(true); };
-  const handleEditCancel = () => { setShowEditModal(false); setEditingCategory(null); reset({ name: '', image: '', internalLink: '', status: 'active', metaTitle: '', metaDescription: '', keywords: '' }); };
-  const handleAddCancel = () => { setShowAddModal(false); reset({ name: '', image: '', internalLink: '', status: 'active', metaTitle: '', metaDescription: '', keywords: '' }); };
+  const handleEditClick = (category: Category) => { setEditingCategory(category); setValue('name', category.name); setValue('image', category.image || ''); setValue('internalLink', category.internalLink || ''); setValue('status', category.status); setValue('parentId', category.parentId || ''); setValue('metaTitle', category.metaTitle || ''); setValue('metaDescription', category.metaDescription || ''); setValue('keywords', category.keywords || ''); setValue('subcategories', (category.children || []).map((c) => c.name)); setShowEditModal(true); };
+  const handleEditCancel = () => { setShowEditModal(false); setEditingCategory(null); reset({ name: '', image: '', internalLink: '', status: 'active', parentId: '', metaTitle: '', metaDescription: '', keywords: '', subcategories: [] }); };
+  const handleAddCancel = () => { setShowAddModal(false); reset({ name: '', image: '', internalLink: '', status: 'active', parentId: '', metaTitle: '', metaDescription: '', keywords: '', subcategories: [] }); };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => { setSearchTerm(e.target.value); setCurrentPage(1); };
   const handlePageChange = (page: number) => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }); };
@@ -136,7 +141,38 @@ export default function CategoryPage() {
     setShowBulkDeleteModal(false);
   };
 
-  const filteredCategories = categories.filter((category) => category.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const activePath = useMemo(() => {
+    const path: Category[] = [];
+    let level = hierarchyCategories;
+    for (const id of activePathIds) {
+      const found = level.find((c) => c.id === id);
+      if (!found) break;
+      path.push(found);
+      level = found.children || [];
+    }
+    return path;
+  }, [hierarchyCategories, activePathIds]);
+
+  const currentParent = activePath[activePath.length - 1] ?? null;
+  const levelCategories = currentParent ? currentParent.children || [] : hierarchyCategories;
+
+  const resetDrillState = () => {
+    setSearchTerm('');
+    setCurrentPage(1);
+    setSelectedIds([]);
+  };
+
+  const handleDrill = (category: Category) => {
+    setActivePathIds((prev) => [...prev, category.id]);
+    resetDrillState();
+  };
+
+  const handleBreadcrumb = (index: number) => {
+    setActivePathIds((prev) => prev.slice(0, index));
+    resetDrillState();
+  };
+
+  const filteredCategories = levelCategories.filter((category) => category.name.toLowerCase().includes(searchTerm.toLowerCase()));
   const sortedCategories = [...filteredCategories].sort((a, b) => {
     if (!sortField) return 0;
     const dir = sortDirection === 'asc' ? 1 : -1;
@@ -159,7 +195,11 @@ export default function CategoryPage() {
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-black">Categories</h1>
-              <p className="text-black text-lg mt-2">{categories.length} categories total</p>
+              <p className="text-black text-lg mt-2">
+                {currentParent
+                  ? `${levelCategories.length} subcategories in "${currentParent.name}"`
+                  : `${categories.length} categories total`}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -191,7 +231,7 @@ export default function CategoryPage() {
                 Grid
               </button>
             </div>
-            <button onClick={() => { reset({ name: '', image: '', internalLink: '', status: 'active', metaTitle: '', metaDescription: '', keywords: '' }); setShowAddModal(true); }} className="bg-[#D4AF37] text-white px-4 py-2.5 text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold whitespace-nowrap">
+            <button onClick={() => { reset({ name: '', image: '', internalLink: '', status: 'active', parentId: currentParent?.id || '', metaTitle: '', metaDescription: '', keywords: '', subcategories: [] }); setShowAddModal(true); }} className="bg-[#D4AF37] text-white px-4 py-2.5 text-lg rounded-md hover:bg-[#b8962e] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] flex items-center gap-2 transition-all font-semibold whitespace-nowrap">
               <Plus className="w-4 h-4" /><span>Add</span>
             </button>
           </div>
@@ -214,14 +254,48 @@ export default function CategoryPage() {
           </div>
         )}
 
+        {!isLoading && !pageError && activePath.length > 0 && (
+          <nav aria-label="Category breadcrumb" className="flex flex-wrap items-center gap-1.5 text-sm">
+            <button
+              onClick={() => handleBreadcrumb(0)}
+              className="rounded-md px-2 py-1 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
+            >
+              All Categories
+            </button>
+            {activePath.map((cat, index) => (
+              <Fragment key={cat.id}>
+                <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
+                <button
+                  onClick={() => handleBreadcrumb(index + 1)}
+                  className={`rounded-md px-2 py-1 transition ${
+                    index === activePath.length - 1
+                      ? 'bg-amber-50 font-semibold text-black'
+                      : 'text-gray-500 hover:bg-gray-100 hover:text-gray-800'
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              </Fragment>
+            ))}
+          </nav>
+        )}
+
         {!isLoading && !pageError && filteredCategories.length === 0 && (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="w-20 h-20 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto">
                 <FolderOpen className="w-8 h-8 text-gray-300" />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">No Categories Found</h3>
-              <p className="mt-1 text-sm text-gray-500">{searchTerm ? 'No categories match your search.' : 'Get started by creating your first category.'}</p>
+              <h3 className="mt-4 text-lg font-semibold text-gray-900">
+                {currentParent ? 'No Subcategories Found' : 'No Categories Found'}
+              </h3>
+              <p className="mt-1 text-sm text-gray-500">
+                {searchTerm
+                  ? 'No categories match your search.'
+                  : currentParent
+                    ? `"${currentParent.name}" has no subcategories yet.`
+                    : 'Get started by creating your first category.'}
+              </p>
             </div>
           </div>
         )}
@@ -230,6 +304,8 @@ export default function CategoryPage() {
           <div className="space-y-6">
             <CategoryTable
               categories={paginatedCategories}
+              level={activePath.length}
+              onDrill={handleDrill}
               viewMode={viewMode}
               onViewModeChange={handleViewModeChange}
               getFullImageUrl={getFullImageUrl}
@@ -250,7 +326,7 @@ export default function CategoryPage() {
       </div>
 
       {(showAddModal || editingCategory) && (
-        <CategoryForm form={form} editingCategory={editingCategory ? { id: editingCategory.id, name: editingCategory.name } : null} isSubmitting={isSubmitting} isLoading={createCategory.isPending || updateCategory.isPending} isUploadingImage={isUploadingImage} onSubmit={onSubmit} onCancel={editingCategory ? handleEditCancel : handleAddCancel} handleImageUpload={handleImageUpload} getFullImageUrl={getFullImageUrl} />
+        <CategoryForm form={form} editingCategory={editingCategory ? { id: editingCategory.id, name: editingCategory.name } : null} isSubmitting={isSubmitting} isLoading={createCategory.isPending || updateCategory.isPending} isUploadingImage={isUploadingImage} onSubmit={onSubmit} onCancel={editingCategory ? handleEditCancel : handleAddCancel} handleImageUpload={handleImageUpload} getFullImageUrl={getFullImageUrl} categories={hierarchyCategories} />
       )}
 
       <ImagePreviewModal show={showImagePreview} imageUrl={previewImage} onClose={() => setShowImagePreview(false)} />

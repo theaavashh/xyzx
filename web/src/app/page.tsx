@@ -65,7 +65,7 @@ export default function Home() {
           <CategoryTileGrid />
         <Hero />
         <WomenItems />
-        <NewsletterSignup />
+       
 
         <TwoImageGrid />
         <ThreeImageGrid />
@@ -75,7 +75,9 @@ export default function Home() {
         {/* <VisitOurStore /> */}
          <PromotionalBanner />
           <Feature />
-          <FooterSocial />
+          <FooterSocial /> 
+          <NewsletterSignup />
+
 
       </div>
     </>

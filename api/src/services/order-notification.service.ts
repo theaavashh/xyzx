@@ -42,6 +42,26 @@ export const notifyNewOrder = async (order: Order): Promise<void> => {
     });
 
     if (fullOrder) {
+      const settings = await prisma.siteSettings.findFirst().catch(() => null);
+
+      const company = {
+        name: settings?.siteName || 'RaphArch',
+        location: process.env.INVOICE_LOCATION || 'Melbourne',
+        address: [settings?.address, settings?.city].filter(Boolean).join(', '),
+        phone: settings?.phone || process.env.SITE_PHONE || '',
+        email: settings?.email || '',
+        website: settings?.siteUrl || '',
+        abn: process.env.INVOICE_ABN || '',
+        bank:
+          process.env.INVOICE_BSB && process.env.INVOICE_ACCOUNT
+            ? {
+                name: settings?.siteName || 'RaphArch',
+                bsb: process.env.INVOICE_BSB,
+                account: process.env.INVOICE_ACCOUNT,
+              }
+            : undefined,
+      };
+
       const items = fullOrder.orderItems.map((item) => ({
         name: item.product?.name || 'Product',
         quantity: item.quantity,
@@ -67,6 +87,11 @@ export const notifyNewOrder = async (order: Order): Promise<void> => {
         tax: fullOrder.tax,
         shipping: fullOrder.shipping,
         total: fullOrder.total,
+        paymentMethod: fullOrder.paymentMethod,
+        paymentStatus: fullOrder.paymentStatus,
+        paidAt: fullOrder.paidAt,
+        notes: fullOrder.notes,
+        company,
       });
     }
   } catch (error) {

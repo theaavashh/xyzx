@@ -1,4 +1,10 @@
-import { Eye } from 'lucide-react';
+'use client';
+
+import { useState } from 'react';
+import { ChevronDown, Eye } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { ORDER_STATUS_OPTIONS } from '../constants';
+import { useUpdateOrderStatus } from '../hooks/useUpdateOrderStatus';
 import type { Order } from '../types';
 
 interface OrderTableProps {
@@ -9,6 +15,7 @@ interface OrderTableProps {
   getPaymentStatusColor: (status: string) => string;
   getStatusIcon: (status: string) => React.ReactElement;
   viewOrderDetails: (order: Order) => void;
+  onStatusChanged?: () => void;
 }
 
 export default function OrderTable({
@@ -19,7 +26,32 @@ export default function OrderTable({
   getPaymentStatusColor,
   getStatusIcon,
   viewOrderDetails,
+  onStatusChanged,
 }: OrderTableProps) {
+  const [pendingValues, setPendingValues] = useState<Record<string, string>>({});
+  const updateStatus = useUpdateOrderStatus();
+
+  const handleStatusChange = (order: Order, status: string) => {
+    setPendingValues((prev) => ({ ...prev, [order.id]: status }));
+    updateStatus.mutate(
+      { id: order.id, status },
+      {
+        onSuccess: () => {
+          toast.success(`${order.orderNumber} marked as ${status.toLowerCase()}`);
+          onStatusChanged?.();
+        },
+        onError: (error: Error) => {
+          setPendingValues((prev) => {
+            const next = { ...prev };
+            delete next[order.id];
+            return next;
+          });
+          toast.error(error.message);
+        },
+      },
+    );
+  };
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <div className="overflow-x-auto">
@@ -44,67 +76,85 @@ export default function OrderTable({
                 </td>
               </tr>
             ) : (
-              orders.map((order) => (
-                <tr
-                  key={order.id}
-                  className="border-b border-gray-100 hover:bg-gray-50"
-                >
-                  <td className="py-3 px-4">
-                    <div className="font-medium text-gray-900">{order.orderNumber}</div>
-                    <div className="text-sm text-gray-500">ID: {order.id.substring(0, 8)}</div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div>
-                      <div className="font-medium text-gray-900">
-                        {order.user?.name ?? order.shippingName}
+              orders.map((order) => {
+                const statusValue = pendingValues[order.id] ?? order.status;
+
+                return (
+                  <tr
+                    key={order.id}
+                    className="border-b border-gray-100 hover:bg-gray-50"
+                  >
+                    <td className="py-3 px-4">
+                      <div className="font-medium text-gray-900">{order.orderNumber}</div>
+                      <div className="text-sm text-gray-500">ID: {order.id.substring(0, 8)}</div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {order.user?.name ?? order.shippingName}
+                        </div>
+                        <div className="text-sm text-gray-500">{order.user?.email ?? order.shippingEmail}</div>
+                        {order.shippingPhone && (
+                          <div className="text-sm text-gray-500">{order.shippingPhone}</div>
+                        )}
                       </div>
-                      <div className="text-sm text-gray-500">{order.user?.email ?? order.shippingEmail}</div>
-                      {order.shippingPhone && (
-                        <div className="text-sm text-gray-500">{order.shippingPhone}</div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="text-sm text-gray-600">
-                      {order.orderItems.length} item{order.orderItems.length !== 1 ? 's' : ''}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="font-medium text-gray-900">
-                      {formatCurrency(order.total, order.currency)}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <span
-                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}
-                    >
-                      {getStatusIcon(order.status)}
-                      <span className="ml-1 capitalize">{order.status.toLowerCase()}</span>
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">
-                    <span
-                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(order.paymentStatus ?? 'PENDING')}`}
-                    >
-                      {(order.paymentStatus ?? 'PENDING').toLowerCase()}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-gray-600">
-                    <div className="text-sm">{formatDate(order.createdAt)}</div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => viewOrderDetails(order)}
-                        className="text-blue-600 hover:text-blue-700"
-                        title="View Details"
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="text-sm text-gray-600">
+                        {order.orderItems.length} item{order.orderItems.length !== 1 ? 's' : ''}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="font-medium text-gray-900">
+                        {formatCurrency(order.total, order.currency)}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="relative inline-flex items-center">
+                        <span className="pointer-events-none absolute left-2 flex items-center">
+                          {getStatusIcon(statusValue)}
+                        </span>
+                        <select
+                          value={statusValue}
+                          onChange={(event) => handleStatusChange(order, event.target.value)}
+                          disabled={updateStatus.isPending}
+                          aria-label={`Change status for order ${order.orderNumber}`}
+                          title="Click to change status"
+                          className={`appearance-none cursor-pointer rounded-full py-1 pl-7 pr-6 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60 ${getStatusColor(statusValue)}`}
+                        >
+                          {ORDER_STATUS_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-1.5 h-3 w-3 opacity-70" />
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(order.paymentStatus ?? 'PENDING')}`}
                       >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+                        {(order.paymentStatus ?? 'PENDING').toLowerCase()}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-gray-600">
+                      <div className="text-sm">{formatDate(order.createdAt)}</div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => viewOrderDetails(order)}
+                          className="text-blue-600 hover:text-blue-700"
+                          title="View Details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

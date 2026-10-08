@@ -3,9 +3,11 @@ export interface CategoryFormData {
   image: string;
   internalLink: string;
   status: 'active' | 'inactive';
+  parentId: string;
   metaTitle: string;
   metaDescription: string;
   keywords: string;
+  subcategories: string[];
   disclaimer?: string;
   additionalDetails?: string;
   faqs?: Array<{ question: string; answer: string }>;

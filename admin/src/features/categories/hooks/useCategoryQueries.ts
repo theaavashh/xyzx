@@ -25,6 +25,8 @@ function transformCategory(apiCategory: CategoryApiResponse): Category {
     createdAt: (apiCategory.createdAt ? new Date(apiCategory.createdAt) : new Date()).toISOString().split('T')[0],
     status: apiCategory.isActive ? 'active' : 'inactive',
     internalLink: apiCategory.internalLink || undefined,
+    parentId: apiCategory.parentId || null,
+    children: apiCategory.children?.map(transformCategory),
     metaTitle: apiCategory.metaTitle || undefined,
     metaDescription: apiCategory.metaDescription || undefined,
     keywords: apiCategory.keywords || undefined,
@@ -40,12 +42,45 @@ export function useCategories() {
   return useQuery({
     queryKey: CATEGORIES_KEY,
     queryFn: async () => {
-      const res = await api.get('/api/v1/categories');
+      const res = await api.get('/api/v1/categories', { params: { limit: 100 } });
       if (res.data.success) {
         const data = res.data.data;
         if (!data) return [] as Category[];
         const arr = Array.isArray(data) ? data : [];
         return arr.map(transformCategory) as Category[];
+      }
+      throw new Error(res.data.message || 'Failed to fetch categories');
+    },
+  });
+}
+
+export function useCategoriesHierarchy() {
+  return useQuery({
+    queryKey: [...CATEGORIES_KEY, 'hierarchy'],
+    queryFn: async () => {
+      const res = await api.get('/api/v1/categories', { params: { limit: 100 } });
+      if (res.data.success) {
+        const data = res.data.data;
+        if (!data) return [] as Category[];
+        const arr = Array.isArray(data) ? data : [];
+        const all = arr.map(transformCategory) as Category[];
+
+        const map = new Map<string, Category>();
+        const roots: Category[] = [];
+
+        for (const cat of all) {
+          map.set(cat.id, { ...cat, children: [] });
+        }
+        for (const cat of all) {
+          const node = map.get(cat.id)!;
+          if (cat.parentId && map.has(cat.parentId)) {
+            map.get(cat.parentId)!.children!.push(node);
+          } else {
+            roots.push(node);
+          }
+        }
+
+        return roots;
       }
       throw new Error(res.data.message || 'Failed to fetch categories');
     },
@@ -60,15 +95,36 @@ export function useCreateCategory() {
         name: data.name,
         image: data.image || '',
         internalLink: data.internalLink,
+        parentId: data.parentId || null,
         metaTitle: data.metaTitle || '',
         metaDescription: data.metaDescription || '',
         keywords: data.keywords || '',
       });
       if (!res.data.success) throw new Error(res.data.message || 'Failed to create category');
+
+      const parentId = res.data.data?.id;
+
+      if (parentId && data.subcategories && data.subcategories.length > 0) {
+        await Promise.all(
+          data.subcategories.map((subName) =>
+            api.post('/api/v1/categories', {
+              name: subName,
+              image: data.image || '',
+              internalLink: data.internalLink,
+              parentId,
+              metaTitle: data.metaTitle || '',
+              metaDescription: data.metaDescription || '',
+              keywords: data.keywords || '',
+            }),
+          ),
+        );
+      }
+
       return res.data;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: CATEGORIES_KEY });
+      qc.invalidateQueries({ queryKey: [...CATEGORIES_KEY, 'hierarchy'] });
       toast.success('Category created successfully!');
     },
     onError: (e) => onError(e, 'create category'),
@@ -78,21 +134,41 @@ export function useCreateCategory() {
 export function useUpdateCategory() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: CategoryFormData }) => {
+    mutationFn: async ({ id, data, existingSubNames = [] }: { id: string; data: CategoryFormData; existingSubNames?: string[] }) => {
       const res = await api.put(`/api/v1/categories/${id}`, {
         name: data.name,
         image: data.image || '',
         internalLink: data.internalLink,
         isActive: data.status === 'active',
+        parentId: data.parentId || null,
         metaTitle: data.metaTitle || '',
         metaDescription: data.metaDescription || '',
         keywords: data.keywords || '',
       });
       if (!res.data.success) throw new Error(res.data.message || 'Failed to update category');
+
+      const newSubs = (data.subcategories || []).filter((name) => !existingSubNames.includes(name));
+      if (newSubs.length > 0) {
+        await Promise.all(
+          newSubs.map((subName) =>
+            api.post('/api/v1/categories', {
+              name: subName,
+              image: data.image || '',
+              internalLink: data.internalLink,
+              parentId: id,
+              metaTitle: data.metaTitle || '',
+              metaDescription: data.metaDescription || '',
+              keywords: data.keywords || '',
+            }),
+          ),
+        );
+      }
+
       return res.data;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: CATEGORIES_KEY });
+      qc.invalidateQueries({ queryKey: [...CATEGORIES_KEY, 'hierarchy'] });
       toast.success('Category updated successfully!');
     },
     onError: (e) => onError(e, 'update category'),
@@ -109,6 +185,7 @@ export function useDeleteCategory() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: CATEGORIES_KEY });
+      qc.invalidateQueries({ queryKey: [...CATEGORIES_KEY, 'hierarchy'] });
       toast.success('Category deleted successfully!');
     },
     onError: (e) => onError(e, 'delete category'),
@@ -129,6 +206,7 @@ export function useBulkStatusToggle() {
             image: c.image,
             internalLink: c.internalLink || '',
             isActive: newStatus === 'active',
+            parentId: c.parentId || null,
             metaTitle: c.metaTitle || '',
             metaDescription: c.metaDescription || '',
             keywords: c.keywords || '',
@@ -139,6 +217,7 @@ export function useBulkStatusToggle() {
     },
     onSuccess: ({ count, newStatus }) => {
       qc.invalidateQueries({ queryKey: CATEGORIES_KEY });
+      qc.invalidateQueries({ queryKey: [...CATEGORIES_KEY, 'hierarchy'] });
       toast.success(`${count} categories ${newStatus === 'active' ? 'activated' : 'deactivated'}!`);
     },
     onError: (e) => onError(e, 'update categories'),
@@ -154,6 +233,7 @@ export function useBulkDeleteCategories() {
     },
     onSuccess: (deletedIds) => {
       qc.invalidateQueries({ queryKey: CATEGORIES_KEY });
+      qc.invalidateQueries({ queryKey: [...CATEGORIES_KEY, 'hierarchy'] });
       toast.success(`${deletedIds.length} categories deleted!`);
     },
     onError: (e) => onError(e, 'delete categories'),

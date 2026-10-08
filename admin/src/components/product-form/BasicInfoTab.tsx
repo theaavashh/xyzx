@@ -163,7 +163,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = React.memo(({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Product Code *
+                  SKU Code *
                 </label>
                 <input
                   type="text"
@@ -172,7 +172,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = React.memo(({
                   className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none text-black bg-gray-50 ${
                     errors.productCode ? 'border-red-500' : 'border-gray-300'
                   }`}
-                  placeholder="Enter product code"
+                  placeholder="e.g. RS291"
                 />
                 {errors.productCode && (
                   <p className="mt-1 text-sm text-red-600">{errors.productCode}</p>

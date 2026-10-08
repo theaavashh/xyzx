@@ -26,6 +26,7 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
+
     ],
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
@@ -44,10 +45,8 @@ const nextConfig: NextConfig = {
       'framer-motion',
       '@tanstack/react-query',
     ],
-  },
-
-  async rewrites() {
-    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9999';
+  },    async rewrites() {
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.rapharch.com.au';
     return [
       {
         source: '/api/:path*',
@@ -58,9 +57,8 @@ const nextConfig: NextConfig = {
         destination: `${apiBase}/uploads/:path*`,
       },
     ];
-  },
-
-  async redirects() {
+  },    async redirects() {
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.rapharch.com.au';
     return [
       {
         source: '/privacy-policy',

@@ -1,6 +1,7 @@
 export type { Category, CategoryApiResponse, CategoriesResponse, CreateCategoryResponse, UpdateCategoryResponse, DeleteCategoryResponse, UploadImageResponse } from './types';
 export {
   useCategories,
+  useCategoriesHierarchy,
   useCreateCategory,
   useUpdateCategory,
   useDeleteCategory,

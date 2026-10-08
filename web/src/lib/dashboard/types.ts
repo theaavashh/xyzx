@@ -31,6 +31,7 @@ export interface OrderItem {
   price: number;
   size?: string;
   color?: string;
+  sku?: string;
 }
 
 export interface Address {
@@ -46,11 +47,34 @@ export interface Address {
   isDefault: boolean;
 }
 
+export const ORDER_STATUSES = [
+  'pending',
+  'confirmed',
+  'processing',
+  'shipped',
+  'delivered',
+  'cancelled',
+  'refunded',
+] as const;
+
+export type OrderStatus = (typeof ORDER_STATUSES)[number] | 'returned';
+
+export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+  pending: 'Pending',
+  confirmed: 'Confirmed',
+  processing: 'Processing',
+  shipped: 'Shipped',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
+  refunded: 'Refunded',
+  returned: 'Returned',
+};
+
 export interface Order {
   id: string;
   orderNumber: string;
   date: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: OrderStatus;
   total: number;
   itemCount: number;
   items: OrderItem[];
@@ -59,6 +83,13 @@ export interface Order {
   paymentMethod: string;
   trackingNumber?: string;
   trackingUrl?: string;
+  subtotal?: number;
+  tax?: number;
+  shipping?: number;
+  email?: string;
+  notes?: string;
+  paymentStatus?: string;
+  adminNotes?: string;
 }
 
 export interface ReturnItem {

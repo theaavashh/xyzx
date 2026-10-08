@@ -10,6 +10,8 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:9
 class TokenRefreshManager {
   private isRefreshing = false;
   private refreshFailed = false;
+  private inFlight: Promise<string | null> | null = null;
+  private generation = 0;
   private failedQueue: Array<{
     resolve: (value: void) => void;
     reject: (reason?: unknown) => void;
@@ -26,33 +28,66 @@ class TokenRefreshManager {
     this.failedQueue = [];
   }
 
-  async refreshToken(): Promise<void> {
-    if (this.refreshFailed) {
-      throw new Error('Token refresh already failed');
+  /**
+   * Exchanges the httpOnly refresh cookie for a new access token.
+   * The request must send cookies (`withCredentials`) because the refresh
+   * token lives on the API origin; the access token is only used as an
+   * optimisation, never required - an expired one must not block renewal.
+   *
+   * Failures are only latched as fatal when the server rejects the refresh
+   * token itself (401/403). Transient network errors leave the session intact
+   * so it can be retried on the next request.
+   */
+  async refreshToken(options: { latchFailure?: boolean } = {}): Promise<string | null> {
+    if (this.inFlight) {
+      return this.inFlight;
     }
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/v1/auth/refresh`,
-        {},
-        { withCredentials: true },
-      );
 
-      if (response.status !== 200) {
-        this.refreshFailed = true;
-        queryClient.setQueryData(['profile'], null);
+    const run = async (): Promise<string | null> => {
+      const latchFailure = options.latchFailure !== false;
+      const generation = this.generation;
+      if (this.refreshFailed) {
+        throw new Error('Token refresh already failed');
+      }
+
+      try {
+        const response = await axios.post(
+          `${API_BASE_URL}/api/v1/auth/refresh`,
+          {},
+          {
+            withCredentials: true,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        );
+
+        const newAccessToken = response.data?.data?.accessToken;
+        if (response.data?.success === false || !newAccessToken) {
+          throw new Error('Token refresh returned no access token');
+        }
+        // `reset()` is called on sign-out; never resurrect a session that
+        // was deliberately ended while this request was in flight.
+        if (generation === this.generation) {
+          setAccessToken(newAccessToken);
+        }
+        return newAccessToken;
+      } catch (error) {
+        const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+        const isAuthFailure = status === 401 || status === 403;
+
+        if (isAuthFailure && latchFailure && generation === this.generation) {
+          this.refreshFailed = true;
+          queryClient.setQueryData(['profile'], null);
+        }
+
         throw new Error('Token refresh failed');
       }
+    };
 
-      // Store the new access token from the refresh response
-      const newAccessToken = response.data?.data?.accessToken;
-      if (newAccessToken) {
-        setAccessToken(newAccessToken);
-      }
-    } catch {
-      this.refreshFailed = true;
-      queryClient.setQueryData(['profile'], null);
-      throw new Error('Token refresh failed');
-    }
+    this.inFlight = run().finally(() => {
+      this.inFlight = null;
+    });
+
+    return this.inFlight;
   }
 
   async enqueueRequest(): Promise<void> {
@@ -77,6 +112,7 @@ class TokenRefreshManager {
     this.isRefreshing = false;
     this.refreshFailed = false;
     this.failedQueue = [];
+    this.generation += 1;
   }
 }
 
@@ -91,13 +127,10 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  // Use the stored access token (from login response) as Bearer auth.
-  // This bypasses CSRF entirely (the CSRF middleware skips when Bearer is present).
   const accessToken = getAccessToken();
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
-
   return config;
 });
 
@@ -139,7 +172,9 @@ api.interceptors.response.use(
         tokenRefreshManager.processQueue(
           refreshError instanceof Error ? refreshError : new Error('Unknown error'),
         );
-        if (typeof window !== 'undefined') {
+        // Only end the session when the refresh token itself was rejected.
+        // A network blip must not sign the admin out.
+        if (tokenRefreshManager.hasFailed() && typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('auth:401'));
         }
         return Promise.reject(error);

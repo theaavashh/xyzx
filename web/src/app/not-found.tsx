@@ -15,7 +15,7 @@ export default function NotFoundPage() {
         <span className="text-[150px] leading-none font-bold text-zinc-600 swansea select-none">
           404
         </span>
-        <h1 className=" text-2xl font-semibold text-zinc-600 mt-6 mb-3 uppercase swansea">
+        <h1 className=" text-2xl font-semibold text-zinc-600 mt-6 mb-3 uppercase bound-regular">
           Lost at sea?
         </h1>
         <p className="text-zinc-600 text-lg font-medium mt-5 mb-3">

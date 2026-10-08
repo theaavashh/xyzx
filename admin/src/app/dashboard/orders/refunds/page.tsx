@@ -67,7 +67,7 @@ export default function RefundsPage() {
 
         <OrderTable orders={orders} viewOrderDetails={viewOrderDetails} getStatusColor={getStatusColor}
           getPaymentStatusColor={getPaymentStatusColor} getStatusIcon={getStatusIcon}
-          formatCurrency={formatCurrency} formatDate={formatDate} />
+          formatCurrency={formatCurrency} formatDate={formatDate} onStatusChanged={loadOrders} />
         <OrderPaginationComponent pagination={pagination} setPagination={setPagination} />
 
         <AnimatePresence>

@@ -32,22 +32,44 @@ export const getCategoryBySlug = async (slug: string): Promise<Category | null> 
 };
 
 const generateSlug = (name: string): string =>
-  name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '') || 'category';
+
+const ensureUniqueSlug = async (baseSlug: string): Promise<string> => {
+  let slug = baseSlug;
+  let suffix = 2;
+  while (await categoryRepository.existsBySlug(slug)) {
+    slug = `${baseSlug}-${suffix++}`;
+  }
+  return slug;
+};
 
 export const createCategory = async (data: {
   name: string;
   slug?: string;
   image?: string;
   internalLink?: string;
+  parentId?: string | null;
   metaTitle?: string;
   metaDescription?: string;
   keywords?: string;
 }): Promise<Category> => {
-  const finalSlug = data.slug || generateSlug(data.name);
+  let finalSlug: string;
 
-  const slugExists = await categoryRepository.existsBySlug(finalSlug);
-  if (slugExists) {
-    throw new Error('Category with this slug already exists');
+  if (data.slug) {
+    const slugExists = await categoryRepository.existsBySlug(data.slug);
+    if (slugExists) {
+      throw new Error('Category with this slug already exists');
+    }
+    finalSlug = data.slug;
+  } else {
+    finalSlug = await ensureUniqueSlug(generateSlug(data.name));
+  }
+
+  if (data.parentId) {
+    const parentExists = await categoryRepository.existsById(data.parentId);
+    if (!parentExists) {
+      throw new Error('Parent category not found');
+    }
   }
 
   return categoryRepository.createCategory({
@@ -56,6 +78,7 @@ export const createCategory = async (data: {
     image: data.image || undefined,
     internalLink: data.internalLink || undefined,
     isActive: true,
+    ...(data.parentId ? { parent: { connect: { id: data.parentId } } } : {}),
     metaTitle: data.metaTitle || undefined,
     metaDescription: data.metaDescription || undefined,
     keywords: data.keywords || undefined,
@@ -70,6 +93,7 @@ export const updateCategory = async (
     image?: string | null;
     internalLink?: string | null;
     isActive?: boolean;
+    parentId?: string | null;
     metaTitle?: string | null;
     metaDescription?: string | null;
     keywords?: string | null;
@@ -78,6 +102,16 @@ export const updateCategory = async (
   const exists = await categoryRepository.existsById(id);
   if (!exists) {
     throw new Error('Category not found');
+  }
+
+  if (data.parentId) {
+    if (data.parentId === id) {
+      throw new Error('A category cannot be its own parent');
+    }
+    const parentExists = await categoryRepository.existsById(data.parentId);
+    if (!parentExists) {
+      throw new Error('Parent category not found');
+    }
   }
 
   const updateSlug = data.slug || (data.name ? generateSlug(data.name) : undefined);
@@ -98,6 +132,11 @@ export const updateCategory = async (
   if (data.image !== undefined) updateData.image = data.image;
   if (data.internalLink !== undefined) updateData.internalLink = data.internalLink;
   if (data.isActive !== undefined) updateData.isActive = data.isActive;
+  if (data.parentId !== undefined) {
+    updateData.parent = data.parentId
+      ? { connect: { id: data.parentId } }
+      : { disconnect: true };
+  }
   if (data.metaTitle !== undefined) updateData.metaTitle = data.metaTitle;
   if (data.metaDescription !== undefined) updateData.metaDescription = data.metaDescription;
   if (data.keywords !== undefined) updateData.keywords = data.keywords;

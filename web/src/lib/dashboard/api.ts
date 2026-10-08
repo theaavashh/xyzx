@@ -3,6 +3,7 @@ import type {
   DashboardStats,
   Order,
   OrderItem,
+  OrderStatus,
   ReturnItem,
   Cancellation,
   WishlistItem,
@@ -37,11 +38,14 @@ async function fetchPaginated<T>(
   const response = await safeRequest<{
     success: boolean;
     data: T[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
+    total?: number;
+    page?: number;
+    limit?: number;
+    totalPages?: number;
+    pagination?: { total?: number; page?: number; limit?: number; pages?: number };
   }>(url);
+
+  const pagination = response?.pagination;
 
   if (!response) {
     return { success: false, data: [], total: 0, page: 1, limit: params?.limit ?? 10, totalPages: 0 };
@@ -50,10 +54,10 @@ async function fetchPaginated<T>(
   return {
     success: response.success,
     data: response.data,
-    total: response.total,
-    page: response.page,
-    limit: response.limit,
-    totalPages: response.totalPages,
+    total: pagination?.total ?? response.total ?? 0,
+    page: pagination?.page ?? response.page ?? 1,
+    limit: pagination?.limit ?? response.limit ?? params?.limit ?? 10,
+    totalPages: pagination?.pages ?? response.totalPages ?? 0,
   };
 }
 
@@ -70,7 +74,7 @@ type ApiOrderItem = {
   price: number;
   size?: string | null;
   color?: string | null;
-  product?: { id: string; name: string; images?: string[] } | null;
+  product?: { id: string; name: string; sku?: string | null; images?: string[] } | null;
 };
 
 type ApiOrder = {
@@ -79,7 +83,14 @@ type ApiOrder = {
   status: string;
   total: number;
   createdAt: string;
+  subtotal?: number | null;
+  tax?: number | null;
+  shipping?: number | null;
+  notes?: string | null;
+  paymentStatus?: string | null;
   paymentMethod?: string | null;
+  adminNotes?: string | null;
+  shippingEmail?: string | null;
   trackingNumber?: string | null;
   trackingUrl?: string | null;
   shippingName?: string | null;
@@ -132,6 +143,7 @@ function mapApiOrder(api: ApiOrder): Order {
     price: oi.price,
     size: oi.size ?? undefined,
     color: oi.color ?? undefined,
+    sku: oi.product?.sku ?? undefined,
   }));
 
   return {
@@ -147,15 +159,43 @@ function mapApiOrder(api: ApiOrder): Order {
     paymentMethod: api.paymentMethod ?? 'N/A',
     trackingNumber: api.trackingNumber ?? undefined,
     trackingUrl: api.trackingUrl ?? undefined,
+    subtotal: api.subtotal ?? undefined,
+    tax: api.tax ?? undefined,
+    shipping: api.shipping ?? undefined,
+    email: api.shippingEmail ?? undefined,
+    notes: api.notes ?? undefined,
+    paymentStatus: api.paymentStatus ?? undefined,
+    adminNotes: api.adminNotes ?? undefined,
   };
 }
 
 export const fetchOrders = async (
   params?: PaginationParams,
+  scope: 'me' | 'all' = 'me',
 ): Promise<PaginatedResponse<Order>> => {
-  const result = await fetchPaginated<ApiOrder>('/api/v1/orders/me', params);
+  const endpoint = scope === 'all' ? '/api/v1/orders' : '/api/v1/orders/me';
+  const result = await fetchPaginated<ApiOrder>(endpoint, params);
   return { ...result, data: result.data.map(mapApiOrder) };
 };
+
+export async function updateOrderStatus(
+  orderId: string,
+  status: OrderStatus,
+  adminNotes?: string,
+): Promise<Order> {
+  const notes = adminNotes?.trim();
+  const response = await apiRequest<{ success: boolean; data: ApiOrder }>(
+    `/api/v1/orders/${orderId}/status`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({
+        status: status.toUpperCase(),
+        ...(notes ? { adminNotes: notes } : {}),
+      }),
+    },
+  );
+  return mapApiOrder(response.data);
+}
 export const fetchReturns = (params?: PaginationParams) => fetchPaginated<ReturnItem>('/api/v1/user/returns', params);
 export const fetchCancellations = (params?: PaginationParams) => fetchPaginated<Cancellation>('/api/v1/user/cancellations', params);
 export const fetchWishlist = (params?: PaginationParams) => fetchPaginated<WishlistItem>('/api/v1/user/wishlist', params);

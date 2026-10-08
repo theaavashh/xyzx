@@ -4,7 +4,9 @@ import { prisma } from '../lib/database';
 
 export interface ProductFilters {
   search?: string;
+  slug?: string;
   categoryId?: string;
+  categorySlug?: string;
   isActive?: boolean;
   isFeatured?: boolean;
   isNew?: boolean;
@@ -49,7 +51,11 @@ const buildWhereClause = (
       { sku: { contains: searchLower } },
     ];
   }
+  if (filters.slug) where.slug = filters.slug;
   if (filters.categoryId) where.categoryId = filters.categoryId;
+  if (filters.categorySlug) {
+    where.category = { slug: filters.categorySlug };
+  }
   if (filters.isActive !== undefined) where.isActive = filters.isActive;
   if (filters.isFeatured !== undefined) where.isFeatured = filters.isFeatured;
   if (filters.isNew !== undefined) where.isNew = filters.isNew;

@@ -3,6 +3,7 @@
 import type { Banner } from '../types';
 import { SITE_URL } from '../utils/constants';
 import { createJsonLdSchema, sanitizeBannerTitle } from '../utils/helpers';
+import { serializeJsonLd } from '@/lib/sanitize';
 import { CountdownTimer } from './CountdownTimer';
 
 interface TopBannerContentProps {
@@ -44,7 +45,7 @@ export function TopBannerContent({ banner }: TopBannerContentProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(createJsonLdSchema(banner, SITE_URL)),
+          __html: serializeJsonLd(createJsonLdSchema(banner, SITE_URL)),
         }}
       />
     </>

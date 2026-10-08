@@ -5,6 +5,8 @@ export interface Category {
   createdAt: string;
   status: 'active' | 'inactive';
   internalLink?: string;
+  parentId?: string | null;
+  children?: Category[];
   metaTitle?: string;
   metaDescription?: string;
   keywords?: string;
@@ -17,6 +19,8 @@ export interface CategoryApiResponse {
   createdAt?: string;
   isActive: boolean;
   internalLink?: string;
+  parentId?: string | null;
+  children?: CategoryApiResponse[];
   metaTitle?: string;
   metaDescription?: string;
   keywords?: string;

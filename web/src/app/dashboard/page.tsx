@@ -24,14 +24,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-16">
+    <div className="max-w-6xl mx-auto space-y-8">
       <div className="h-px bg-gray-100" />
 
       {/* Orders */}
       <section>
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-sm font-medium text-zinc-600 uppercase tracking-wider">Your Orders</h2>
-          <Link href="/dashboard/orders" className="text-sm text-zinc-600 uppercase tracking-wider hover:text-zinc-600 transition-colors">
+          <h2 className="bound-regular text-sm font-medium text-zinc-600 uppercase tracking-wider">Your Orders</h2>
+          <Link href="/dashboard/orders" className="bound-regular text-sm text-zinc-600 uppercase tracking-wider hover:text-zinc-600 transition-colors">
             View All
           </Link>
         </div>

@@ -6,9 +6,17 @@ import toast from 'react-hot-toast';
 import type { User } from '@/lib/dashboard/types';
 import { csrfHeaders } from '@/utils/csrf';
 
+export interface AuthResult {
+  success: boolean;
+  requiresOtp?: boolean;
+  error?: string;
+}
+
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<AuthResult>;
+  verifyOtp: (email: string, otp: string) => Promise<AuthResult>;
+  resendOtp: (email: string) => Promise<AuthResult>;
   signup: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   isLoading: boolean;
@@ -175,41 +183,88 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, [scheduleRefresh, clearRefreshTimer, setUserAndCache]);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const loadProfile = useCallback(async () => {
+    const profileRes = await fetchWithCredentials('/api/v1/auth/profile');
+    if (profileRes.ok) {
+      const profileData = await profileRes.json();
+      if (profileData.success && profileData.data) {
+        setUserAndCache(profileData.data);
+        scheduleRefresh();
+      }
+    }
+  }, [scheduleRefresh, setUserAndCache]);
+
+  const login = async (email: string, password: string): Promise<AuthResult> => {
     try {
       setIsLoading(true);
 
       const response = await fetchWithCredentials('/api/v1/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password, role: 'user' }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        return { success: false, error: data.message || 'Invalid email or password. Please try again.' };
       }
 
       if (data.data?.requiresOtp) {
-        return false;
+        return { success: false, requiresOtp: true };
       }
 
-      const profileRes = await fetchWithCredentials('/api/v1/auth/profile');
-      if (profileRes.ok) {
-        const profileData = await profileRes.json();
-        if (profileData.success && profileData.data) {
-          setUserAndCache(profileData.data);
-          scheduleRefresh();
-        }
-      }
-
-      return true;
+      await loadProfile();
+      return { success: true };
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Login failed';
-      toast.error(message);
-      return false;
+      return {
+        success: false,
+        error: err instanceof Error && err.message ? err.message : 'Login failed. Please try again.',
+      };
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const verifyOtp = async (email: string, otp: string): Promise<AuthResult> => {
+    try {
+      setIsLoading(true);
+
+      const response = await fetchWithCredentials('/api/v1/auth/verify-otp', {
+        method: 'POST',
+        body: JSON.stringify({ email, otp }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: data.message || 'Invalid or expired OTP. Please try again.' };
+      }
+
+      await loadProfile();
+      return { success: true };
+    } catch {
+      return { success: false, error: 'Unable to verify OTP. Please try again.' };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resendOtp = async (email: string): Promise<AuthResult> => {
+    try {
+      const response = await fetchWithCredentials('/api/v1/auth/resend-otp', {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: data.message || 'Unable to resend OTP. Please try again.' };
+      }
+
+      return { success: true };
+    } catch {
+      return { success: false, error: 'Unable to resend OTP. Please try again.' };
     }
   };
 
@@ -260,6 +315,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     () => ({
       user,
       login,
+      verifyOtp,
+      resendOtp,
       signup,
       logout,
       isLoading,

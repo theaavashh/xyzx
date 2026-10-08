@@ -5,7 +5,6 @@ import { verifyOtpRequest, resendOtpRequest, forgotPasswordRequest, tokenRefresh
 import { LoginFormData, UseLoginReturn, LoginStep } from '../types/login.types';
 import toast from 'react-hot-toast';
 import { queryClient } from '@/contexts/AuthContextTanStack';
-import { setCookie } from '@/utils/cookie';
 import { setAccessToken } from '@/utils/authToken';
 
 const RESEND_COOLDOWN_SECONDS = 30;
@@ -60,11 +59,7 @@ export function useLogin(): UseLoginReturn {
 
       if (result.success) {
         if (result.data?.accessToken) {
-          setCookie('accessToken', result.data.accessToken, 900);
           setAccessToken(result.data.accessToken);
-        }
-        if (result.data?.refreshToken) {
-          setCookie('refreshToken', result.data.refreshToken, 604800);
         }
         tokenRefreshManager.reset();
         queryClient.invalidateQueries({ queryKey: ['profile'] });

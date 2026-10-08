@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import type { NewInProduct } from './types';
+import type { NewInProduct, NewInVariant } from './types';
 import { NewInCard } from './components/NewInCard';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9999';
@@ -21,19 +21,32 @@ async function fetchNewInProducts(): Promise<NewInProduct[]> {
     if (!res.ok) return [];
     const json = await res.json();
     if (!json.success || !Array.isArray(json.data)) return [];
-    return json.data.map((p: any) => ({
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-      price: p.price,
-      originalPrice: p.originalPrice ?? undefined,
-      image: p.thumbnail || p.images?.[0] || '',
-      hoverImage: p.thumbnail || p.images?.[0] || '',
-      badge: p.isNew ? 'New' : p.isOnSale ? 'Sale' : undefined,
-      colors: (p.selectedColors || [])?.map((c: string) => ({ name: c, hex: c })),
-      patterns: (p.selectedPatterns || [])?.map((name: string) => ({ name })),
-      category: p.category ?? null,
-    }));
+    return json.data.map((p: any) => {
+      const variants = p.variants as NewInVariant[] | undefined;
+      const variantPrices = (variants ?? [])
+        .map((v) => v.price)
+        .filter((price): price is number => typeof price === 'number' && price > 0);
+      // Variant price wins when set; a variant price of 0 means "not priced yet".
+      const displayPrice = variantPrices.length > 0 ? Math.min(...variantPrices) : p.price ?? 0;
+      const firstVariant = variants?.[0];
+      const variantOriginal = firstVariant?.discountPrice ?? firstVariant?.comparePrice ?? null;
+      const hasVariantDiscount = typeof variantOriginal === 'number' && variantOriginal > displayPrice;
+
+      return {
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        price: displayPrice,
+        originalPrice: hasVariantDiscount ? variantOriginal : p.originalPrice ?? undefined,
+        image: p.thumbnail || p.images?.[0] || '',
+        hoverImage: p.thumbnail || p.images?.[0] || '',
+        badge: p.isNew ? 'New' : p.isOnSale ? 'Sale' : undefined,
+        colors: (p.selectedColors || [])?.map((c: string) => ({ name: c, hex: c })),
+        patterns: (p.selectedPatterns || [])?.map((name: string) => ({ name })),
+        category: p.category ?? null,
+        variants,
+      };
+    });
   } catch {
     return [];
   }

@@ -41,7 +41,6 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma ./node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma
 COPY --from=builder /app/src ./src
-COPY --from=builder /app/src/proto ./dist/proto
 COPY --from=builder /app/tsconfig.json ./
 
 RUN apk add --no-cache su-exec
@@ -55,7 +54,6 @@ EXPOSE 9999
 
 ENV NODE_ENV=production
 ENV PORT=9999
-ENV GRPC_PORT=50051
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:9999/api/v1/health || exit 1

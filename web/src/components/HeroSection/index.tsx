@@ -147,7 +147,7 @@ export default function HeroSection() {
           className={`text-white max-w-6xl xl:max-w-[90rem] w-full pointer-events-auto ${positionClasses(slides[current].position).inner}`}
         >
           {slides[current].title && (
-              <h1 className="bound-regular text-3xl md:text-5xl leading-tight drop-shadow-lg mb-6 uppercase tracking-wide font-extrabold">
+              <h1 className="bound-regular text-2xl md:text-4xl leading-tight drop-shadow-lg mb-6 uppercase tracking-wide font-extrabold">
                {slides[current].title}
              </h1>
           )}

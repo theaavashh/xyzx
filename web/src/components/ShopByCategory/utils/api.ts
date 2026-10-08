@@ -9,6 +9,7 @@ interface ApiCategory {
   image: string;
   internalLink: string;
   isActive: boolean;
+  parentId?: string | null;
 }
 
 interface ApiCategoryResponse {
@@ -17,7 +18,7 @@ interface ApiCategoryResponse {
 }
 
 export async function fetchCategories(): Promise<Category[]> {
-  const response = await fetch(`${API_BASE}/api/v1/categories?isActive=true`, {
+  const response = await fetch(`${API_BASE}/api/v1/categories?isActive=true&limit=100`, {
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
@@ -31,7 +32,7 @@ export async function fetchCategories(): Promise<Category[]> {
   if (!json.success || !json.data) return [];
 
   return json.data
-    .filter((cat) => cat.isActive !== false)
+    .filter((cat) => cat.isActive !== false && !cat.parentId)
     .map((cat, index) => ({
       id: cat.id,
       title: cat.name,

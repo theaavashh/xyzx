@@ -119,9 +119,9 @@ export default function DashboardLayout({
         </aside>
 
         <div className="lg:hidden bg-white border-b border-gray-100 px-6 py-8 sticky top-0 z-40">
-          <p className="text-2xl text-zinc-600 tracking-wide mb-1">Welcome, {user?.firstName || user?.username}</p>
+          <p className="bound-regular text-2xl text-zinc-600 tracking-wide mb-1">Welcome, {user?.firstName || user?.username}</p>
           <div className="flex items-center justify-between mt-4">
-            <h1 className="text-base font-medium text-zinc-600 uppercase tracking-wide">Dashboard</h1>
+            <h1 className="bound-regular text-base font-medium text-zinc-600 uppercase tracking-wide">Dashboard</h1>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-2 -mr-2"
@@ -143,7 +143,7 @@ export default function DashboardLayout({
         </div>
 
         <main className="flex-1">
-          <div className="px-6 sm:px-10 lg:px-16 py-10 lg:py-16">
+          <div className="px-6 sm:px-10 lg:px-16 pt-4 pb-8 lg:pt-6 lg:pb-12">
             {children}
           </div>
         </main>

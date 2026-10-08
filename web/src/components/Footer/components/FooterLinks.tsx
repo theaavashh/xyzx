@@ -77,33 +77,33 @@ export const FooterLinks = memo(function FooterLinks({ sections }: FooterLinksPr
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-12">
+    <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-12">
       {displaySections.map((section, index) => {
         const sectionId = section.id ?? `section-${index}`;
         const isOpen = openSections.includes(sectionId);
 
         return (
-          <div key={sectionId} className="border-b border-gray-300 md:border-b-0 pb-3 md:pb-0">
+          <div key={sectionId} className="border-b border-gray-300 sm:border-b-0 sm:pb-0">
             <button
               onClick={() => toggleSection(sectionId)}
-              className="flex items-center justify-between w-full text-left md:cursor-default py-2 md:py-0"
+              className="flex items-center justify-between w-full text-left sm:cursor-default py-1 sm:py-0"
             >
-              <h4 className="swansea text-base lg:text-lg font-extrabold text-zinc-900 tracking-wider uppercase">
+              <h4 className="bound-regular text-sm sm:text-base font-extrabold text-zinc-900 tracking-wider uppercase">
                 {section.title}
               </h4>
               {isOpen ? (
-                <Minus className="w-5 h-5 text-zinc-600 md:hidden" />
+                <Minus className="w-5 h-5 text-zinc-600 sm:hidden" />
               ) : (
-                <Plus className="w-5 h-5 text-zinc-600 md:hidden" />
+                <Plus className="w-5 h-5 text-zinc-600 sm:hidden" />
               )}
             </button>
-            <div className="hidden md:block">
+            <div className="hidden sm:block">
               <ul className="space-y-2 lg:space-y-3 mt-3" role="list">
                 {section.links.map((link, linkIndex) => (
                   <li key={link.id ?? `link-${index}-${linkIndex}`}>
                     <Link
                       href={link.href}
-                      className="text-base lg:text-xl text-zinc-600 hover:opacity-60 transition-opacity"
+                      className="text-base lg:text-lg text-zinc-600 hover:opacity-60 transition-opacity"
                     >
                       {link.name}
                     </Link>
@@ -111,7 +111,7 @@ export const FooterLinks = memo(function FooterLinks({ sections }: FooterLinksPr
                 ))}
               </ul>
             </div>
-            <div className="md:hidden">
+            <div className="sm:hidden">
               <AnimatePresence initial={false}>
                 {isOpen && (
                   <motion.ul
@@ -126,7 +126,7 @@ export const FooterLinks = memo(function FooterLinks({ sections }: FooterLinksPr
                       <li key={link.id ?? `link-${index}-${linkIndex}`}>
                         <Link
                           href={link.href}
-                          className="text-base lg:text-xl text-zinc-600 hover:opacity-60 transition-opacity"
+                          className="text-sm lg:text-xl text-zinc-600 hover:opacity-60 transition-opacity"
                         >
                           {link.name}
                         </Link>

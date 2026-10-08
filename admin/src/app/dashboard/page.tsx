@@ -3,7 +3,6 @@
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import DashboardLayout from '@/components/DashboardLayout';
-import ProtectedRoute from '@/components/ProtectedRoute';
 import KPICards from '@/components/dashboard/KPICards';
 import RecentSection from '@/components/dashboard/RecentSection';
 import TrafficAndProducts from '@/components/dashboard/TrafficAndProducts';
@@ -39,12 +38,10 @@ function DashboardContent() {
 
 export default function Dashboard() {
   return (
-    <ProtectedRoute>
-      <Suspense fallback={<div>Loading...</div>}>
-        <DashboardLayout>
-          <DashboardContent />
-        </DashboardLayout>
-      </Suspense>
-    </ProtectedRoute>
+    <Suspense fallback={<div>Loading...</div>}>
+      <DashboardLayout>
+        <DashboardContent />
+      </DashboardLayout>
+    </Suspense>
   );
 }

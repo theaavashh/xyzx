@@ -1,3 +1,14 @@
+export interface NewInVariant {
+  color?: string;
+  size?: string;
+  pattern?: string;
+  price?: number;
+  comparePrice?: number;
+  discountPrice?: number;
+  sku?: string;
+  quantity?: number;
+}
+
 export interface NewInProduct {
   id: number;
   name: string;
@@ -10,4 +21,5 @@ export interface NewInProduct {
   colors?: { name: string; hex: string }[];
   patterns?: { name: string }[];
   category?: { id: string; name: string; slug: string } | null;
+  variants?: NewInVariant[];
 }

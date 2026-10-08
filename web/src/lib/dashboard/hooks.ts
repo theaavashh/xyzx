@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import * as dashboardApi from './api';
-import type { PaginationParams, Address, WishlistItem } from './types';
+import type { PaginationParams, Address, WishlistItem, OrderStatus } from './types';
 
 const QUERY_KEYS = {
   dashboard: {
@@ -57,10 +57,10 @@ export const useDashboardStats = () => {
   });
 };
 
-export const useOrders = (params?: PaginationParams) => {
+export const useOrders = (params?: PaginationParams, scope: 'me' | 'all' = 'me') => {
   return useQuery({
-    queryKey: QUERY_KEYS.orders.list(params),
-    queryFn: () => dashboardApi.fetchOrders(params),
+    queryKey: [...QUERY_KEYS.orders.list(params), scope],
+    queryFn: () => dashboardApi.fetchOrders(params, scope),
     staleTime: SHORT_STALE_TIME,
     gcTime: DEFAULT_GC_TIME,
   });
@@ -73,6 +73,29 @@ export const useOrderById = (orderId: string) => {
     enabled: !!orderId,
     staleTime: SHORT_STALE_TIME,
     gcTime: DEFAULT_GC_TIME,
+  });
+};
+
+export const useUpdateOrderStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      status,
+      adminNotes,
+    }: {
+      id: string;
+      status: OrderStatus;
+      adminNotes?: string;
+    }) => dashboardApi.updateOrderStatus(id, status, adminNotes),
+    onSuccess: () => {
+      toast.success('Order status updated');
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders.all });
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, 'Failed to update order status'));
+    },
   });
 };
 

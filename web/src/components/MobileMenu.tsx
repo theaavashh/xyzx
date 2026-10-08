@@ -59,7 +59,7 @@ export default function MobileMenu({ isOpen, onClose, navItems, activeSubmenu, s
                       Back
                     </button>
 
-                    <p className="text-xl font-semibold text-zinc-600 mb-5 uppercase tracking-wide">
+                    <p className="text-lg font-semibold text-zinc-600 mb-5 uppercase tracking-wide">
                       {activeSubmenu}
                     </p>
 
@@ -67,10 +67,13 @@ export default function MobileMenu({ isOpen, onClose, navItems, activeSubmenu, s
                       {navItems
                         .find((item) => item.name === activeSubmenu)
                         ?.columns.map((col) => (
-                          <div key={col.title}>
+                          <div
+                            key={col.title}
+                            className="border-t border-zinc-200 py-3"
+                          >
                             <Link
                               href={col.href || '#'}
-                              className="block text-lg font-medium text-zinc-600 uppercase tracking-widest mb-3 hover:text-zinc-600 transition-colors"
+                              className="block text-base font-medium text-zinc-600 uppercase tracking-widest mb-3 hover:text-zinc-600 transition-colors"
                               onClick={onClose}
                             >
                               {col.title}
@@ -80,7 +83,7 @@ export default function MobileMenu({ isOpen, onClose, navItems, activeSubmenu, s
                                 <Link
                                   key={link.href}
                                   href={link.href}
-                                  className="block text-xl text-zinc-600 hover:text-zinc-600 transition-colors"
+                                  className="block text-base text-zinc-600 hover:text-zinc-600 transition-colors"
                                   onClick={onClose}
                                 >
                                   {link.label}
@@ -107,7 +110,7 @@ export default function MobileMenu({ isOpen, onClose, navItems, activeSubmenu, s
                           onClick={() => item.columns.length > 0 ? setActiveSubmenu(item.name) : onClose()}
                           className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-zinc-50 transition-colors text-left"
                         >
-                          <span className="text-xl font-medium text-zinc-800">{item.name}</span>
+                          <span className="text-lg font-medium text-zinc-800">{item.name}</span>
                           {item.columns.length > 0 && <HiChevronRight className="h-4 w-4 text-zinc-300" />}
                         </button>
                       ))}
@@ -121,7 +124,7 @@ export default function MobileMenu({ isOpen, onClose, navItems, activeSubmenu, s
               <div className="border-t border-zinc-100 px-5 py-4 space-y-3">
                 <Link
                   href="/contact-us"
-                  className="flex items-center gap-3 px-3 py-2.5 text-base text-zinc-600 hover:text-zinc-600 rounded-lg hover:bg-zinc-50 transition-colors"
+                  className="flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-600 hover:text-zinc-600 rounded-lg hover:bg-zinc-50 transition-colors"
                   onClick={onClose}
                 >
                   <HiPhone className="h-5 w-5" />
@@ -129,7 +132,7 @@ export default function MobileMenu({ isOpen, onClose, navItems, activeSubmenu, s
                 </Link>
                 <Link
                   href="/stores"
-                  className="flex items-center gap-3 px-3 py-2.5 text-base text-zinc-600 hover:text-zinc-600 rounded-lg hover:bg-zinc-50 transition-colors"
+                  className="flex items-center gap-3 px-3 py-2.5 text-sm text-zinc-600 hover:text-zinc-600 rounded-lg hover:bg-zinc-50 transition-colors"
                   onClick={onClose}
                 >
                   <HiMapPin className="h-5 w-5" />

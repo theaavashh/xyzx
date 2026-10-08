@@ -14,7 +14,7 @@ import StripeCheckoutForm from "@/components/StripeCheckoutForm";
 import type { CheckoutFormRef } from "@/components/StripeCheckoutForm";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContextTanStack";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:9999";
 
@@ -148,8 +148,12 @@ export default function CheckoutPage() {
         if (data.success) {
           setClientSecret(data.data.clientSecret);
         }
-      } catch {
-        setPaymentError("Failed to initialize payment. Please try again.");
+      } catch (error) {
+        setPaymentError(
+          error instanceof ApiError && error.message
+            ? error.message
+            : "Failed to initialize payment. Please try again.",
+        );
       } finally {
         setIsLoading(false);
       }
@@ -256,7 +260,7 @@ export default function CheckoutPage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        <h1 className="swansea text-3xl sm:text-4xl font-bold text-zinc-900 tracking-wide mb-10">Checkout</h1>
+        <h1 className="bound-regular text-3xl sm:text-4xl font-bold text-zinc-900 tracking-wide mb-10">Checkout</h1>
 
         <form onSubmit={handleSubmit(onValidSubmit)}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
@@ -303,7 +307,7 @@ export default function CheckoutPage() {
 
               {/* Delivery */}
               <div>
-                <h2 className="text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-4 pb-2 border-b border-neutral-100">Delivery Method</h2>
+                <h2 className="bound-regular text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-4 pb-2 border-b border-neutral-100">Delivery Method</h2>
                 <div className="grid grid-cols-2 bg-neutral-100 rounded-2xl p-1">
                   <button
                     type="button"
@@ -337,7 +341,7 @@ export default function CheckoutPage() {
 
               {/* Contact */}
               <div className="bg-gray-50 rounded-2xl p-5">
-                <h2 className="text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-4 pb-2 border-b border-neutral-100">Contact Information</h2>
+                <h2 className="bound-regular text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-4 pb-2 border-b border-neutral-100">Contact Information</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="relative">
                     <input
@@ -389,7 +393,7 @@ export default function CheckoutPage() {
                 <>
                   {/* Address */}
                   <div className="bg-gray-50 rounded-2xl p-5">
-                    <h2 className="text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-4 pb-2 border-b border-neutral-100">Shipping Address</h2>
+                    <h2 className="bound-regular text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-4 pb-2 border-b border-neutral-100">Shipping Address</h2>
                     <div className="space-y-4">
                       <div>
                         <label className={labelClass}>Country / Region</label>
@@ -452,7 +456,7 @@ export default function CheckoutPage() {
 
                   {/* Shipping Method */}
                   <div className="bg-gray-50 rounded-2xl p-5">
-                    <h2 className="text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-4 pb-2 border-b border-neutral-100">Shipping Method</h2>
+                    <h2 className="bound-regular text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-4 pb-2 border-b border-neutral-100">Shipping Method</h2>
                     <div className="space-y-3">
                       <label className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${shippingMethod === "standard" ? "border-black bg-neutral-50 shadow-sm" : "border-neutral-200 hover:border-neutral-300"}`}>
                         <div className="flex items-center gap-3">
@@ -511,7 +515,7 @@ export default function CheckoutPage() {
             {/* Right — Order Summary */}
             <div className="lg:col-span-5">
               <div className="bg-neutral-50 rounded-3xl p-6 lg:p-8 sticky top-24">
-                <h2 className="text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-6">Order Summary</h2>
+                <h2 className="bound-regular text-sm font-semibold text-zinc-900 uppercase tracking-widest mb-6">Order Summary</h2>
 
                 <div className="space-y-4 mb-6 max-h-72 overflow-y-auto">
                   {items.map((item) => (

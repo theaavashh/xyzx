@@ -1,17 +1,19 @@
 'use client';
 
-import { Package, Search, ChevronRight, Clock, CheckCircle2, XCircle, RotateCcw } from 'lucide-react';
+import { Package, Clock, CheckCircle2, XCircle, RotateCcw, BadgeCheck, Undo2 } from 'lucide-react';
 import Link from 'next/link';
 import { useOrders } from '@/lib/dashboard/hooks';
-import type { Order } from '@/lib/dashboard/types';
+import { useAuth } from '@/contexts/AuthContextTanStack';
 import { ErrorState } from '@/components/dashboard/ErrorState';
 
 const STATUS_CONFIG = {
   pending: { icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', label: 'Pending' },
+  confirmed: { icon: BadgeCheck, color: 'text-indigo-600', bg: 'bg-indigo-50', label: 'Confirmed' },
   processing: { icon: Clock, color: 'text-blue-600', bg: 'bg-blue-50', label: 'Processing' },
   shipped: { icon: Package, color: 'text-purple-600', bg: 'bg-purple-50', label: 'Shipped' },
   delivered: { icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50', label: 'Delivered' },
   cancelled: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-50', label: 'Cancelled' },
+  refunded: { icon: Undo2, color: 'text-rose-600', bg: 'bg-rose-50', label: 'Refunded' },
   returned: { icon: RotateCcw, color: 'text-zinc-600', bg: 'bg-gray-50', label: 'Returned' },
 };
 
@@ -27,7 +29,9 @@ function OrderSkeleton() {
 }
 
 export default function OrdersPage() {
-  const { data: ordersData, isLoading, error, refetch } = useOrders();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+  const { data: ordersData, isLoading, error, refetch } = useOrders(undefined, isAdmin ? 'all' : 'me');
 
   if (isLoading) {
     return <OrderSkeleton />;
@@ -43,8 +47,12 @@ export default function OrdersPage() {
     <div className="space-y-8 mt-5">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className={`swansea text-4xl font-medium text-zinc-600 uppercase`}>My Orders</h1>
-          <p className="text-xl text-zinc-600 mt-1">Track and manage your orders</p>
+          <h1 className="bound-regular text-2xl font-medium text-zinc-600 uppercase">
+            {isAdmin ? 'All Orders' : 'My Orders'}
+          </h1>
+          <p className="text-xl text-zinc-600 mt-1">
+            {isAdmin ? 'Review and update order status' : 'Track and manage your orders'}
+          </p>
         </div>
       </div>
 
@@ -54,10 +62,16 @@ export default function OrdersPage() {
             <Package className="h-8 w-8 text-zinc-600" />
           </div>
           <h3 className="text-xl font-medium text-zinc-600 mb-2">No orders yet</h3>
-          <p className="text-base text-zinc-600 mb-8">You haven&apos;t placed any orders with us yet.</p>
-          <Link href="/products" className="inline-flex items-center px-8 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors">
-            Start Shopping
-          </Link>
+          <p className="text-base text-zinc-600 mb-8">
+            {isAdmin
+              ? 'There are no orders to manage yet.'
+              : "You haven't placed any orders with us yet."}
+          </p>
+          {!isAdmin && (
+            <Link href="/products" className="inline-flex items-center px-8 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors">
+              Start Shopping
+            </Link>
+          )}
         </div>
       ) : (
         <div className="space-y-6">

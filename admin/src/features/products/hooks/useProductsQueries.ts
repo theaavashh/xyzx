@@ -204,7 +204,7 @@ export function useCategoriesForProducts() {
   return useQuery({
     queryKey: ['categories-for-products'],
     queryFn: async () => {
-      const res = await api.get<any>('/api/v1/categories');
+      const res = await api.get<any>('/api/v1/categories/hierarchy');
       if (res.data.success) {
         const categoriesData = res.data.data;
         if (!categoriesData) return [] as CategoryFilterItem[];
